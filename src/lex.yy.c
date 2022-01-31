@@ -1927,9 +1927,25 @@ int main() {
       int val, total = 0, n = 0;
       while ( (val = yylex()) > 0 ) {
            switch(val){
-             case 1042: printf("ID\t%s\t%d\t%d\n", yytext , row , column);column+=yyleng;break;
-             case 1024: printf("BREAK\t%s\t%d\t%d\n", yytext , row , column);column+=yyleng;break;
-             case 1041: printf("NEWLINE\t\\n\t%d\t%d\n" , row , column);row++ ; column+=yyleng;break;
+            case 1024: printf("BREAK\t%s\t%d\t%d\n", yytext , row , column);column+=yyleng;break;
+            case 1025: printf("FUNC\t%s\t%d\t%d\n", yytext , row , column);column+=yyleng;break;
+            case 1026: printf("VARCASE\t%s\t%d\t%d\n", yytext , row , column);column+=yyleng;break;
+            case 1027: printf("STRUCT\t%s\t%d\t%d\n", yytext , row , column);column+=yyleng;break;
+            case 1028: printf("RETURN\t%s\t%d\t%d\n", yytext , row , column);column+=yyleng;break;
+            case 1029: printf("ELSE\t%s\t%d\t%d\n", yytext , row , column);column+=yyleng;break;
+            case 1030: printf("GOTO\t%s\t%d\t%d\n", yytext , row , column);column+=yyleng;break;
+            case 1031: printf("PACKAGE\t%s\t%d\t%d\n", yytext , row , column);column+=yyleng;break;
+            case 1032: printf("CONST\t%s\t%d\t%d\n", yytext , row , column);column+=yyleng;break;
+            case 1033: printf("IF\t%s\t%d\t%d\n", yytext , row , column);column+=yyleng;break;
+            case 1034: printf("RANGE\t%s\t%d\t%d\n", yytext , row , column);column+=yyleng;break;
+            case 1035: printf("CONTINUE\t%s\t%d\t%d\n", yytext , row , column);column+=yyleng;break;
+            case 1036: printf("FOR\t%s\t%d\t%d\n", yytext , row , column);column+=yyleng;break;
+            case 1037: printf("OPERATOR\t%s\t%d\t%d\n", yytext , row , column);column+=yyleng;break;
+            case 1038: printf("IMPORT\t%s\t%d\t%d\n", yytext , row , column);column+=yyleng;break;
+            case 1039: printf("SPACE\t%s\t%d\t%d\n", yytext , row , column);column+=yyleng;break;
+            case 1040: printf("TAB\t%s\t%d\t%d\n", yytext , row , column);column+=yyleng;break;
+            case 1041: printf("NEWLINE\t\\n\t%d\t%d\n" , row , column);row++ ; column+=yyleng;break;
+            case 1042: printf("ID\t%s\t%d\t%d\n", yytext , row , column);column+=yyleng;break;
            }
            
       }
