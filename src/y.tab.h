@@ -12,5 +12,10 @@ enum KEYWORD {
     RANGE,
     CONTINUE,
     FOR,
-    IMPORT
-}
+    OPERATOR,
+    IMPORT,
+    SPACE,
+    TAB,
+    NEWLINE,
+    ID
+};
