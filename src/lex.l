@@ -62,11 +62,12 @@ void yyerror(char *s) {
 int main() {
       int val, total = 0, n = 0;
       while ( (val = yylex()) > 0 ) {
-           /*switch(val){
-             case 1042: printf("ID\t%s\t%d\t%d", &yytext() , &row , &column);
-
-           }*/
-           printf("Token %d Found\n", val);
+           switch(val){
+             case 1042: printf("ID\t%s\t%d\t%d\n", yytext , row , column);column+=yyleng;break;
+             case 1024: printf("BREAK\t%s\t%d\t%d\n", yytext , row , column);column+=yyleng;break;
+             case 1041: printf("NEWLINE\t\\n\t%d\t%d\n" , row , column);row++ ; column+=yyleng;break;
+           }
+           
       }
       printf("BYE\n");
 }
