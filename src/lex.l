@@ -1,8 +1,9 @@
 %{
 #include <stdio.h>
 #include "y.tab.h"
-void yyerror (char *s);
+void yyerror(char *s);
 int yylex();
+int row = 1, column = 1;
 %}
 
 letter [a-zA-Z_]
@@ -28,10 +29,11 @@ newline [\n]
 "import" { return IMPORT; }
 
 
-{letter} ( {letter} | {digit} )*     { return ID; }
+{letter}({letter}|{digit})*     { //yylval.id = strdup(yytext);
+                                  return ID; }
 
-{digit}+       { // yylval.num = atoi(yytext); 
-                 return CONSTANT; }
+{digit}+       { //yylval.num = atoi(yytext); 
+                 return CONST; }
 [+\-/\*%]       { // yylval.num = atoi(yytext); 
                  return OPERATOR; }
 [&|!\^]        { // yylval.num = atoi(yytext); 
@@ -60,6 +62,10 @@ void yyerror(char *s) {
 int main() {
       int val, total = 0, n = 0;
       while ( (val = yylex()) > 0 ) {
+           /*switch(val){
+             case 1042: printf("ID\t%s\t%d\t%d", &yytext() , &row , &column);
+
+           }*/
            printf("Token %d Found\n", val);
       }
       printf("BYE\n");
