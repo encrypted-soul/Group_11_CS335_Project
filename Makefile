@@ -1,10 +1,21 @@
-# Format all cpp file using clang-format before compiling
-all: build
+SOURCE_DIR="./src"
+TEST_DIR="./test"
 
-buildc: src/lex_c.l
-	flex -o src/lex.yy.c src/lex_c.l
-	gcc src/lex.yy.c -lfl -o src/lex_c.o
+all: build
 
 build: src/lex.l 
 	flex -+ -o src/lex.yy.cc src/lex.l
 	g++ src/lex.yy.cc -lfl -o src/lex.o
+
+clean:
+	rm -f $(SOURCE_DIR)/*.o
+	rm -rf $(TEST_DIR)/lex/output
+
+# TODOs: 
+# 1. Automate testing: write input, output and compare automatically
+#                       ( ? Use github actions )
+# 2. Format files: Avoids unnecessary changes. Use:
+#                  a) TERMINAL: clang-format -i FILE_TO_FORMAT
+#                  b) VSCODE: Install clang-format extension
+#                             Configure default formatter as clang-format
+#                             Ctrl + Shift + I

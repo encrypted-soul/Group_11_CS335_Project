@@ -36,6 +36,7 @@ enum KEYWORD {
     STRING_LIT,
     BINARY_LIT,
     HEX_LIT,
-    FLOAT_LIT
+    FLOAT_LIT,
+    DEC_LIT
 };
 

@@ -853,7 +853,7 @@ YY_RULE_SETUP
 case 31:
 YY_RULE_SETUP
 #line 53 "src/lex.l"
-{return CONST;}
+{return DEC_LIT;}
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
@@ -2031,9 +2031,11 @@ int main()
     case 1060:
     	cout<<"FLOAT_LIT"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
       break; 
+    case 1061:
+      cout<<"DEC_LIT"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
+      break;
     }
     column+=lexer->YYLeng();
   }
-  printf("BYE\n");
 }
 

@@ -50,7 +50,7 @@ newline [\n]
 {letter}({letter}|{dec_digit})*     { //yylval.id = strdup(lexer->YYText());
                                   return ID; }
 
-{dec_digit}+ {return CONST;}
+{dec_digit}+ {return DEC_LIT;}
 (0)[bB]{binary_digit}+ {return BINARY_LIT;}
 (0)[xX]{hex_digit}+ {return HEX_LIT;}
 {dec_digit}*+"."{dec_digit}+|{dec_digit}*+"."{dec_digit}*+[eE][-+]?{dec_digit}*|{dec_digit}*+[eE][-+    ]?{dec_digit}*|"."{dec_digit}*+[eE][-+]?{dec_digit}*  { return FLOAT_LIT;} 
@@ -204,8 +204,10 @@ int main()
     case 1060:
     	cout<<"FLOAT_LIT"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
       break; 
+    case 1061:
+      cout<<"DEC_LIT"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
+      break;
     }
     column+=lexer->YYLeng();
   }
-  printf("BYE\n");
 }
