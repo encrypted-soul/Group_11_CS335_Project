@@ -53,7 +53,7 @@ newline [\n]
 {dec_digit}+ {return CONST;}
 (0)[bB]{binary_digit}+ {return BINARY_LIT;}
 (0)[xX]{hex_digit}+ {return HEX_LIT;}
-
+{dec_digit}*+"."{dec_digit}+|{dec_digit}*+"."{dec_digit}*+[eE][-+]?{dec_digit}*|{dec_digit}*+[eE][-+    ]?{dec_digit}*|"."{dec_digit}*+[eE][-+]?{dec_digit}*  { return FLOAT_LIT;} 
 \"(\\.|[^"\\])*\"	{ return STRING_LIT; }
 
 [+\-/\*%]       { // yylval.num = atoi(lexer->YYText());
