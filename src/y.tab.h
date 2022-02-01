@@ -33,6 +33,9 @@ enum KEYWORD {
     BYTE,
     TRUE,
     FALSE,
-    STRING,
+    STRING_LIT,
+    BINARY_LIT,
+    HEX_LIT,
+    FLOAT_LIT
 };
 

@@ -8,7 +8,9 @@ int row = 1, column = 1;
 %}
 %option noyywrap 
 letter [a-zA-Z_]
-digit [0-9]
+dec_digit [0-9]
+binary_digit [01]
+hex_digit [0-9a-fA-F]
 ws [ ]
 tab [\t]
 newline [\n]
@@ -43,13 +45,16 @@ newline [\n]
 "byte" { return BYTE; }
 "true" { return TRUE; }
 "false" { return FALSE; }
-"string" { return STRING; }
+"string" { return STRING_LIT; }
 
-
-{letter}({letter}|{digit})*     { //yylval.id = strdup(lexer->YYText());
+{letter}({letter}|{dec_digit})*     { //yylval.id = strdup(lexer->YYText());
                                   return ID; }
 
-\"(\\.|[^"\\])*\"	{ return STRING; }
+{dec_digit}+ {return CONST;}
+(0)[bB]{binary_digit}+ {return BINARY_LIT;}
+(0)[xX]{hex_digit}+ {return HEX_LIT;}
+
+\"(\\.|[^"\\])*\"	{ return STRING_LIT; }
 
 [+\-/\*%]       { // yylval.num = atoi(lexer->YYText());
 			//cout<<lexer->YYText()<<"\n"; 
@@ -188,11 +193,17 @@ int main()
     	cout<<"FALSE"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
       break;
     case 1057:
-    	cout<<"STRING"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
+    	cout<<"STRING_LIT"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
       break;
     case 1058:
-    	cout<<"STRUCT"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
-      break;    
+    	cout<<"BINARY_LIT"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
+      break;  
+    case 1059:
+    	cout<<"HEX_LIT"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
+      break; 
+    case 1060:
+    	cout<<"FLOAT_LIT"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
+      break; 
     }
     column+=lexer->YYLeng();
   }
