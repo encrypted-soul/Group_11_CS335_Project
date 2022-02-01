@@ -1,4 +1,5 @@
 enum KEYWORD {
+    CASE=1023,
     BREAK=1024,
     FUNC=1025,
     VARCASE=1026,
@@ -17,6 +18,21 @@ enum KEYWORD {
     SPACE=1039,
     TAB=1040,
     NEWLINE=1041,
-    ID=1042
+    ID=1042,
+    VAR=1043,
+    INT8,
+    INT16,
+    INT32,
+    INT64,
+    UINT8,
+    UINT16,
+    UINT32,
+    UINT64,
+    FLOAT32,
+    FLOAT64,
+    BYTE,
+    TRUE,
+    FALSE,
+    STRING,
 };
 
