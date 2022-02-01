@@ -1,11 +1,12 @@
 %{
-#include <stdio.h>
+#include<iostream>
+using namespace std;
 #include "y.tab.h"
-void yyerror(char *s);
+void yyerror(string s);
 int yylex();
 int row = 1, column = 1;
 %}
-
+%option noyywrap 
 letter [a-zA-Z_]
 digit [0-9]
 ws [ ]
@@ -45,22 +46,23 @@ newline [\n]
 "string" { return STRING; }
 
 
-{letter}({letter}|{digit})*     { //yylval.id = strdup(yytext);
+{letter}({letter}|{digit})*     { //yylval.id = strdup(lexer->YYText());
                                   return ID; }
 
 \"(\\.|[^"\\])*\"	{ return STRING; }
 
-[+\-/\*%]       { // yylval.num = atoi(yytext); 
+[+\-/\*%]       { // yylval.num = atoi(lexer->YYText());
+			//cout<<lexer->YYText()<<"\n"; 
                  return OPERATOR; }
-[&|!\^]        { // yylval.num = atoi(yytext); 
+[&|!\^]        { // yylval.num = atoi(lexer->YYText()); 
                  return OPERATOR; }
-[<>=]          { // yylval.num = atoi(yytext); 
+[<>=]          { // yylval.num = atoi(lexer->YYText()); 
                  return OPERATOR; }
-[()\[\]\{\}]   { // yylval.num = atoi(yytext); 
+[()\[\]\{\}]   { // yylval.num = atoi(lexer->YYText()); 
                  return OPERATOR; }
-[\"\',;]       { // yylval.num = atoi(yytext); 
+[\"\',;]       { // yylval.num = atoi(lexer->YYText()); 
                  return OPERATOR; }
-[.]            { // yylval.num = atoi(yytext); 
+[.]            { // yylval.num = atoi(lexer->YYText()); 
                  return OPERATOR; }
 
 {ws}           { return SPACE; }    // +1 column
@@ -73,124 +75,126 @@ newline [\n]
 
 %%
 
-void yyerror(char *s) {
-    printf("ERROR %s\n", s);
+void yyerror(string s) {
+	cout<<"ERROR: "<<s<<"\n";
 }
 
 int main()
 {
+  FlexLexer* lexer = new yyFlexLexer;
   int val, total = 0, n = 0;
-  while ((val = yylex()) > 0)
+  while ((val = lexer->yylex()) > 0)
   {
     switch (val)
     {
     case 1023:
-      printf("CASE\t%s\t%d\t%d\n", yytext, row, column);
+      cout<<"CASE"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
       break;
     case 1024:
-      printf("BREAK\t%s\t%d\t%d\n", yytext, row, column);
+      cout<<"BREAK"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";	
       break;
     case 1025:
-      printf("FUNC\t%s\t%d\t%d\n", yytext, row, column);
+      cout<<"FUNC"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
       break;
     case 1026:
-      printf("VAR\t%s\t%d\t%d\n", yytext, row, column);
+      cout<<"VAR"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
       break;
     case 1027:
-      printf("STRUCT\t%s\t%d\t%d\n", yytext, row, column);
+      cout<<"STRUCT"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
       break;
     case 1028:
-      printf("RETURN\t%s\t%d\t%d\n", yytext, row, column);
+    	cout<<"RETURN"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
       break;
     case 1029:
-      printf("ELSE\t%s\t%d\t%d\n", yytext, row, column);
+    	cout<<"ELSE"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
       break;
     case 1030:
-      printf("GOTO\t%s\t%d\t%d\n", yytext, row, column);
+    	cout<<"GOTO"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
       break;
     case 1031:
-      printf("PACKAGE\t%s\t%d\t%d\n", yytext, row, column);
+    	cout<<"PACKAGE"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
       break;
     case 1032:
-      printf("CONST\t%s\t%d\t%d\n", yytext, row, column);
+    	cout<<"CONST"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
       break;
     case 1033:
-      printf("IF\t%s\t%d\t%d\n", yytext, row, column);
+    	cout<<"IF"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
       break;
     case 1034:
-      printf("RANGE\t%s\t%d\t%d\n", yytext, row, column);
+    	cout<<"RANGE"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
       break;
     case 1035:
-      printf("CONTINUE\t%s\t%d\t%d\n", yytext, row, column);
+    	cout<<"CONTINUE"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
       break;
     case 1036:
-      printf("FOR\t%s\t%d\t%d\n", yytext, row, column);
+    	cout<<"FOR"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
       break;
     case 1037:
-      printf("%s\t%s\t%d\t%d\n", yytext, yytext, row, column);
+    	cout<< lexer->YYText() <<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
+      //printf("%s\t%s\t%d\t%d\n", lexer->YYText(), lexer->YYText(), row, column);
       break;
     case 1038:
-      printf("IMPORT\t%s\t%d\t%d\n", yytext, row, column);
+    	cout<<"IMPORT"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
       break;
     case 1040: column+=3; break;
     case 1041: row++; column=0; break; //will be updated with yyleng
     case 1042:
-      printf("ID\t%s\t%d\t%d\n", yytext, row, column);
+    	cout<<"ID"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
       break;
-    case 1043: 
-      printf("VAR\t%s\t%d\t%d\n", yytext, row, column);
-      break;
-
-    case 1044: 
-      printf("INT8\t%s\t%d\t%d\n", yytext, row, column);
-      break;
-    case 1045: 
-      printf("INT16\t%s\t%d\t%d\n", yytext, row, column);
-      break;
-    case 1046: 
-      printf("INT32\t%s\t%d\t%d\n", yytext, row, column);
-      break;
-    case 1047: 
-      printf("INT64\t%s\t%d\t%d\n", yytext, row, column);
+    case 1043:
+    	cout<<"VAR"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
       break;
 
-    case 1048: 
-      printf("UINT8\t%s\t%d\t%d\n", yytext, row, column);
+    case 1044:
+    	cout<<"INT8"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
       break;
-    case 1049: 
-      printf("UINT16\t%s\t%d\t%d\n", yytext, row, column);
+    case 1045:
+    	cout<<"INT16"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
       break;
-    case 1050: 
-      printf("UINT32\t%s\t%d\t%d\n", yytext, row, column);
+    case 1046:
+    	cout<<"INT32"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
       break;
-    case 1051: 
-      printf("UINT64\t%s\t%d\t%d\n", yytext, row, column);
-      break;
-
-    case 1052: 
-      printf("FLOAT32\t%s\t%d\t%d\n", yytext, row, column);
-      break;
-    case 1053: 
-      printf("FLOAT64\t%s\t%d\t%d\n", yytext, row, column);
+    case 1047:
+    	cout<<"INT64"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
       break;
 
-    case 1054: 
-      printf("BYTE\t%s\t%d\t%d\n", yytext, row, column);
+    case 1048:
+    	cout<<"UINT8"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
       break;
-    case 1055: 
-      printf("TRUE\t%s\t%d\t%d\n", yytext, row, column);
+    case 1049:
+    	cout<<"UINT16"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
       break;
-    case 1056: 
-      printf("FALSE\t%s\t%d\t%d\n", yytext, row, column);
+    case 1050:
+    	cout<<"UINT32"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
       break;
-    case 1057: 
-      printf("STRING\t%s\t%d\t%d\n", yytext, row, column);
+    case 1051:
+    	cout<<"UINT64"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
       break;
-    case 1058: 
-      printf("STRUCT\t%s\t%d\t%d\n", yytext, row, column);
+
+    case 1052:
+    	cout<<"FLOAT32"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
+      break;
+    case 1053:
+    	cout<<"FLOAT64"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
+      break;
+
+    case 1054:
+    	cout<<"BYTE"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
+      break;
+    case 1055:
+    	cout<<"TRUE"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
+      break;
+    case 1056:
+    	cout<<"FALSE"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
+      break;
+    case 1057:
+    	cout<<"STRING"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
+      break;
+    case 1058:
+    	cout<<"STRUCT"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
       break;    
     }
-    column+=yyleng;
+    column+=lexer->YYLeng();
   }
   printf("BYE\n");
 }
