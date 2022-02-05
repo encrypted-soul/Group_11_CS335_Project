@@ -1,5 +1,8 @@
 # cs335--compiler-design
 Project for the course CS335, Spring 2022
+Source Language - Golang
+Implementation Language - C++
+Target Language - MIPS
 
 ## Milestone 2 - Lexical Analysis
 
