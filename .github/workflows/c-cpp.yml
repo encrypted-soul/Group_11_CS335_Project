@@ -13,5 +13,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: install
+      run: sudo apt-get install libfl-dev
     - name: make
       run: make
