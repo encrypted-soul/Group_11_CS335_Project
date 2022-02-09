@@ -1,0 +1,4 @@
+-   repo: https://github.com/gagan-aryan/Group_11_CS335_Project
+    rev: ''  # Use the sha / tag you want to point at
+    hooks:
+            -   id: clang-format
