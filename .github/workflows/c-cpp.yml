@@ -17,3 +17,5 @@ jobs:
       run: sudo apt-get install libfl-dev
     - name: make
       run: make
+    - name: clang
+      run: sudo apt install clang-format
