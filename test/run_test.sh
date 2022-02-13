@@ -29,7 +29,7 @@ for TEST_FILE in ${TEST_DIR}/*
 do 
     if [ -d ${TEST_FILE} ]; then continue; fi;
     # constant.go -> constant.output.txt
-    TEST_OUTPUT_FILE=${TEST_OUTPUT_DIR}/$(basename -a $TEST_FILE).output.txt
+    TEST_OUTPUT_FILE=${TEST_OUTPUT_DIR}/$(basename $TEST_FILE .go).output.txt
     rm -f ${TEST_OUTPUT_FILE} 
     ${SOURCE_DIR}/${TEST_CLASS}.o < ${TEST_FILE} > ${TEST_OUTPUT_FILE}
 done
