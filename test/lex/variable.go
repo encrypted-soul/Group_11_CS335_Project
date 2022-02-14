@@ -13,6 +13,6 @@ func main() {
     var d = true
     fmt.Println(d)
 
-    f = "apple"
+    var f = "apple"
     fmt.Println(f)
 }

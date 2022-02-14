@@ -5,16 +5,19 @@ using namespace std;
 void yyerror(string s);
 int yylex();
 int row = 1, column = 1;
+char ** a[256] = ["FLOAT", "HEX", ]
 %}
+
 %option noyywrap 
 letter [a-zA-Z_]
 dec_digit [0-9]
 binary_digit [01]
-hex_digit [0-9a-fA-F]
+hex_digit [[:xdigit:]]
 ws [ ]
 tab [\t]
 newline [\n]
 
+// TODO: define GE, LE, NE, EQ
 %%
 "break"  { return BREAK; }
 "func" { return FUNC; }
@@ -50,10 +53,14 @@ newline [\n]
 {letter}({letter}|{dec_digit})*     { //yylval.id = strdup(lexer->YYText());
                                   return ID; }
 
+// TODO: Define YYLTYPE as union and Assign relevant values to yylval
+// For integer values use strtol() function with relevant base
 {dec_digit}+ {return DEC_LIT;}
 (0)[bB]{binary_digit}+ {return BINARY_LIT;}
 (0)[xX]{hex_digit}+ {return HEX_LIT;}
 {dec_digit}*+"."{dec_digit}+|{dec_digit}*+"."{dec_digit}*+[eE][-+]?{dec_digit}*|{dec_digit}*+[eE][-+    ]?{dec_digit}*|"."{dec_digit}*+[eE][-+]?{dec_digit}*  { return FLOAT_LIT;} 
+
+// TODO: Use BEGIN for recognizing string
 \"(\\.|[^"\\])*\"	{ return STRING_LIT; }
 
 [+\-/\*%]       { // yylval.num = atoi(lexer->YYText());
@@ -84,6 +91,9 @@ void yyerror(string s) {
 	cout<<"ERROR: "<<s<<"\n";
 }
 
+// TODO: Use macro in place of macro values e.g. 1059 -> HEX_LIT because we are going to use
+// TODO: yacc generated y.tab.h file so we should not depend on the numbers assigned to macros
+// TODO: Find Alternative way to print information about token rather than using switch-case 
 int main()
 {
   FlexLexer* lexer = new yyFlexLexer;
