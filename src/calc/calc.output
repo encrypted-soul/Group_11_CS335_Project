@@ -1,0 +1,178 @@
+Grammar
+
+    0 $accept: program $end
+
+    1 program: program expression '\n'
+    2        | %empty
+
+    3 expression: INTEGER
+    4           | expression '+' expression
+    5           | expression '-' expression
+    6           | expression '*' expression
+    7           | expression '/' expression
+
+
+Terminals, with rules where they appear
+
+    $end (0) 0
+    '\n' (10) 1
+    '*' (42) 6
+    '+' (43) 4
+    '-' (45) 5
+    '/' (47) 7
+    error (256)
+    INTEGER (258) 3
+
+
+Nonterminals, with rules where they appear
+
+    $accept (9)
+        on left: 0
+    program (10)
+        on left: 1 2
+        on right: 0 1
+    expression (11)
+        on left: 3 4 5 6 7
+        on right: 1 4 5 6 7
+
+
+State 0
+
+    0 $accept: • program $end
+
+    $default  reduce using rule 2 (program)
+
+    program  go to state 1
+
+
+State 1
+
+    0 $accept: program • $end
+    1 program: program • expression '\n'
+
+    $end     shift, and go to state 2
+    INTEGER  shift, and go to state 3
+
+    expression  go to state 4
+
+
+State 2
+
+    0 $accept: program $end •
+
+    $default  accept
+
+
+State 3
+
+    3 expression: INTEGER •
+
+    $default  reduce using rule 3 (expression)
+
+
+State 4
+
+    1 program: program expression • '\n'
+    4 expression: expression • '+' expression
+    5           | expression • '-' expression
+    6           | expression • '*' expression
+    7           | expression • '/' expression
+
+    '+'   shift, and go to state 5
+    '-'   shift, and go to state 6
+    '*'   shift, and go to state 7
+    '/'   shift, and go to state 8
+    '\n'  shift, and go to state 9
+
+
+State 5
+
+    4 expression: expression '+' • expression
+
+    INTEGER  shift, and go to state 3
+
+    expression  go to state 10
+
+
+State 6
+
+    5 expression: expression '-' • expression
+
+    INTEGER  shift, and go to state 3
+
+    expression  go to state 11
+
+
+State 7
+
+    6 expression: expression '*' • expression
+
+    INTEGER  shift, and go to state 3
+
+    expression  go to state 12
+
+
+State 8
+
+    7 expression: expression '/' • expression
+
+    INTEGER  shift, and go to state 3
+
+    expression  go to state 13
+
+
+State 9
+
+    1 program: program expression '\n' •
+
+    $default  reduce using rule 1 (program)
+
+
+State 10
+
+    4 expression: expression • '+' expression
+    4           | expression '+' expression •
+    5           | expression • '-' expression
+    6           | expression • '*' expression
+    7           | expression • '/' expression
+
+    '*'  shift, and go to state 7
+    '/'  shift, and go to state 8
+
+    $default  reduce using rule 4 (expression)
+
+
+State 11
+
+    4 expression: expression • '+' expression
+    5           | expression • '-' expression
+    5           | expression '-' expression •
+    6           | expression • '*' expression
+    7           | expression • '/' expression
+
+    '*'  shift, and go to state 7
+    '/'  shift, and go to state 8
+
+    $default  reduce using rule 5 (expression)
+
+
+State 12
+
+    4 expression: expression • '+' expression
+    5           | expression • '-' expression
+    6           | expression • '*' expression
+    6           | expression '*' expression •
+    7           | expression • '/' expression
+
+    $default  reduce using rule 6 (expression)
+
+
+State 13
+
+    4 expression: expression • '+' expression
+    5           | expression • '-' expression
+    6           | expression • '*' expression
+    7           | expression • '/' expression
+    7           | expression '/' expression •
+
+    $default  reduce using rule 7 (expression)
