@@ -507,8 +507,13 @@ using namespace std;
 void yyerror(string s);
 int yylex();
 int row = 1, column = 1;
-#line 511 "src/lex.yy.cc"
+//char ** a[256] = ["FLOAT", "HEX", ]
 #line 512 "src/lex.yy.cc"
+/* TODO: define GE, LE, NE, EQ*/
+/* TODO: Define YYLTYPE as union and Assign relevant values to yylval*/
+/* For integer values use strtol() function with relevant base*/
+/* TODO: Use BEGIN for recognizing string*/
+#line 517 "src/lex.yy.cc"
 
 #define INITIAL 0
 
@@ -640,9 +645,9 @@ YY_DECL
 		}
 
 	{
-#line 18 "src/lex.l"
+#line 26 "src/lex.l"
 
-#line 646 "src/lex.yy.cc"
+#line 651 "src/lex.yy.cc"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -701,247 +706,247 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 19 "src/lex.l"
+#line 27 "src/lex.l"
 { return BREAK; }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 20 "src/lex.l"
+#line 28 "src/lex.l"
 { return FUNC; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 21 "src/lex.l"
+#line 29 "src/lex.l"
 { return VAR; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 22 "src/lex.l"
+#line 30 "src/lex.l"
 {return CASE;}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 23 "src/lex.l"
+#line 31 "src/lex.l"
 { return STRUCT; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 24 "src/lex.l"
+#line 32 "src/lex.l"
 { return RETURN; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 25 "src/lex.l"
+#line 33 "src/lex.l"
 { return ELSE; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 26 "src/lex.l"
+#line 34 "src/lex.l"
 { return GOTO; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 27 "src/lex.l"
+#line 35 "src/lex.l"
 { return PACKAGE; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 28 "src/lex.l"
+#line 36 "src/lex.l"
 { return CONST; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 29 "src/lex.l"
+#line 37 "src/lex.l"
 { return IF; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 30 "src/lex.l"
+#line 38 "src/lex.l"
 { return RANGE; }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 31 "src/lex.l"
+#line 39 "src/lex.l"
 { return CONTINUE; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 32 "src/lex.l"
+#line 40 "src/lex.l"
 { return FOR; }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 33 "src/lex.l"
+#line 41 "src/lex.l"
 { return IMPORT; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 35 "src/lex.l"
+#line 43 "src/lex.l"
 { return INT8; }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 36 "src/lex.l"
+#line 44 "src/lex.l"
 { return INT16; }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 37 "src/lex.l"
+#line 45 "src/lex.l"
 { return INT32; }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 38 "src/lex.l"
+#line 46 "src/lex.l"
 { return INT64; }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 39 "src/lex.l"
+#line 47 "src/lex.l"
 { return UINT8; }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 40 "src/lex.l"
+#line 48 "src/lex.l"
 { return UINT16; }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 41 "src/lex.l"
+#line 49 "src/lex.l"
 { return UINT32; }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 42 "src/lex.l"
+#line 50 "src/lex.l"
 { return UINT64; }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 43 "src/lex.l"
+#line 51 "src/lex.l"
 { return FLOAT32; }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 44 "src/lex.l"
+#line 52 "src/lex.l"
 { return FLOAT64; }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 45 "src/lex.l"
+#line 53 "src/lex.l"
 { return BYTE; }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 46 "src/lex.l"
+#line 54 "src/lex.l"
 { return TRUE; }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 47 "src/lex.l"
+#line 55 "src/lex.l"
 { return FALSE; }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 48 "src/lex.l"
+#line 56 "src/lex.l"
 { return STRING_LIT; }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 50 "src/lex.l"
+#line 58 "src/lex.l"
 { //yylval.id = strdup(lexer->YYText());
                                   return ID; }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 53 "src/lex.l"
+#line 62 "src/lex.l"
 {return DEC_LIT;}
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 54 "src/lex.l"
+#line 63 "src/lex.l"
 {return BINARY_LIT;}
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 55 "src/lex.l"
+#line 64 "src/lex.l"
 {return HEX_LIT;}
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 56 "src/lex.l"
+#line 65 "src/lex.l"
 { return FLOAT_LIT;} 
 	YY_BREAK
 case 35:
 /* rule 35 can match eol */
 YY_RULE_SETUP
-#line 57 "src/lex.l"
+#line 67 "src/lex.l"
 { return STRING_LIT; }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 59 "src/lex.l"
+#line 69 "src/lex.l"
 { // yylval.num = atoi(lexer->YYText());
 			//cout<<lexer->YYText()<<"\n"; 
                  return OPERATOR; }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 62 "src/lex.l"
+#line 72 "src/lex.l"
 { // yylval.num = atoi(lexer->YYText()); 
                  return OPERATOR; }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 64 "src/lex.l"
+#line 74 "src/lex.l"
 { // yylval.num = atoi(lexer->YYText()); 
                  return OPERATOR; }
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 66 "src/lex.l"
+#line 76 "src/lex.l"
 { // yylval.num = atoi(lexer->YYText()); 
                  return OPERATOR; }
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 68 "src/lex.l"
+#line 78 "src/lex.l"
 { // yylval.num = atoi(lexer->YYText()); 
                  return OPERATOR; }
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 70 "src/lex.l"
+#line 80 "src/lex.l"
 { // yylval.num = atoi(lexer->YYText()); 
                  return OPERATOR; }
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 73 "src/lex.l"
+#line 83 "src/lex.l"
 { return SPACE; }    // +1 column
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 74 "src/lex.l"
+#line 84 "src/lex.l"
 { return TAB; }      // +4 column
 	YY_BREAK
 case 44:
 /* rule 44 can match eol */
 YY_RULE_SETUP
-#line 75 "src/lex.l"
+#line 85 "src/lex.l"
 { return NEWLINE; }  // +1 line , column = 0
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 77 "src/lex.l"
+#line 87 "src/lex.l"
 { ECHO; 
                            yyerror("...NOT RECOGNIZED...") ;
                          }
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 81 "src/lex.l"
+#line 91 "src/lex.l"
 ECHO;
 	YY_BREAK
-#line 945 "src/lex.yy.cc"
+#line 950 "src/lex.yy.cc"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1904,13 +1909,16 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 81 "src/lex.l"
+#line 91 "src/lex.l"
 
 
 void yyerror(string s) {
 	cout<<"ERROR: "<<s<<"\n";
 }
 
+/* TODO: Use macro in place of macro values e.g. 1059 -> HEX_LIT because we are going to use
+   TODO: yacc generated y.tab.h file so we should not depend on the numbers assigned to macros
+   TODO: Find Alternative way to print information about token rather than using switch-case */
 int main()
 {
   FlexLexer* lexer = new yyFlexLexer;
@@ -1919,119 +1927,119 @@ int main()
   {
     switch (val)
     {
-    case 1023:
+    case CASE:
       cout<<"CASE"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
       break;
-    case 1024:
+    case BREAK:
       cout<<"BREAK"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";	
       break;
-    case 1025:
+    case FUNC:
       cout<<"FUNC"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
       break;
-    case 1026:
-      cout<<"VAR"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
-      break;
-    case 1027:
+    //case VARCASE:
+      //cout<<"VARCASE"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
+      //break;
+    case STRUCT:
       cout<<"STRUCT"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
       break;
-    case 1028:
+    case RETURN:
     	cout<<"RETURN"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
       break;
-    case 1029:
+    case ELSE:
     	cout<<"ELSE"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
       break;
-    case 1030:
+    case GOTO:
     	cout<<"GOTO"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
       break;
-    case 1031:
+    case PACKAGE:
     	cout<<"PACKAGE"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
       break;
-    case 1032:
+    case CONST:
     	cout<<"CONST"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
       break;
-    case 1033:
+    case IF:
     	cout<<"IF"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
       break;
-    case 1034:
+    case RANGE:
     	cout<<"RANGE"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
       break;
-    case 1035:
+    case CONTINUE:
     	cout<<"CONTINUE"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
       break;
-    case 1036:
+    case FOR:
     	cout<<"FOR"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
       break;
-    case 1037:
+    case OPERATOR:
     	cout<< lexer->YYText() <<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
       //printf("%s\t%s\t%d\t%d\n", lexer->YYText(), lexer->YYText(), row, column);
       break;
-    case 1038:
+    case IMPORT:
     	cout<<"IMPORT"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
       break;
-    case 1040: column+=3; break;
-    case 1041: row++; column=0; break; //will be updated with yyleng
-    case 1042:
+    case TAB: column+=3; break;
+    case NEWLINE: row++; column=0; break; //will be updated with yyleng
+    case ID:
     	cout<<"ID"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
       break;
-    case 1043:
+    case VAR: //***VARCASE REPEAT ERROR see line 117***
     	cout<<"VAR"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
       break;
 
-    case 1044:
+    case INT8:
     	cout<<"INT8"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
       break;
-    case 1045:
+    case INT16:
     	cout<<"INT16"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
       break;
-    case 1046:
+    case INT32:
     	cout<<"INT32"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
       break;
-    case 1047:
+    case INT64:
     	cout<<"INT64"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
       break;
 
-    case 1048:
+    case UINT8:
     	cout<<"UINT8"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
       break;
-    case 1049:
+    case UINT16:
     	cout<<"UINT16"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
       break;
-    case 1050:
+    case UINT32:
     	cout<<"UINT32"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
       break;
-    case 1051:
+    case UINT64:
     	cout<<"UINT64"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
       break;
 
-    case 1052:
+    case FLOAT32:
     	cout<<"FLOAT32"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
       break;
-    case 1053:
+    case FLOAT64:
     	cout<<"FLOAT64"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
       break;
 
-    case 1054:
+    case BYTE:
     	cout<<"BYTE"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
       break;
-    case 1055:
+    case TRUE:
     	cout<<"TRUE"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
       break;
-    case 1056:
+    case FALSE:
     	cout<<"FALSE"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
       break;
-    case 1057:
+    case STRING_LIT:
     	cout<<"STRING_LIT"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
       break;
-    case 1058:
+    case BINARY_LIT:
     	cout<<"BINARY_LIT"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
       break;  
-    case 1059:
+    case HEX_LIT:
     	cout<<"HEX_LIT"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
       break; 
-    case 1060:
+    case FLOAT_LIT:
     	cout<<"FLOAT_LIT"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
       break; 
-    case 1061:
+    case DEC_LIT:
       cout<<"DEC_LIT"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
       break;
     }
