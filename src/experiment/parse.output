@@ -8,18 +8,12 @@ Terminals unused in grammar
     RETURN
     ELSE
     GOTO
-    PACKAGE
-    CONST
     IF
     RANGE
     CONTINUE
     FOR
-    OPERATOR
-    IMPORT
     SPACE
     TAB
-    NEWLINE
-    ID
     VAR
     INT8
     INT16
@@ -34,11 +28,11 @@ Terminals unused in grammar
     BYTE
     TRUE
     FALSE
-    STRING_LIT
     BINARY_LIT
     HEX_LIT
     FLOAT_LIT
     DEC_LIT
+    '+'
     '-'
     '*'
     '/'
@@ -48,18 +42,60 @@ Grammar
 
     0 $accept: SourceFile $end
 
-    1 SourceFile: '+' '\n'
-    2           | %empty
+    1 SourceFile: PackageClause ';' STAR_ImportDecl_SC STAR_TopLevelDecl_SC
+
+    2 PackageClause: PACKAGE PackageName
+
+    3 PackageName: ID
+
+    4 ImportDecl: IMPORT ImportSpec
+    5           | IMPORT '(' STAR_ImportSpec_SC ')'
+
+    6 ImportSpec: ImportPath
+    7           | '.' ImportPath
+    8           | PackageName ImportPath
+
+    9 ImportPath: STRING_LIT
+
+   10 TopLevelDecl: Declaration
+
+   11 STAR_TopLevelDecl_SC: STAR_TopLevelDecl_SC TopLevelDecl ';'
+   12                     | %empty
+
+   13 STAR_ImportDecl_SC: STAR_ImportDecl_SC ImportDecl ';'
+   14                   | %empty
+
+   15 STAR_ImportSpec_SC: STAR_ImportSpec_SC ImportSpec ';'
+   16                   | %empty
+
+   17 STAR_CM_ID: STAR_CM_ID ',' ID
+   18           | %empty
+
+   19 STAR_ConstSpec_SC: STAR_ConstSpec_SC ConstSpec ';'
+   20                  | %empty
+
+   21 Declaration: ConstDecl
+
+   22 ConstDecl: CONST ConstSpec
+   23          | CONST '(' STAR_ConstSpec_SC ')'
+
+   24 ConstSpec: IdentifierList
+
+   25 IdentifierList: ID STAR_CM_ID
 
 
 Terminals, with rules where they appear
 
     $end (0) 0
-    '\n' (10) 1
+    '(' (40) 5 23
+    ')' (41) 5 23
     '*' (42)
-    '+' (43) 1
+    '+' (43)
+    ',' (44) 17
     '-' (45)
+    '.' (46) 7
     '/' (47)
+    ';' (59) 1 11 13 15 19
     error (256)
     CASE (258)
     BREAK (259)
@@ -69,82 +105,432 @@ Terminals, with rules where they appear
     RETURN (263)
     ELSE (264)
     GOTO (265)
-    PACKAGE (266)
-    CONST (267)
+    PACKAGE (266) 2
+    CONST (267) 22 23
     IF (268)
     RANGE (269)
     CONTINUE (270)
     FOR (271)
-    OPERATOR (272)
-    IMPORT (273)
-    SPACE (274)
-    TAB (275)
-    NEWLINE (276)
-    ID (277)
-    VAR (278)
-    INT8 (279)
-    INT16 (280)
-    INT32 (281)
-    INT64 (282)
-    UINT8 (283)
-    UINT16 (284)
-    UINT32 (285)
-    UINT64 (286)
-    FLOAT32 (287)
-    FLOAT64 (288)
-    BYTE (289)
-    TRUE (290)
-    FALSE (291)
-    STRING_LIT (292)
-    BINARY_LIT (293)
-    HEX_LIT (294)
-    FLOAT_LIT (295)
-    DEC_LIT (296)
+    SPACE (272)
+    TAB (273)
+    ID (274) 3 17 25
+    VAR (275)
+    INT8 (276)
+    INT16 (277)
+    INT32 (278)
+    INT64 (279)
+    UINT8 (280)
+    UINT16 (281)
+    UINT32 (282)
+    UINT64 (283)
+    FLOAT32 (284)
+    FLOAT64 (285)
+    BYTE (286)
+    TRUE (287)
+    FALSE (288)
+    STRING_LIT (289) 9
+    BINARY_LIT (290)
+    HEX_LIT (291)
+    FLOAT_LIT (292)
+    DEC_LIT (293)
+    IMPORT (294) 4 5
 
 
 Nonterminals, with rules where they appear
 
-    $accept (47)
+    $accept (49)
         on left: 0
-    SourceFile (48)
-        on left: 1 2
+    SourceFile (50)
+        on left: 1
         on right: 0
+    PackageClause (51)
+        on left: 2
+        on right: 1
+    PackageName (52)
+        on left: 3
+        on right: 2 8
+    ImportDecl (53)
+        on left: 4 5
+        on right: 13
+    ImportSpec (54)
+        on left: 6 7 8
+        on right: 4 15
+    ImportPath (55)
+        on left: 9
+        on right: 6 7 8
+    TopLevelDecl (56)
+        on left: 10
+        on right: 11
+    STAR_TopLevelDecl_SC (57)
+        on left: 11 12
+        on right: 1 11
+    STAR_ImportDecl_SC (58)
+        on left: 13 14
+        on right: 1 13
+    STAR_ImportSpec_SC (59)
+        on left: 15 16
+        on right: 5 15
+    STAR_CM_ID (60)
+        on left: 17 18
+        on right: 17 25
+    STAR_ConstSpec_SC (61)
+        on left: 19 20
+        on right: 19 23
+    Declaration (62)
+        on left: 21
+        on right: 10
+    ConstDecl (63)
+        on left: 22 23
+        on right: 21
+    ConstSpec (64)
+        on left: 24
+        on right: 19 22
+    IdentifierList (65)
+        on left: 25
+        on right: 24
 
 
 State 0
 
-    0 $accept: . SourceFile $end
+    0 $accept: • SourceFile $end
 
-    '+'  shift, and go to state 1
+    PACKAGE  shift, and go to state 1
 
-    $default  reduce using rule 2 (SourceFile)
-
-    SourceFile  go to state 2
+    SourceFile     go to state 2
+    PackageClause  go to state 3
 
 
 State 1
 
-    1 SourceFile: '+' . '\n'
+    2 PackageClause: PACKAGE • PackageName
 
-    '\n'  shift, and go to state 3
+    ID  shift, and go to state 4
+
+    PackageName  go to state 5
 
 
 State 2
 
-    0 $accept: SourceFile . $end
+    0 $accept: SourceFile • $end
 
-    $end  shift, and go to state 4
+    $end  shift, and go to state 6
 
 
 State 3
 
-    1 SourceFile: '+' '\n' .
+    1 SourceFile: PackageClause • ';' STAR_ImportDecl_SC STAR_TopLevelDecl_SC
 
-    $default  reduce using rule 1 (SourceFile)
+    ';'  shift, and go to state 7
 
 
 State 4
 
-    0 $accept: SourceFile $end .
+    3 PackageName: ID •
+
+    $default  reduce using rule 3 (PackageName)
+
+
+State 5
+
+    2 PackageClause: PACKAGE PackageName •
+
+    $default  reduce using rule 2 (PackageClause)
+
+
+State 6
+
+    0 $accept: SourceFile $end •
 
     $default  accept
+
+
+State 7
+
+    1 SourceFile: PackageClause ';' • STAR_ImportDecl_SC STAR_TopLevelDecl_SC
+
+    $default  reduce using rule 14 (STAR_ImportDecl_SC)
+
+    STAR_ImportDecl_SC  go to state 8
+
+
+State 8
+
+    1 SourceFile: PackageClause ';' STAR_ImportDecl_SC • STAR_TopLevelDecl_SC
+   13 STAR_ImportDecl_SC: STAR_ImportDecl_SC • ImportDecl ';'
+
+    IMPORT  shift, and go to state 9
+
+    $default  reduce using rule 12 (STAR_TopLevelDecl_SC)
+
+    ImportDecl            go to state 10
+    STAR_TopLevelDecl_SC  go to state 11
+
+
+State 9
+
+    4 ImportDecl: IMPORT • ImportSpec
+    5           | IMPORT • '(' STAR_ImportSpec_SC ')'
+
+    ID          shift, and go to state 4
+    STRING_LIT  shift, and go to state 12
+    '('         shift, and go to state 13
+    '.'         shift, and go to state 14
+
+    PackageName  go to state 15
+    ImportSpec   go to state 16
+    ImportPath   go to state 17
+
+
+State 10
+
+   13 STAR_ImportDecl_SC: STAR_ImportDecl_SC ImportDecl • ';'
+
+    ';'  shift, and go to state 18
+
+
+State 11
+
+    1 SourceFile: PackageClause ';' STAR_ImportDecl_SC STAR_TopLevelDecl_SC •
+   11 STAR_TopLevelDecl_SC: STAR_TopLevelDecl_SC • TopLevelDecl ';'
+
+    CONST  shift, and go to state 19
+
+    $default  reduce using rule 1 (SourceFile)
+
+    TopLevelDecl  go to state 20
+    Declaration   go to state 21
+    ConstDecl     go to state 22
+
+
+State 12
+
+    9 ImportPath: STRING_LIT •
+
+    $default  reduce using rule 9 (ImportPath)
+
+
+State 13
+
+    5 ImportDecl: IMPORT '(' • STAR_ImportSpec_SC ')'
+
+    $default  reduce using rule 16 (STAR_ImportSpec_SC)
+
+    STAR_ImportSpec_SC  go to state 23
+
+
+State 14
+
+    7 ImportSpec: '.' • ImportPath
+
+    STRING_LIT  shift, and go to state 12
+
+    ImportPath  go to state 24
+
+
+State 15
+
+    8 ImportSpec: PackageName • ImportPath
+
+    STRING_LIT  shift, and go to state 12
+
+    ImportPath  go to state 25
+
+
+State 16
+
+    4 ImportDecl: IMPORT ImportSpec •
+
+    $default  reduce using rule 4 (ImportDecl)
+
+
+State 17
+
+    6 ImportSpec: ImportPath •
+
+    $default  reduce using rule 6 (ImportSpec)
+
+
+State 18
+
+   13 STAR_ImportDecl_SC: STAR_ImportDecl_SC ImportDecl ';' •
+
+    $default  reduce using rule 13 (STAR_ImportDecl_SC)
+
+
+State 19
+
+   22 ConstDecl: CONST • ConstSpec
+   23          | CONST • '(' STAR_ConstSpec_SC ')'
+
+    ID   shift, and go to state 26
+    '('  shift, and go to state 27
+
+    ConstSpec       go to state 28
+    IdentifierList  go to state 29
+
+
+State 20
+
+   11 STAR_TopLevelDecl_SC: STAR_TopLevelDecl_SC TopLevelDecl • ';'
+
+    ';'  shift, and go to state 30
+
+
+State 21
+
+   10 TopLevelDecl: Declaration •
+
+    $default  reduce using rule 10 (TopLevelDecl)
+
+
+State 22
+
+   21 Declaration: ConstDecl •
+
+    $default  reduce using rule 21 (Declaration)
+
+
+State 23
+
+    5 ImportDecl: IMPORT '(' STAR_ImportSpec_SC • ')'
+   15 STAR_ImportSpec_SC: STAR_ImportSpec_SC • ImportSpec ';'
+
+    ID          shift, and go to state 4
+    STRING_LIT  shift, and go to state 12
+    ')'         shift, and go to state 31
+    '.'         shift, and go to state 14
+
+    PackageName  go to state 15
+    ImportSpec   go to state 32
+    ImportPath   go to state 17
+
+
+State 24
+
+    7 ImportSpec: '.' ImportPath •
+
+    $default  reduce using rule 7 (ImportSpec)
+
+
+State 25
+
+    8 ImportSpec: PackageName ImportPath •
+
+    $default  reduce using rule 8 (ImportSpec)
+
+
+State 26
+
+   25 IdentifierList: ID • STAR_CM_ID
+
+    $default  reduce using rule 18 (STAR_CM_ID)
+
+    STAR_CM_ID  go to state 33
+
+
+State 27
+
+   23 ConstDecl: CONST '(' • STAR_ConstSpec_SC ')'
+
+    $default  reduce using rule 20 (STAR_ConstSpec_SC)
+
+    STAR_ConstSpec_SC  go to state 34
+
+
+State 28
+
+   22 ConstDecl: CONST ConstSpec •
+
+    $default  reduce using rule 22 (ConstDecl)
+
+
+State 29
+
+   24 ConstSpec: IdentifierList •
+
+    $default  reduce using rule 24 (ConstSpec)
+
+
+State 30
+
+   11 STAR_TopLevelDecl_SC: STAR_TopLevelDecl_SC TopLevelDecl ';' •
+
+    $default  reduce using rule 11 (STAR_TopLevelDecl_SC)
+
+
+State 31
+
+    5 ImportDecl: IMPORT '(' STAR_ImportSpec_SC ')' •
+
+    $default  reduce using rule 5 (ImportDecl)
+
+
+State 32
+
+   15 STAR_ImportSpec_SC: STAR_ImportSpec_SC ImportSpec • ';'
+
+    ';'  shift, and go to state 35
+
+
+State 33
+
+   17 STAR_CM_ID: STAR_CM_ID • ',' ID
+   25 IdentifierList: ID STAR_CM_ID •
+
+    ','  shift, and go to state 36
+
+    $default  reduce using rule 25 (IdentifierList)
+
+
+State 34
+
+   19 STAR_ConstSpec_SC: STAR_ConstSpec_SC • ConstSpec ';'
+   23 ConstDecl: CONST '(' STAR_ConstSpec_SC • ')'
+
+    ID   shift, and go to state 26
+    ')'  shift, and go to state 37
+
+    ConstSpec       go to state 38
+    IdentifierList  go to state 29
+
+
+State 35
+
+   15 STAR_ImportSpec_SC: STAR_ImportSpec_SC ImportSpec ';' •
+
+    $default  reduce using rule 15 (STAR_ImportSpec_SC)
+
+
+State 36
+
+   17 STAR_CM_ID: STAR_CM_ID ',' • ID
+
+    ID  shift, and go to state 39
+
+
+State 37
+
+   23 ConstDecl: CONST '(' STAR_ConstSpec_SC ')' •
+
+    $default  reduce using rule 23 (ConstDecl)
+
+
+State 38
+
+   19 STAR_ConstSpec_SC: STAR_ConstSpec_SC ConstSpec • ';'
+
+    ';'  shift, and go to state 40
+
+
+State 39
+
+   17 STAR_CM_ID: STAR_CM_ID ',' ID •
+
+    $default  reduce using rule 17 (STAR_CM_ID)
+
+
+State 40
+
+   19 STAR_ConstSpec_SC: STAR_ConstSpec_SC ConstSpec ';' •
+
+    $default  reduce using rule 19 (STAR_ConstSpec_SC)

@@ -1,15 +1,15 @@
 %{
-#include<iostream>
-#include "parse.tab.hpp"
-using namespace std;
+#include <stdio.h>
+#include "parse.tab.h"
 int yylex();
-extern int yylval;
+extern void yyerror(char* s);
 %}
+
 %option noyywrap
 letter [a-zA-Z_]
-dec_digit [0-9]
-binary_digit [01]
-hex_digit [0-9a-fA-F]
+digit [[:digit:]]
+hexdigit [[:xdigit:]]
+bindigit [01]
 ws [ ]
 tab [\t]
 newline [\n]
@@ -46,36 +46,27 @@ newline [\n]
 "false" { return FALSE; }
 "string" { return STRING_LIT; }
 
-{letter}({letter}|{dec_digit})*     { //yylval.id = strdup(lexer->YYText());
-                                  return ID; }
 
-{dec_digit}+ {return DEC_LIT;}
-(0)[bB]{binary_digit}+ {return BINARY_LIT;}
-(0)[xX]{hex_digit}+ {return HEX_LIT;}
-{dec_digit}*+"."{dec_digit}+|{dec_digit}*+"."{dec_digit}*+[eE][-+]?{dec_digit}*|{dec_digit}*+[eE][-+    ]?{dec_digit}*|"."{dec_digit}*+[eE][-+]?{dec_digit}*  { return FLOAT_LIT;}
+{letter}({letter}|{digit})*     { return ID; }
+{digit}+ {return DEC_LIT;}
+(0)[bB]{bindigit}+ {return BINARY_LIT;}
+(0)[xX]{hexdigit}+ {return HEX_LIT;}
+{digit}*+"."{digit}+|{digit}*+"."{digit}*+[eE][-+]?{digit}*|{digit}*+[eE][-+    ]?{digit}*|"."{digit}*+[eE][-+]?{digit}*  { return FLOAT_LIT;}
 \"(\\.|[^"\\])*\"	{ return STRING_LIT; }
 
-[+\-/\*%]       { // yylval.num = atoi(lexer->YYText());
-			//cout<<lexer->YYText()<<"\n";
-                 return OPERATOR; }
-[&|!\^]        { // yylval.num = atoi(lexer->YYText());
-                 return OPERATOR; }
-[<>=]          { // yylval.num = atoi(lexer->YYText());
-                 return OPERATOR; }
-[()\[\]\{\}]   { // yylval.num = atoi(lexer->YYText());
-                 return OPERATOR; }
-[\"\',;]       { // yylval.num = atoi(lexer->YYText());
-                 return OPERATOR; }
-[.]            { // yylval.num = atoi(lexer->YYText());
-                 return OPERATOR; }
+[-+/\*%]      { return *yytext; }
+[&|!\^]        { return *yytext; }
+[<>=]          { return *yytext; }
+[\(\)\[\]\{\}]   { return *yytext; }
+["',;]       { return *yytext; }
+[.]            { return *yytext; }
 
-{ws}           { return SPACE; }    // +1 column
-{tab}          { return TAB; }      // +4 column
-{newline}      { return NEWLINE; }  // +1 line , column = 0
+{ws}          ;
+{tab}         ;
+{newline}     ;
 
 .                        { ECHO;
-                           cout << "...NOT RECOGNIZED..." ;
+                           yyerror("...NOT RECOGNIZED...") ;
                          }
 
 %%
-

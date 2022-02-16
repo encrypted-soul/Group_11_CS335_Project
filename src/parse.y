@@ -2,7 +2,7 @@
 #include "iostream.h"
 %}
 
-%token CASE BREAK FUNC VARCASE STRUCT RETURN ELSE GOTO PACKAGE CONST IF RANGE CONTINUE FOR OPERATOR IMPORT SPACE TAB NEWLINE ID VAR INT8 INT16 INT32 INT64 UINT8 UINT16 UINT32 UINT64 FLOAT32 FLOAT64 BYTE TRUE FALSE STRING_LIT BINARY_LIT HEX_LIT FLOAT_LIT DEC_LIT 
+%token CASE BREAK FUNC VARCASE STRUCT RETURN ELSE GOTO PACKAGE CONST IF RANGE CONTINUE FOR OPERATOR IMPORT SPACE TAB NEWLINE ID VAR INT8 INT16 INT32 INT64 UINT8 UINT16 UINT32 UINT64 FLOAT32 FLOAT64 BYTE TRUE FALSE STRING_LIT BINARY_LIT HEX_LIT FLOAT_LIT DEC_LIT
 
 /* TODO: Specify precedence rules for all operators */
 /* TODO: Observe binary_op, rel_op, add_op, ;... -> these seems to be a class of operator having same precedence and are mentioned in increasing order of precedence( top(rel_op) is lowest and bottom(unary_op) is highest) : CONFIRM
@@ -13,7 +13,7 @@
 /************************** MAJOR WORK **************************/
 
 /* 1. DEFINE SEMANTICS OF RULES (e.g. for "exp : exp '+' exp", define "$$ = $1 + $3")
-/* 2. Conver all EBNF rules into equivalent yacc rule. 
+/* 2. Conver all EBNF rules into equivalent yacc rule.
 /*    Specifically We are looking for  */
 /*    |   alternation -> used as it is so nothing changes */
 /*    ()  grouping    -> ditto */
@@ -104,7 +104,6 @@ unary_op   : "+" ;
 |            "^" ;
 |            "*" ;
 |            "&" ;
-|            "<-" ;
 
 
 PrimaryExpr : Operand ;
@@ -112,14 +111,11 @@ PrimaryExpr : Operand ;
 |             MethodExpr ;
 |             PrimaryExpr Selector ;
 |             PrimaryExpr Index ;
-|             PrimaryExpr Slice ;
 |             PrimaryExpr TypeAssertion ;
 |             PrimaryExpr Arguments ;
 
 Selector       : "." identifier ;
 Index          : "[" Expression "]" ;
-Slice          : "[" [ Expression ] ":" [ Expression ] "]" ;
-|                "[" [ Expression ] ":" Expression ":" Expression "]" ;
 
 /* TODO: what are conversions and do we support them */
 Conversion : Type "(" Expression [ "," ] ")" ;
@@ -145,8 +141,6 @@ Literal     : BasicLit ;
 /* TODO: Replace by token names  */
 BasicLit    : int_lit ;
 |             float_lit ;
-|             imaginary_lit ;
-|             rune_lit ;
 |             string_lit ;
 
 OperandName : identifier ;
@@ -159,8 +153,6 @@ CompositeLit  : LiteralType LiteralValue ;
 LiteralType   : StructType ;
 |               ArrayType ;
 |               "[" "..." "]" ElementType ;
-|               SliceType ;
-|               MapType ;
 |               TypeName ;
 
 LiteralValue  : "{" [ ElementList [ "," ] ] "}" ;
@@ -206,7 +198,6 @@ Statement : Declaration ;
 |           SwitchStmt ;
 |           SelectStmt ;
 |           ForStmt ;
-|           DeferStmt ;
 
 LabeledStmt : Label ":" Statement ;
 Label       : identifier ;
@@ -214,17 +205,12 @@ Label       : identifier ;
 
 SimpleStmt : EmptyStmt ;
 |            ExpressionStmt ;
-|            SendStmt ;
 |            IncDecStmt ;
 |            Assignment ;
 |            ShortVarDecl ;
 
 EmptyStmt : ;
 ExpressionStmt : Expression ;
-
-/* TODO: Remove channel related rules  */
-SendStmt : Channel "<-" Expression ;
-Channel  : Expression ;
 
 IncDecStmt : Expression ( "++" | "--" ) ;
 
@@ -270,12 +256,8 @@ GoStmt : "go" Expression ;
 /* TODO: Remove Select statements if we don't support them */
 SelectStmt : "select" "{" { CommClause } "}" ;
 CommClause : CommCase ":" StatementList ;
-CommCase   : "case" ( SendStmt | RecvStmt ) 
+CommCase   : "case" ( SendStmt | RecvStmt )
 |            "default" ;
-
-/* TODO: remove send and recieve statements */
-RecvStmt   : [ ExpressionList "=" | IdentifierList ":=" ] RecvExpr ;
-RecvExpr   : Expression ;
 
 ReturnStmt : "return" [ ExpressionList ] ;
 
@@ -288,9 +270,6 @@ GotoStmt : "goto" Label ;
 
 /* TODO: remove fallthrough if don't need it */
 FallthroughStmt : "fallthrough" ;
-
-/* TODO: We don't support concurrency, so remove every rule related to it. e.g. defer, send, recieve, go clause, ;.. */
-DeferStmt : "defer" Expression ;
 
 /************************** Types **************************/
 
@@ -306,22 +285,16 @@ TypeLit   : ArrayType ;
 |           StructType ;
 |           PointerType ;
 |           FunctionType ;
-|           InterfaceType ;
-|           SliceType ;
-|           MapType ;
-|           ChannelType ;
 
 ArrayType   : "[" ArrayLength "]" ElementType ;
 ArrayLength : Expression ;
 ElementType : Type ;
 
-/* TODO: Remove rules for slice and slice type */
-SliceType : "[" "]" ElementType ;
 
 StructType    : "struct" "{" { FieldDecl ";" } "}" ;
 FieldDecl     : (IdentifierList Type | EmbeddedField) [ Tag ] ;
 EmbeddedField : [ "*" ] TypeName ;
-Tag           : string_lit 
+Tag           : string_lit
 
 PointerType : "*" BaseType ;
 BaseType    : Type ;
@@ -334,18 +307,3 @@ Result         : Parameters ;
 Parameters     : "(" [ ParameterList [ "," ] ] ")" ;
 ParameterList  : ParameterDecl { "," ParameterDecl } ;
 ParameterDecl  : [ IdentifierList ] [ "..." ] Type ;
-
-
-
-/* TODO: Remove rules related to Interface and InterfaceTypes */
-InterfaceType      : "interface" "{" { ( MethodSpec | InterfaceTypeName ) ";" } "}" ;
-MethodSpec         : MethodName Signature ;
-MethodName         : identifier ;
-InterfaceTypeName  : TypeName ;
-
-/* TODO: If we do not support map then remove map and map type rules: */
-MapType     : "map" "[" KeyType "]" ElementType ;
-KeyType     : Type ;
-
-/* TODO: Remove channel and channel type rules */
-ChannelType : ( "chan" | "chan" "<-" | "<-" "chan" ) ElementType ;

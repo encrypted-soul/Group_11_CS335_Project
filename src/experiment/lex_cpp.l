@@ -1,13 +1,15 @@
 %{
-#include <stdio.h>
-#include "parse.tab.h"
+#include<iostream>
+#include "parse.tab.hpp"
+using namespace std;
 int yylex();
-extern void yyerror(char* s);
+extern int yylval;
 %}
-
 %option noyywrap
 letter [a-zA-Z_]
-digit [0-9]
+dec_digit [0-9]
+binary_digit [01]
+hex_digit [0-9a-fA-F]
 ws [ ]
 tab [\t]
 newline [\n]
@@ -44,23 +46,27 @@ newline [\n]
 "false" { return FALSE; }
 "string" { return STRING_LIT; }
 
-
-{letter}({letter}|{digit})*     { //yylval.id = strdup(yytext);
+{letter}({letter}|{dec_digit})*     { //yylval.id = strdup(lexer->YYText());
                                   return ID; }
 
+{dec_digit}+ {return DEC_LIT;}
+(0)[bB]{binary_digit}+ {return BINARY_LIT;}
+(0)[xX]{hex_digit}+ {return HEX_LIT;}
+{dec_digit}*+"."{dec_digit}+|{dec_digit}*+"."{dec_digit}*+[eE][-+]?{dec_digit}*|{dec_digit}*+[eE][-+    ]?{dec_digit}*|"."{dec_digit}*+[eE][-+]?{dec_digit}*  { return FLOAT_LIT;}
 \"(\\.|[^"\\])*\"	{ return STRING_LIT; }
 
-[+\-/\*%]       { // yylval.num = atoi(yytext);
+[+\-/\*%]       { // yylval.num = atoi(lexer->YYText());
+			//cout<<lexer->YYText()<<"\n";
                  return OPERATOR; }
-[&|!\^]        { // yylval.num = atoi(yytext);
+[&|!\^]        { // yylval.num = atoi(lexer->YYText());
                  return OPERATOR; }
-[<>=]          { // yylval.num = atoi(yytext);
+[<>=]          { // yylval.num = atoi(lexer->YYText());
                  return OPERATOR; }
-[()\[\]\{\}]   { // yylval.num = atoi(yytext);
+[()\[\]\{\}]   { // yylval.num = atoi(lexer->YYText());
                  return OPERATOR; }
-[\"\',;]       { // yylval.num = atoi(yytext);
+[\"\',;]       { // yylval.num = atoi(lexer->YYText());
                  return OPERATOR; }
-[.]            { // yylval.num = atoi(yytext);
+[.]            { // yylval.num = atoi(lexer->YYText());
                  return OPERATOR; }
 
 {ws}           { return SPACE; }    // +1 column
@@ -68,7 +74,8 @@ newline [\n]
 {newline}      { return NEWLINE; }  // +1 line , column = 0
 
 .                        { ECHO;
-                           yyerror("...NOT RECOGNIZED...") ;
+                           cout << "...NOT RECOGNIZED..." ;
                          }
 
 %%
+
