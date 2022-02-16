@@ -38,7 +38,7 @@ Nonterminals, with rules where they appear
 
 State 0
 
-    0 $accept: • program $end
+    0 $accept: . program $end
 
     $default  reduce using rule 2 (program)
 
@@ -47,8 +47,8 @@ State 0
 
 State 1
 
-    0 $accept: program • $end
-    1 program: program • expression '\n'
+    0 $accept: program . $end
+    1 program: program . expression '\n'
 
     $end     shift, and go to state 2
     INTEGER  shift, and go to state 3
@@ -58,25 +58,25 @@ State 1
 
 State 2
 
-    0 $accept: program $end •
+    0 $accept: program $end .
 
     $default  accept
 
 
 State 3
 
-    3 expression: INTEGER •
+    3 expression: INTEGER .
 
     $default  reduce using rule 3 (expression)
 
 
 State 4
 
-    1 program: program expression • '\n'
-    4 expression: expression • '+' expression
-    5           | expression • '-' expression
-    6           | expression • '*' expression
-    7           | expression • '/' expression
+    1 program: program expression . '\n'
+    4 expression: expression . '+' expression
+    5           | expression . '-' expression
+    6           | expression . '*' expression
+    7           | expression . '/' expression
 
     '+'   shift, and go to state 5
     '-'   shift, and go to state 6
@@ -87,7 +87,7 @@ State 4
 
 State 5
 
-    4 expression: expression '+' • expression
+    4 expression: expression '+' . expression
 
     INTEGER  shift, and go to state 3
 
@@ -96,7 +96,7 @@ State 5
 
 State 6
 
-    5 expression: expression '-' • expression
+    5 expression: expression '-' . expression
 
     INTEGER  shift, and go to state 3
 
@@ -105,7 +105,7 @@ State 6
 
 State 7
 
-    6 expression: expression '*' • expression
+    6 expression: expression '*' . expression
 
     INTEGER  shift, and go to state 3
 
@@ -114,7 +114,7 @@ State 7
 
 State 8
 
-    7 expression: expression '/' • expression
+    7 expression: expression '/' . expression
 
     INTEGER  shift, and go to state 3
 
@@ -123,18 +123,18 @@ State 8
 
 State 9
 
-    1 program: program expression '\n' •
+    1 program: program expression '\n' .
 
     $default  reduce using rule 1 (program)
 
 
 State 10
 
-    4 expression: expression • '+' expression
-    4           | expression '+' expression •
-    5           | expression • '-' expression
-    6           | expression • '*' expression
-    7           | expression • '/' expression
+    4 expression: expression . '+' expression
+    4           | expression '+' expression .
+    5           | expression . '-' expression
+    6           | expression . '*' expression
+    7           | expression . '/' expression
 
     '*'  shift, and go to state 7
     '/'  shift, and go to state 8
@@ -144,11 +144,11 @@ State 10
 
 State 11
 
-    4 expression: expression • '+' expression
-    5           | expression • '-' expression
-    5           | expression '-' expression •
-    6           | expression • '*' expression
-    7           | expression • '/' expression
+    4 expression: expression . '+' expression
+    5           | expression . '-' expression
+    5           | expression '-' expression .
+    6           | expression . '*' expression
+    7           | expression . '/' expression
 
     '*'  shift, and go to state 7
     '/'  shift, and go to state 8
@@ -158,21 +158,21 @@ State 11
 
 State 12
 
-    4 expression: expression • '+' expression
-    5           | expression • '-' expression
-    6           | expression • '*' expression
-    6           | expression '*' expression •
-    7           | expression • '/' expression
+    4 expression: expression . '+' expression
+    5           | expression . '-' expression
+    6           | expression . '*' expression
+    6           | expression '*' expression .
+    7           | expression . '/' expression
 
     $default  reduce using rule 6 (expression)
 
 
 State 13
 
-    4 expression: expression • '+' expression
-    5           | expression • '-' expression
-    6           | expression • '*' expression
-    7           | expression • '/' expression
-    7           | expression '/' expression •
+    4 expression: expression . '+' expression
+    5           | expression . '-' expression
+    6           | expression . '*' expression
+    7           | expression . '/' expression
+    7           | expression '/' expression .
 
     $default  reduce using rule 7 (expression)

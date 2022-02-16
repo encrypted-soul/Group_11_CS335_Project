@@ -19,6 +19,7 @@ Terminals unused in grammar
     SPACE
     TAB
     NEWLINE
+    ID
     VAR
     INT8
     INT16
@@ -33,11 +34,11 @@ Terminals unused in grammar
     BYTE
     TRUE
     FALSE
+    STRING_LIT
     BINARY_LIT
     HEX_LIT
     FLOAT_LIT
     DEC_LIT
-    '+'
     '-'
     '*'
     '/'
@@ -47,35 +48,16 @@ Grammar
 
     0 $accept: SourceFile $end
 
-    1 SourceFile: PackageClause ";" ImportDecl ";" TopLevelDecl ";"
-
-    2 PackageClause: "package" PackageName
-
-    3 PackageName: ID
-
-    4 ImportDecl: "import" ImportSpec
-
-    5 ImportSpec: "."
-    6           | PackageName ImportPath
-
-    7 ImportPath: STRING_LIT
-
-    8 TopLevelDecl: Declaration
-
-    9 Declaration: ConstDecl
-
-   10 ConstDecl: "const" ConstSpec
-
-   11 ConstSpec: IdentifierList
-
-   12 IdentifierList: ID "," ID
+    1 SourceFile: '+' '\n'
+    2           | %empty
 
 
 Terminals, with rules where they appear
 
     $end (0) 0
+    '\n' (10) 1
     '*' (42)
-    '+' (43)
+    '+' (43) 1
     '-' (45)
     '/' (47)
     error (256)
@@ -98,7 +80,7 @@ Terminals, with rules where they appear
     SPACE (274)
     TAB (275)
     NEWLINE (276)
-    ID (277) 3 12
+    ID (277)
     VAR (278)
     INT8 (279)
     INT16 (280)
@@ -113,255 +95,56 @@ Terminals, with rules where they appear
     BYTE (289)
     TRUE (290)
     FALSE (291)
-    STRING_LIT (292) 7
+    STRING_LIT (292)
     BINARY_LIT (293)
     HEX_LIT (294)
     FLOAT_LIT (295)
     DEC_LIT (296)
-    ";" (297) 1
-    "package" (298) 2
-    "import" (299) 4
-    "." (300) 5
-    "const" (301) 10
-    "," (302) 12
 
 
 Nonterminals, with rules where they appear
 
-    $accept (52)
+    $accept (47)
         on left: 0
-    SourceFile (53)
-        on left: 1
+    SourceFile (48)
+        on left: 1 2
         on right: 0
-    PackageClause (54)
-        on left: 2
-        on right: 1
-    PackageName (55)
-        on left: 3
-        on right: 2 6
-    ImportDecl (56)
-        on left: 4
-        on right: 1
-    ImportSpec (57)
-        on left: 5 6
-        on right: 4
-    ImportPath (58)
-        on left: 7
-        on right: 6
-    TopLevelDecl (59)
-        on left: 8
-        on right: 1
-    Declaration (60)
-        on left: 9
-        on right: 8
-    ConstDecl (61)
-        on left: 10
-        on right: 9
-    ConstSpec (62)
-        on left: 11
-        on right: 10
-    IdentifierList (63)
-        on left: 12
-        on right: 11
 
 
 State 0
 
     0 $accept: . SourceFile $end
 
-    "package"  shift, and go to state 1
+    '+'  shift, and go to state 1
 
-    SourceFile     go to state 2
-    PackageClause  go to state 3
+    $default  reduce using rule 2 (SourceFile)
+
+    SourceFile  go to state 2
 
 
 State 1
 
-    2 PackageClause: "package" . PackageName
+    1 SourceFile: '+' . '\n'
 
-    ID  shift, and go to state 4
-
-    PackageName  go to state 5
+    '\n'  shift, and go to state 3
 
 
 State 2
 
     0 $accept: SourceFile . $end
 
-    $end  shift, and go to state 6
+    $end  shift, and go to state 4
 
 
 State 3
 
-    1 SourceFile: PackageClause . ";" ImportDecl ";" TopLevelDecl ";"
-
-    ";"  shift, and go to state 7
-
-
-State 4
-
-    3 PackageName: ID .
-
-    $default  reduce using rule 3 (PackageName)
-
-
-State 5
-
-    2 PackageClause: "package" PackageName .
-
-    $default  reduce using rule 2 (PackageClause)
-
-
-State 6
-
-    0 $accept: SourceFile $end .
-
-    $default  accept
-
-
-State 7
-
-    1 SourceFile: PackageClause ";" . ImportDecl ";" TopLevelDecl ";"
-
-    "import"  shift, and go to state 8
-
-    ImportDecl  go to state 9
-
-
-State 8
-
-    4 ImportDecl: "import" . ImportSpec
-
-    ID   shift, and go to state 4
-    "."  shift, and go to state 10
-
-    PackageName  go to state 11
-    ImportSpec   go to state 12
-
-
-State 9
-
-    1 SourceFile: PackageClause ";" ImportDecl . ";" TopLevelDecl ";"
-
-    ";"  shift, and go to state 13
-
-
-State 10
-
-    5 ImportSpec: "." .
-
-    $default  reduce using rule 5 (ImportSpec)
-
-
-State 11
-
-    6 ImportSpec: PackageName . ImportPath
-
-    STRING_LIT  shift, and go to state 14
-
-    ImportPath  go to state 15
-
-
-State 12
-
-    4 ImportDecl: "import" ImportSpec .
-
-    $default  reduce using rule 4 (ImportDecl)
-
-
-State 13
-
-    1 SourceFile: PackageClause ";" ImportDecl ";" . TopLevelDecl ";"
-
-    "const"  shift, and go to state 16
-
-    TopLevelDecl  go to state 17
-    Declaration   go to state 18
-    ConstDecl     go to state 19
-
-
-State 14
-
-    7 ImportPath: STRING_LIT .
-
-    $default  reduce using rule 7 (ImportPath)
-
-
-State 15
-
-    6 ImportSpec: PackageName ImportPath .
-
-    $default  reduce using rule 6 (ImportSpec)
-
-
-State 16
-
-   10 ConstDecl: "const" . ConstSpec
-
-    ID  shift, and go to state 20
-
-    ConstSpec       go to state 21
-    IdentifierList  go to state 22
-
-
-State 17
-
-    1 SourceFile: PackageClause ";" ImportDecl ";" TopLevelDecl . ";"
-
-    ";"  shift, and go to state 23
-
-
-State 18
-
-    8 TopLevelDecl: Declaration .
-
-    $default  reduce using rule 8 (TopLevelDecl)
-
-
-State 19
-
-    9 Declaration: ConstDecl .
-
-    $default  reduce using rule 9 (Declaration)
-
-
-State 20
-
-   12 IdentifierList: ID . "," ID
-
-    ","  shift, and go to state 24
-
-
-State 21
-
-   10 ConstDecl: "const" ConstSpec .
-
-    $default  reduce using rule 10 (ConstDecl)
-
-
-State 22
-
-   11 ConstSpec: IdentifierList .
-
-    $default  reduce using rule 11 (ConstSpec)
-
-
-State 23
-
-    1 SourceFile: PackageClause ";" ImportDecl ";" TopLevelDecl ";" .
+    1 SourceFile: '+' '\n' .
 
     $default  reduce using rule 1 (SourceFile)
 
 
-State 24
+State 4
 
-   12 IdentifierList: ID "," . ID
+    0 $accept: SourceFile $end .
 
-    ID  shift, and go to state 25
-
-
-State 25
-
-   12 IdentifierList: ID "," ID .
-
-    $default  reduce using rule 12 (IdentifierList)
+    $default  accept

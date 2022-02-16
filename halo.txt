@@ -1,0 +1,27 @@
+PackageClause ';'
+|             ImportDecl ';' TopLevelDecl ';' ;
+
+PackageClause  : "package" PackageName ;
+PackageName    : ID ;
+
+ImportDecl       : "import" ImportSpec ;
+ImportSpec       : "." | PackageName ImportPath ;
+ImportPath       : STRING_LIT ;
+
+TopLevelDecl  : Declaration ;
+
+/************************** Declarations **************************/
+
+Declaration   : ConstDecl ;
+
+ConstDecl      : "const" ConstSpec ;
+ConstSpec      : IdentifierList ;
+IdentifierList : ID "," ID ;
+
+
+
+
+PackageClause ';' '\n' {printf("Source File");};
+
+PackageClause  : "package" PackageName { printf("PackageClause");};
+PackageName    : ID {printf("PackageName");};
