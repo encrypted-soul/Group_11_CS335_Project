@@ -5,7 +5,7 @@ using namespace std;
 void yyerror(string s);
 int yylex();
 int row = 1, column = 1;
-char ** a[256] = ["FLOAT", "HEX", ]
+//char ** a[256] = ["FLOAT", "HEX", ] // Commented WIP
 %}
 
 %option noyywrap 
@@ -17,7 +17,12 @@ ws [ ]
 tab [\t]
 newline [\n]
 
-// TODO: define GE, LE, NE, EQ
+/* TODO: define GE, LE, NE, EQ*/
+
+/* TODO: Define YYLTYPE as union and Assign relevant values to yylval*/
+/* For integer values use strtol() function with relevant base*/
+
+/* TODO: Use BEGIN for recognizing string*/
 %%
 "break"  { return BREAK; }
 "func" { return FUNC; }
@@ -53,14 +58,12 @@ newline [\n]
 {letter}({letter}|{dec_digit})*     { //yylval.id = strdup(lexer->YYText());
                                   return ID; }
 
-// TODO: Define YYLTYPE as union and Assign relevant values to yylval
-// For integer values use strtol() function with relevant base
+
 {dec_digit}+ {return DEC_LIT;}
 (0)[bB]{binary_digit}+ {return BINARY_LIT;}
 (0)[xX]{hex_digit}+ {return HEX_LIT;}
 {dec_digit}*+"."{dec_digit}+|{dec_digit}*+"."{dec_digit}*+[eE][-+]?{dec_digit}*|{dec_digit}*+[eE][-+    ]?{dec_digit}*|"."{dec_digit}*+[eE][-+]?{dec_digit}*  { return FLOAT_LIT;} 
 
-// TODO: Use BEGIN for recognizing string
 \"(\\.|[^"\\])*\"	{ return STRING_LIT; }
 
 [+\-/\*%]       { // yylval.num = atoi(lexer->YYText());
@@ -91,9 +94,10 @@ void yyerror(string s) {
 	cout<<"ERROR: "<<s<<"\n";
 }
 
-// TODO: Use macro in place of macro values e.g. 1059 -> HEX_LIT because we are going to use
-// TODO: yacc generated y.tab.h file so we should not depend on the numbers assigned to macros
-// TODO: Find Alternative way to print information about token rather than using switch-case 
+/* TODO: Use macro in place of macro values e.g. 1059 -> HEX_LIT because we are going to use --- done
+   TODO: yacc generated y.tab.h file so we should not depend on the numbers assigned to macros
+   TODO: Find Alternative way to print information about token rather than using switch-case 
+   TODO: Fix MACRO VAR/VARCASE error */
 int main()
 {
   FlexLexer* lexer = new yyFlexLexer;
@@ -102,119 +106,119 @@ int main()
   {
     switch (val)
     {
-    case 1023:
+    case CASE:
       cout<<"CASE"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
       break;
-    case 1024:
+    case BREAK:
       cout<<"BREAK"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";	
       break;
-    case 1025:
+    case FUNC:
       cout<<"FUNC"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
       break;
-    case 1026:
-      cout<<"VAR"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
-      break;
-    case 1027:
+    //case VARCASE:
+      //cout<<"VARCASE"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
+      //break;
+    case STRUCT:
       cout<<"STRUCT"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
       break;
-    case 1028:
+    case RETURN:
     	cout<<"RETURN"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
       break;
-    case 1029:
+    case ELSE:
     	cout<<"ELSE"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
       break;
-    case 1030:
+    case GOTO:
     	cout<<"GOTO"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
       break;
-    case 1031:
+    case PACKAGE:
     	cout<<"PACKAGE"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
       break;
-    case 1032:
+    case CONST:
     	cout<<"CONST"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
       break;
-    case 1033:
+    case IF:
     	cout<<"IF"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
       break;
-    case 1034:
+    case RANGE:
     	cout<<"RANGE"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
       break;
-    case 1035:
+    case CONTINUE:
     	cout<<"CONTINUE"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
       break;
-    case 1036:
+    case FOR:
     	cout<<"FOR"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
       break;
-    case 1037:
+    case OPERATOR:
     	cout<< lexer->YYText() <<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
       //printf("%s\t%s\t%d\t%d\n", lexer->YYText(), lexer->YYText(), row, column);
       break;
-    case 1038:
+    case IMPORT:
     	cout<<"IMPORT"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
       break;
-    case 1040: column+=3; break;
-    case 1041: row++; column=0; break; //will be updated with yyleng
-    case 1042:
+    case TAB: column+=3; break;
+    case NEWLINE: row++; column=0; break; //will be updated with yyleng
+    case ID:
     	cout<<"ID"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
       break;
-    case 1043:
+    case VAR: //***VARCASE REPEAT ERROR see line 117***
     	cout<<"VAR"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
       break;
 
-    case 1044:
+    case INT8:
     	cout<<"INT8"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
       break;
-    case 1045:
+    case INT16:
     	cout<<"INT16"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
       break;
-    case 1046:
+    case INT32:
     	cout<<"INT32"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
       break;
-    case 1047:
+    case INT64:
     	cout<<"INT64"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
       break;
 
-    case 1048:
+    case UINT8:
     	cout<<"UINT8"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
       break;
-    case 1049:
+    case UINT16:
     	cout<<"UINT16"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
       break;
-    case 1050:
+    case UINT32:
     	cout<<"UINT32"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
       break;
-    case 1051:
+    case UINT64:
     	cout<<"UINT64"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
       break;
 
-    case 1052:
+    case FLOAT32:
     	cout<<"FLOAT32"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
       break;
-    case 1053:
+    case FLOAT64:
     	cout<<"FLOAT64"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
       break;
 
-    case 1054:
+    case BYTE:
     	cout<<"BYTE"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
       break;
-    case 1055:
+    case TRUE:
     	cout<<"TRUE"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
       break;
-    case 1056:
+    case FALSE:
     	cout<<"FALSE"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
       break;
-    case 1057:
+    case STRING_LIT:
     	cout<<"STRING_LIT"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
       break;
-    case 1058:
+    case BINARY_LIT:
     	cout<<"BINARY_LIT"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
       break;  
-    case 1059:
+    case HEX_LIT:
     	cout<<"HEX_LIT"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
       break; 
-    case 1060:
+    case FLOAT_LIT:
     	cout<<"FLOAT_LIT"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
       break; 
-    case 1061:
+    case DEC_LIT:
       cout<<"DEC_LIT"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
       break;
     }
