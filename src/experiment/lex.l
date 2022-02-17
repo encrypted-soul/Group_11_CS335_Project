@@ -30,7 +30,11 @@ newline [\n]
 "continue" { return CONTINUE; }
 "for" { return FOR; }
 "import" { return IMPORT; }
-
+"select" {return SELECT;}
+"default" {return DEFAULT;}
+"fallthrough" { return FALLTHROUGH;}
+"go" { return GO;}
+"type" {return TYPE_TOK; }
 "int8" { return INT8; }
 "int16" { return INT16; }
 "int32" { return INT32; }
@@ -44,8 +48,8 @@ newline [\n]
 "byte" { return BYTE; }
 "true" { return TRUE; }
 "false" { return FALSE; }
-"string" { return STRING_LIT; }
-
+"string" { return STRING; }
+"..." { return ELIPSIS;}
 
 {letter}({letter}|{digit})*     { return ID; }
 {digit}+ {return DEC_LIT;}
@@ -58,7 +62,7 @@ newline [\n]
 [&|!\^]        { return *yytext; }
 [<>=]          { return *yytext; }
 [\(\)\[\]\{\}]   { return *yytext; }
-["',;]       { return *yytext; }
+["',;:]       { return *yytext; }
 [.]            { return *yytext; }
 
 {ws}          ;

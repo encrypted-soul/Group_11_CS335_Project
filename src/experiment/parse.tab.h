@@ -1,8 +1,8 @@
-/* A Bison parser, made by GNU Bison 3.7.5.  */
+/* A Bison parser, made by GNU Bison 3.5.1.  */
 
 /* Bison interface for Yacc-like parsers in C
 
-   Copyright (C) 1984, 1989-1990, 2000-2015, 2018-2021 Free Software Foundation,
+   Copyright (C) 1984, 1989-1990, 2000-2015, 2018-2020 Free Software Foundation,
    Inc.
 
    This program is free software: you can redistribute it and/or modify
@@ -31,9 +31,8 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-/* DO NOT RELY ON FEATURES THAT ARE NOT DOCUMENTED in the manual,
-   especially those whose name start with YY_ or yy_.  They are
-   private implementation details that can be changed or removed.  */
+/* Undocumented macros, especially those whose name start with YY_,
+   are private implementation details.  Do not rely on them.  */
 
 #ifndef YY_YY_PARSE_TAB_H_INCLUDED
 # define YY_YY_PARSE_TAB_H_INCLUDED
@@ -45,54 +44,56 @@
 extern int yydebug;
 #endif
 
-/* Token kinds.  */
+/* Token type.  */
 #ifndef YYTOKENTYPE
 # define YYTOKENTYPE
   enum yytokentype
   {
-    YYEMPTY = -2,
-    YYEOF = 0,                     /* "end of file"  */
-    YYerror = 256,                 /* error  */
-    YYUNDEF = 257,                 /* "invalid token"  */
-    CASE = 258,                    /* CASE  */
-    BREAK = 259,                   /* BREAK  */
-    FUNC = 260,                    /* FUNC  */
-    VARCASE = 261,                 /* VARCASE  */
-    STRUCT = 262,                  /* STRUCT  */
-    RETURN = 263,                  /* RETURN  */
-    ELSE = 264,                    /* ELSE  */
-    GOTO = 265,                    /* GOTO  */
-    PACKAGE = 266,                 /* PACKAGE  */
-    CONST = 267,                   /* CONST  */
-    IF = 268,                      /* IF  */
-    RANGE = 269,                   /* RANGE  */
-    CONTINUE = 270,                /* CONTINUE  */
-    FOR = 271,                     /* FOR  */
-    SPACE = 272,                   /* SPACE  */
-    TAB = 273,                     /* TAB  */
-    ID = 274,                      /* ID  */
-    VAR = 275,                     /* VAR  */
-    INT8 = 276,                    /* INT8  */
-    INT16 = 277,                   /* INT16  */
-    INT32 = 278,                   /* INT32  */
-    INT64 = 279,                   /* INT64  */
-    UINT8 = 280,                   /* UINT8  */
-    UINT16 = 281,                  /* UINT16  */
-    UINT32 = 282,                  /* UINT32  */
-    UINT64 = 283,                  /* UINT64  */
-    FLOAT32 = 284,                 /* FLOAT32  */
-    FLOAT64 = 285,                 /* FLOAT64  */
-    BYTE = 286,                    /* BYTE  */
-    TRUE = 287,                    /* TRUE  */
-    FALSE = 288,                   /* FALSE  */
-    STRING_LIT = 289,              /* STRING_LIT  */
-    BINARY_LIT = 290,              /* BINARY_LIT  */
-    HEX_LIT = 291,                 /* HEX_LIT  */
-    FLOAT_LIT = 292,               /* FLOAT_LIT  */
-    DEC_LIT = 293,                 /* DEC_LIT  */
-    IMPORT = 294                   /* IMPORT  */
+    CASE = 258,
+    BREAK = 259,
+    FUNC = 260,
+    VARCASE = 261,
+    STRUCT = 262,
+    RETURN = 263,
+    ELSE = 264,
+    GOTO = 265,
+    PACKAGE = 266,
+    CONST = 267,
+    IF = 268,
+    RANGE = 269,
+    CONTINUE = 270,
+    FOR = 271,
+    SPACE = 272,
+    TAB = 273,
+    ID = 274,
+    VAR = 275,
+    INT8 = 276,
+    INT16 = 277,
+    INT32 = 278,
+    INT64 = 279,
+    UINT8 = 280,
+    UINT16 = 281,
+    UINT32 = 282,
+    UINT64 = 283,
+    FLOAT32 = 284,
+    FLOAT64 = 285,
+    BYTE = 286,
+    TRUE = 287,
+    FALSE = 288,
+    STRING_LIT = 289,
+    BINARY_LIT = 290,
+    HEX_LIT = 291,
+    FLOAT_LIT = 292,
+    DEC_LIT = 293,
+    IMPORT = 294,
+    STRING = 295,
+    ELIPSIS = 296,
+    SELECT = 297,
+    GO = 298,
+    FALLTHROUGH = 299,
+    DEFAULT = 300,
+    TYPE_TOK = 301
   };
-  typedef enum yytokentype yytoken_kind_t;
 #endif
 
 /* Value type.  */
