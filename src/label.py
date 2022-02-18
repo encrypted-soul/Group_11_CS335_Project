@@ -5,8 +5,6 @@ file2 = open('new_parse.gv', 'x')
 
 lines = file1.readlines()
 
-print("hey gagan")
-
 count = 0
 # Strips the newline character
 for line in lines:

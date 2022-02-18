@@ -5,10 +5,10 @@ void yyerror(char* s);
 int yydebug = 1;
 %}
 %define parse.trace
-%token CASE BREAK FUNC VARCASE STRUCT RETURN ELSE GOTO PACKAGE CONST IF RANGE CONTINUE FOR SPACE TAB ID VAR INT8 INT16 INT32 INT64 UINT8 UINT16 UINT32 UINT64 FLOAT32 FLOAT64 BYTE TRUE FALSE STRING_LIT BINARY_LIT HEX_LIT FLOAT_LIT DEC_LIT IMPORT STRING ELIPSIS SELECT GO FALLTHROUGH DEFAULT TYPE_TOK IMPORT_NAME
+%token CASE BREAK FUNC VARCASE STRUCT RETURN ELSE GOTO PACKAGE CONST IF RANGE CONTINUE FOR SPACE TAB ID VAR INT8 INT16 INT32 INT64 UINT8 UINT16 UINT32 UINT64 FLOAT32 FLOAT64 BYTE TRUE FALSE STRING_LIT BINARY_LIT HEX_LIT FLOAT_LIT DEC_LIT IMPORT STRING ELIPSIS SELECT GO FALLTHROUGH DEFAULT TYPE_TOK GE LE DOUBLE_OR DOUBLE_AND EQ NE LEFT_SHIFT RIGHT_SHIFT INCMNT DECMNT OR_EQ XOR_EQ MUL_EQ DIV_EQ MOD_EQ LS_EQ RS_EQ AND_EQ PLUS_EQ MINUS_EQ
 
 %left ','
-%right '=' "+=" "-=" "|=" "^=" "*=" "/=" "%=" "<<=" ">>=" "&="
+%right '=' PLUS_EQ MINUS_EQ OR_EQ XOR_EQ MUL_EQ DIV_EQ MOD_EQ LS_EQ RS_EQ AND_EQ
 %left "||"
 %left "&&"
 %left '|'
@@ -141,16 +141,17 @@ add_op     : '+'
 |            '|'
 |            '^' ;
 
-assign_op  : "+="
-|           "-="
-|"|="
-|"^="
-|"*="
-|"/="
-|"%="
-|"<<="
-|">>="
-|"&="
+assign_op  : PLUS_EQ
+|           MINUS_EQ
+|OR_EQ
+|XOR_EQ
+|MUL_EQ
+|DIV_EQ
+|MOD_EQ
+|LS_EQ
+|RS_EQ
+|AND_EQ
+|'='
 ;
 mul_op     : '*'
 |            '/'
@@ -357,8 +358,8 @@ Productions leading up to the conflict state found.  Still finding a possible un
 */
 EmptyStmt		: 	%empty ;
 ExpressionStmt	:	Expression ;
-IncDecStmt		:	Expression "++"
-|					Expression "--" ;
+IncDecStmt		:	Expression INCMNT
+|					Expression DECMNT ;
 
 Assignment		:	ExpressionList assign_op ExpressionList;
 

@@ -1,13 +1,13 @@
 
 all:
-	bison -d -v -Wconflicts-sr parse.y
+	bison -d -v parse.y
 	bison --graph parse.y
 	python3 label.py
 	sfdp -x -Goverlap=scale -Tpng new_parse.gv > automata.png
-	flex  lex.l
+	flex lex.l
 	gcc -c -lfl parse.tab.c
 	gcc -c -lfl lex.yy.c
-	gcc parse.tab.o lex.yy.o -o parse
+	gcc parse.tab.o lex.yy.o -o parse.o
 	rm -rf parse.gv
 
 clean:

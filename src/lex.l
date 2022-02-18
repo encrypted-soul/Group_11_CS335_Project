@@ -51,6 +51,27 @@ newline [\n]
 "string" { return STRING; }
 "..." { return ELIPSIS;}
 
+">=" {return GE;}
+"<=" {return LE;}
+"||" { return DOUBLE_OR;}
+"&&" {return DOUBLE_AND;}
+"==" {return EQ;}
+"!=" {return NE;}
+"<<" {return LEFT_SHIFT;}
+">>" { return RIGHT_SHIFT;}
+"++" { return INCMNT;}
+"--" { return DECMNT;}
+"+="  {return PLUS_EQ;}
+"-=" {return MINUS_EQ;}
+"|="  { return OR_EQ;}
+"^=" { return XOR_EQ;}
+"*=" { return MUL_EQ;}
+"/=" { return DIV_EQ;}
+"%=" { return MOD_EQ;}
+"<<=" { return LS_EQ;}
+">>=" { return RS_EQ;}
+"&=" { return AND_EQ;}
+
 {letter}({letter}|{digit})*     { return ID; }
 {digit}+ {return DEC_LIT;}
 (0)[bB]{bindigit}+ {return BINARY_LIT;}
