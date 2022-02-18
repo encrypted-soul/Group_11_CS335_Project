@@ -1,131 +1,238 @@
 %{
-#include "iostream.h"
+#include <stdio.h>
+int yylex();
+void yyerror(char* s);
+int yydebug = 1;
 %}
+%define parse.trace
+%token CASE BREAK FUNC VARCASE STRUCT RETURN ELSE GOTO PACKAGE CONST IF RANGE CONTINUE FOR SPACE TAB ID VAR INT8 INT16 INT32 INT64 UINT8 UINT16 UINT32 UINT64 FLOAT32 FLOAT64 BYTE TRUE FALSE STRING_LIT BINARY_LIT HEX_LIT FLOAT_LIT DEC_LIT IMPORT STRING ELIPSIS SELECT GO FALLTHROUGH DEFAULT TYPE_TOK IMPORT_NAME
 
-%token CASE BREAK FUNC VARCASE STRUCT RETURN ELSE GOTO PACKAGE CONST IF RANGE CONTINUE FOR OPERATOR IMPORT SPACE TAB NEWLINE ID VAR INT8 INT16 INT32 INT64 UINT8 UINT16 UINT32 UINT64 FLOAT32 FLOAT64 BYTE TRUE FALSE STRING_LIT BINARY_LIT HEX_LIT FLOAT_LIT DEC_LIT
-
-/* TODO: Specify precedence rules for all operators */
-/* TODO: Observe binary_op, rel_op, add_op, ;... -> these seems to be a class of operator having same precedence and are mentioned in increasing order of precedence( top(rel_op) is lowest and bottom(unary_op) is highest) : CONFIRM
-/* Associativity */
+%left ','
+%right '=' "+=" "-=" "|=" "^=" "*=" "/=" "%=" "<<=" ">>=" "&="
+%left "||"
+%left "&&"
+%left '|'
+%left '^'
+%left '&'
+%left "==" "!="
+%left '>' '<' ">=" "<="
+%left ">>" "<<"
 %left '+' '-'
-%left '*' '/'
+%left '*' '/' '%'
+%right '!'
 
-/************************** MAJOR WORK **************************/
-
-/* 1. DEFINE SEMANTICS OF RULES (e.g. for "exp : exp '+' exp", define "$$ = $1 + $3")
-/* 2. Conver all EBNF rules into equivalent yacc rule.
-/*    Specifically We are looking for  */
-/*    |   alternation -> used as it is so nothing changes */
-/*    ()  grouping    -> ditto */
-/*    []  option (0 or 1 times) {} -> Two alternative rules */
-/*    {}  repetition (0 to n times)  -> Define new recursive rule for this particular term only */
-/*    Look for original go lexer/yacc tool for reference */
-/* 3. Remove all unnecessary rules and support only what we promised initially */
-
-/**************************            **************************/
+%left EXPR
+%right UNARY
 
 %%
 /* First non-terminal symbol defined is taken as the start symbol, so ours is SourceFile*/
 /* %start SourceFile */
-SourceFile  : PackageClause ";" { ImportDecl ";" } { TopLevelDecl ";" } ;
+/* DON'T USE SC -> Semi Colon  recursively */
+/* CM -> Comma */
+/* Name in order : {IMPORT ';'} -> STAR_Import_SC */
+/* { ',' ID} -> STAR_CM_ID */
 
-PackageClause  : "package" PackageName ;
-PackageName    : identifier ;
+SourceFile: PackageClause ';' STAR_ImportDecl_SC STAR_TopLevelDecl_SC;
 
-ImportDecl       : "import" ( ImportSpec | "(" { ImportSpec ";" } ")" ) ;
-ImportSpec       : [ "." | PackageName ] ImportPath ;
-ImportPath       : string_lit ;
-
-
-/* HERE */
-TopLevelDecl  : Declaration ;
-|               FunctionDecl ;
-| 		MethodDecl ;
+PackageClause  : PACKAGE PackageName ; /* package math */
+PackageName    : ID ; /* math */
 
 
+/* CHANGE: Use comma in place of Semi colon */
+ImportDecl       : IMPORT ImportSpec /* import "fmt" */
+|                  IMPORT '(' STAR_ImportSpec_SC')' ; /* import ( "fmt", "mth",) ; */
 
+ImportSpec       : ImportPath /* "llvm/dir" */
+|                  '.' ImportPath /* . "llvm/dir" */
+|                  PackageName ImportPath ; /* math "llvm/dir" ;  cmd "llvm/cmd" ; "llvm" "dir" */
+
+ImportPath       : STRING_LIT ; /* "fmt" */
+
+TopLevelDecl     : Declaration
+|                  FunctionDecl;
+
+/******************* FUCK YOU BISON ********************/
+
+STAR_TopLevelDecl_SC : STAR_TopLevelDecl_SC TopLevelDecl ';'
+|                   %empty ;
+
+STAR_ImportDecl_SC : STAR_ImportDecl_SC ImportDecl ';'
+|                 %empty ;
+
+STAR_ImportSpec_SC : STAR_ImportSpec_SC ImportSpec ';'
+|                 %empty ;
+
+STAR_CM_ID: STAR_CM_ID ',' ID
+|                 %empty ;
+
+STAR_ConstSpec_SC : STAR_ConstSpec_SC ConstSpec ';'
+|                 %empty ;
+STAR_VarSpec_SC   : STAR_VarSpec_SC VarSpec ';'
+|                 %empty ;
+STAR_CM_EXP: STAR_CM_EXP ',' Expression
+|                 %empty ;
+STAR_TypeSpec_SC   : STAR_TypeSpec_SC ';'
+|                 %empty ;
+
+/* this same as if StatementList */
+STAR_Statement_SC	: STAR_Statement_SC Statement ';'
+|					%empty;
+
+
+STAR_CM_ParameterDecl	: STAR_CM_ParameterDecl ',' ParameterDecl
+|					%empty;
+
+STAR_FieldDecl_SC : STAR_FieldDecl_SC FieldDecl ';'
+|                 %empty ;
 /************************** Declarations **************************/
 
-Declaration   : ConstDecl | TypeDecl | VarDecl ;
+Declaration      : ConstDecl
+|                  TypeDecl
+|                  VarDecl ; /* const ... */
 
-TypeDecl : "type" ( TypeSpec | "(" { TypeSpec ";" } ")" ) ;
-TypeSpec : AliasDecl | TypeDef ;
-AliasDecl : identifier "=" Type ;
-TypeDef : identifier Type ;
+/************** Constant Declaration ******************/
 
-VarDecl     : "var" ( VarSpec | "(" { VarSpec ";" } ")" ) ;
-VarSpec     : IdentifierList ( Type [ "=" ExpressionList ] | "=" ExpressionList ) ;
-/* TODO: Remove short variable declaration if we don't support it. */
-ShortVarDecl : IdentifierList ":=" ExpressionList ;
+ConstDecl        : CONST ConstSpec /* const a, b, c, d ; */
+|                  CONST '(' STAR_ConstSpec_SC ')' ; /* const  ( a, b, c , d ; e, f, g, h); */
+ConstSpec        : IdentifierList ;
+IdentifierList   : ID STAR_CM_ID  ; /* a, b, c */
 
-ConstDecl      : "const" ( ConstSpec | "(" { ConstSpec ";" } ")" ) ;
-/* TODO: Remove types? */
-ConstSpec      : IdentifierList [ [ Type ] "=" ExpressionList ] ;
-IdentifierList : identifier { "," identifier } ;
-ExpressionList : Expression { "," Expression } ;
+/************** Type Declaration ******************/
+TypeDecl         : TYPE_TOK TypeSpec
+|                  TYPE_TOK '(' STAR_TypeSpec_SC ')';
+TypeSpec         : AliasDecl
+|                  TypeDef ;
+AliasDecl        : ID '=' Type ;
+TypeDef          : ID Type ;
 
-/************************** Expressions **************************/
+/************* Variable Declaration ******************/
 
-Expression : UnaryExpr | Expression binary_op Expression ;
+VarDecl          : VAR VarSpec
+|                  VAR '(' STAR_VarSpec_SC ')' ;
+VarSpec          : IdentifierList "=" ExpressionList ;
 
-UnaryExpr  : PrimaryExpr | unary_op UnaryExpr ;
+/************* Expressions ******************/
+
+ExpressionList : Expression STAR_CM_EXP ;
+
+Expression : UnaryExpr %prec UNARY
+|            Expression binary_op Expression %prec EXPR ;
+
+UnaryExpr  : PrimaryExpr
+|            unary_op UnaryExpr ;
 
 /* TODO: Remove extra operators that we do not support */
 /* TODO: Replace <= to LE and ;... */
-binary_op  : "||" ;
-| 	     "&&" ;
-| 	     rel_op ;
-|            add_op ;
+binary_op  : "||"
+| 	     "&&"
+| 	     rel_op
+|            add_op
 | 	     mul_op ;
 
-rel_op     : "==" ;
-|     	     "!=" ;
-|            "<" ;
-|            "<=" ;
-|            ">" ;
-|            ">=" ;
+rel_op     : "=="
+|     	     "!="
+|            '<'
+|            "<="
+|            '>'
+|            ">="
+;
+add_op     : '+'
+|            '-'
+|            '|'
+|            '^' ;
 
-add_op     : "+" ;
-|            "-" ;
-|            "|" ;
-|            "^" ;
+assign_op  : "+="
+|           "-="
+|"|="
+|"^="
+|"*="
+|"/="
+|"%="
+|"<<="
+|">>="
+|"&="
+;
+mul_op     : '*'
+|            '/'
+|            '%'
+|            "<<"
+|            ">>"
+|            '&' ;
 
-mul_op     : "*" ;
-|            "/" ;
-|            "%" ;
-|            "<<" ;
-|            ">>" ;
-|            "&" ;
-|            "&^" ;
+unary_op   : '+'
+|            '-'
+|            '!'
+|            '^'
+|            '*'
+|            '&'
 
-unary_op   : "+" ;
-|            "-" ;
-|            "!" ;
-|            "^" ;
-|            "*" ;
-|            "&" ;
+/*
+parse.y: warning: reduce/reduce conflict on token '.' [-Wcounterexamples]
+  Example: ID • '.' ID
+  First reduce derivation
+    PrimaryExpr
+    ↳ 82: Operand
+          ↳ 98: OperandName
+                ↳ 110: QualifiedIdent
+                       ↳ 111: PackageName '.' ID
+                              ↳ 3: ID •
+  Second reduce derivation
+    PrimaryExpr
+    ↳ 84: PrimaryExpr             Selector
+          ↳ 82: Operand           ↳ 86: '.' ID
+                ↳ 98: OperandName
+                      ↳ 109: ID •
 
+*/
 
 PrimaryExpr : Operand ;
-|             Conversion ;
-|             MethodExpr ;
-|             PrimaryExpr Selector ;
-|             PrimaryExpr Index ;
-|             PrimaryExpr TypeAssertion ;
-|             PrimaryExpr Arguments ;
+|             PrimaryExpr Index;
+|             PrimaryExpr Selector
+|             PrimaryExpr Arguments;
 
-Selector       : "." identifier ;
-Index          : "[" Expression "]" ;
+Selector       : '.' ID ;
+Index          : '[' Expression ']' ;
 
-/* TODO: what are conversions and do we support them */
-Conversion : Type "(" Expression [ "," ] ")" ;
-/* TODO: what are type assertion and do we support them */
-TypeAssertion  : "." "(" Type ")" ;
-Arguments      : "(" [ ( ExpressionList | Type [ "," ExpressionList ] ) [ "..." ] [ "," ] ] ")" ;
+Arguments      : '(' ')'
+|                '(' ArgumentInBracket ')'
+;
 
-MethodExpr    : ReceiverType "." MethodName ;
-ReceiverType  : Type ;
+/*
+parse.y: warning: shift/reduce conflict on token ID [-Wcounterexamples]
+  Example: '*' • ID
+  Shift derivation
+    ArgumentInBracketFirst
+    ↳ 92: Type
+          ↳ 192: TypeLit
+                 ↳ 198: PointerType
+                        ↳ 207: '*' BaseType
+                                   ↳ 208: Type
+                                          ↳ 191: TypeName
+                                                 ↳ 194: • ID
+  Reduce derivation
+    ArgumentInBracketFirst
+    ↳ 91: ExpressionList
+          ↳ 50: Expression                                            STAR_CM_EXP
+                ↳ 51: UnaryExpr                                       ↳ 50: ε
+                      ↳ 54: unary_op    UnaryExpr
+                            ↳ 80: '*' • ↳ 53: PrimaryExpr
+                                              ↳ 82: Operand
+                                                    ↳ 99: OperandName
+                                                          ↳ 110: ID
 
+*/
+
+ArgumentInBracket : ArgumentInBracketFirst ArgumentInBracketEnd ;
+
+ArgumentInBracketFirst : Type
+|                         Type ',' ExpressionList
+;
+
+ArgumentInBracketEnd : ELIPSIS ','
+|                      ELIPSIS
+|                      %empty
+;
+/*Arugument removed CM*/
 /* TODO: Literal -> token name */
 Operand     : Literal ;
 |             OperandName ;
@@ -134,176 +241,278 @@ Operand     : Literal ;
 /************************** Literals **************************/
 
 /* TODO: Remove composite literal and what they do even mean? */
-Literal     : BasicLit ;
-|             CompositeLit ;
-|             FunctionLit ;
+Literal     : BasicLit
+|             CompositeLit
+|             FunctionLit
+;
 
 /* TODO: Replace by token names  */
-BasicLit    : int_lit ;
-|             float_lit ;
-|             string_lit ;
+/* TODO: get integer value using strtol() function by giving appropriate base in lexer */
+INT_LIT : DEC_LIT
+|         BINARY_LIT
+|         HEX_LIT
+;
 
-OperandName : identifier ;
-|             QualifiedIdent ;
+BasicLit    : INT_LIT
+|             FLOAT_LIT
+|             STRING_LIT
+;
 
-/* TODO: How are we going to use qualified identifiers */
-QualifiedIdent : PackageName "." identifier ;
+OperandName : ID
+|             QualifiedIdent
+;
+/* TODO: How are we going to use qualified IDs */
+QualifiedIdent : PackageName '.' ID ;
+
 
 CompositeLit  : LiteralType LiteralValue ;
-LiteralType   : StructType ;
-|               ArrayType ;
-|               "[" "..." "]" ElementType ;
-|               TypeName ;
+LiteralType   : StructType
+|               ArrayType
+|               '[' ELIPSIS ']' ElementType
+|               TypeName
+;
 
-LiteralValue  : "{" [ ElementList [ "," ] ] "}" ;
-ElementList   : KeyedElement { "," KeyedElement } ;
-KeyedElement  : [ Key ":" ] Element ;
-Key           : FieldName ;
-|               Expression ;
-|               LiteralValue ;
+LiteralValue  : '{' '}'
+|               '{' ElementList '}'
+;
 
-FieldName     : identifier ;
-Element       : Expression ;
-|               LiteralValue ;
+ElementList   : KeyedElement STAR_CM_KeyedElement ;
+STAR_CM_KeyedElement : STAR_CM_KeyedElement ',' KeyedElement
+|                      %empty
+;
+
+/* add colon as token */
+KeyedElement  : Key ':' Element
+|               Element
+;
+
+Key           : Expression
+|               LiteralValue
+;
+
+Element       : Expression
+|               LiteralValue
+;
 
 /* TODO: If we don't use function literals remove the corresponding rules */
-FunctionLit : "func" Signature FunctionBody ;
+FunctionLit : FUNC Signature FunctionBody ;
 
-/**************************Function  Declaration **************************/
+/************************** Function Declaration **************************/
+FunctionDecl	:	FUNC FunctionName Signature  FunctionBody
+|					FUNC FunctionName Signature	;
 
-FunctionDecl : "func" FunctionName Signature [ FunctionBody ] ;
-FunctionName : identifier ;
-FunctionBody : Block ;
-
-Block : "{" StatementList "}" ;
-StatementList : { Statement ";" } ;
-
-/**************************Method  Declarations **************************/
-MethodDecl : "func" Receiver MethodName Signature [ FunctionBody ] ;
-Receiver   : Parameters ;
-
-/************************** Statements **************************/
-
-Statement : Declaration ;
-|           LabeledStmt ;
-|           SimpleStmt ;
-|           GoStmt ;
-|           ReturnStmt ;
-|           BreakStmt ;
-|           ContinueStmt ;
-|           GotoStmt ;
-|           FallthroughStmt ;
-|           Block ;
-|           IfStmt ;
-|           SwitchStmt ;
-|           SelectStmt ;
-|           ForStmt ;
-
-LabeledStmt : Label ":" Statement ;
-Label       : identifier ;
+FunctionName 	:	ID;
+FunctionBody	:	Block ;
+Block			:	'{' STAR_Statement_SC '}' ;
+/* no ... operator */
 
 
-SimpleStmt : EmptyStmt ;
-|            ExpressionStmt ;
-|            IncDecStmt ;
-|            Assignment ;
-|            ShortVarDecl ;
 
-EmptyStmt : ;
-ExpressionStmt : Expression ;
+/************** Statement ***************/
 
-IncDecStmt : Expression ( "++" | "--" ) ;
+Statement 		: 	Declaration
+|           		LabeledStmt
+|           		SimpleStmt
+|           		GoStmt
+|           		ReturnStmt
+|           		BreakStmt
+|           		ContinueStmt
+|           		GotoStmt
+|           		FallthroughStmt
+|           		Block
+|           		IfStmt
+|           		ForStmt ;
 
-Assignment : ExpressionList assign_op ExpressionList ;
-assign_op : [ add_op | mul_op ] "=" ;
+/* removed switchstmt, SelectStmt */
 
-IfStmt : "if" [ SimpleStmt ";" ] Expression Block [ "else" ( IfStmt | Block ) ] ;
+LabeledStmt		: 	Label ':' Statement ;
+Label			:	ID ;
 
-/* TODO: remove type switch Statement */
-SwitchStmt : ExprSwitchStmt ;
-|            TypeSwitchStmt ;
+SimpleStmt		:	EmptyStmt
+|					ExpressionStmt
+|					IncDecStmt
+|					Assignment ;
+/*|					ShortVarDecl ;	*/
+
+/* Create new tokens for ++ and -- */
+/*
+Productions leading up to the conflict state found.  Still finding a possible unifying counterexample...time limit exceeded: 6.000000
+  First example: '{' '}' '}'
+  First reduce derivation
+    IfStmt
+    ↳ 166: '{' STAR_Statement_SC Block
+               ↳ 142: ε          ↳ 142: '}' '}'
+  Second example: QualifiedIdent • '{' '}' Block
+  Second reduce derivation
+    IfStmt
+    ↳ 166: Expression                                                                           Block
+           ↳ 51: UnaryExpr
+                 ↳ 53: PrimaryExpr
+                       ↳ 92: Operand
+                             ↳ 106: Literal
+                                    ↳ 110: CompositeLit
+                                           ↳ 121: LiteralType                    LiteralValue
+                                                  ↳ 125: TypeName                ↳ 126: '{' '}'
+
+*/
+EmptyStmt		: 	%empty ;
+ExpressionStmt	:	Expression ;
+IncDecStmt		:	Expression "++"
+|					Expression "--" ;
+
+Assignment		:	ExpressionList assign_op ExpressionList;
 
 
-ExprSwitchStmt : "switch" [ SimpleStmt ";" ] [ Expression ] "{" { ExprCaseClause } "}" ;
-ExprCaseClause : ExprSwitchCase ":" StatementList ;
-ExprSwitchCase : "case" ExpressionList ;
-|                "default" ;
+IfStmt			:	IF Expression Block
+|					IF SimpleStmt ';' Expression Block
+|					IF SimpleStmt ';' Expression Block ELSE Block
+|					IF SimpleStmt ';' Expression Block ELSE IfStmt ;
 
+/* TOKEN: FOR */
+ForStmt : FOR Block
+|         FOR ForStmtAfter Block
+;
 
-/* TODO: Remove type switch statement rules */
-TypeSwitchStmt  : "switch" [ SimpleStmt ";" ] TypeSwitchGuard "{" { TypeCaseClause } "}" ;
-TypeSwitchGuard : [ identifier ":=" ] PrimaryExpr "." "(" "type" ")" ;
-TypeCaseClause  : TypeSwitchCase ":" StatementList ;
-TypeSwitchCase  : "case" TypeList ;
-|                 "default" ;
-TypeList        : Type { "," Type } ;
+/* statement that comes after a for statement */
+ForStmtAfter : Condition
+|              ForClause
+|              RangeClause
+;
 
-
-ForStmt : "for" [ Condition | ForClause | RangeClause ] Block ;
 Condition : Expression ;
 
-ForClause : [ InitStmt ] ";" [ Condition ] ";" [ PostStmt ] ;
+ForClause : OPT_InitStmt ';' OPT_Condition ';' OPT_PostStmt;
+
+OPT_InitStmt : InitStmt
+;
+
+OPT_Condition : Condition
+|              %empty
+;
+
+/*
+                                                                                                                                                                                                ↳ 120: KeyedElement STAR_CM_KeyedElement •
+parse.y: warning: reduce/reduce conflict on token '{' [-Wcounterexamples]
+  Example: •
+  First reduce derivation
+    OPT_PostStmt
+    ↳ 175: PostStmt
+           ↳ 178: SimpleStmt
+                  ↳ 149: EmptyStmt
+                         ↳ 153: ε •
+  Second reduce derivation
+    OPT_PostStmt
+    ↳ 176: ε •
+*/
+OPT_PostStmt : PostStmt
+;
+
 InitStmt : SimpleStmt ;
 PostStmt : SimpleStmt ;
 
+
 /* TODO: Remove range clause related rules if we don't support them */
-RangeClause : [ ExpressionList "=" | IdentifierList ":=" ] "range" Expression ;
+/* NOTE: Removed short variable declaration */
+RangeClause : RANGE Expression
+|             ExpressionList '=' RANGE Expression
+;
 
-/* TODO: Remove go statement related rules as we don't support them */
-GoStmt : "go" Expression ;
+/* TOKEN: GO */
+GoStmt : GO Expression ;
 
+ReturnStmt : RETURN ExpressionList
+|            RETURN
+;
 
-/* TODO: Remove Select statements if we don't support them */
-SelectStmt : "select" "{" { CommClause } "}" ;
-CommClause : CommCase ":" StatementList ;
-CommCase   : "case" ( SendStmt | RecvStmt )
-|            "default" ;
+BreakStmt : BREAK Label
+|           BREAK
+;
 
-ReturnStmt : "return" [ ExpressionList ] ;
-
-BreakStmt : "break" [ Label ] ;
-
-ContinueStmt : "continue" [ Label ] ;
+ContinueStmt : CONTINUE Label
+|              CONTINUE
+;
 
 /* TODO: goto is bad, remove if we don't support */
-GotoStmt : "goto" Label ;
+GotoStmt : GOTO Label ;
 
 /* TODO: remove fallthrough if don't need it */
-FallthroughStmt : "fallthrough" ;
+FallthroughStmt : FALLTHROUGH;
 
-/************************** Types **************************/
+/************************Types******************************/
 
-/* TODO: How do we plan to support types */
-Type      : TypeName ;
-|           TypeLit ;
-|           "(" Type ")" ;
+Type : TypeName
+|      TypeLit
+|      '(' Type ')' ;
 
-TypeName  : identifier ;
-|           QualifiedIdent ;
+TypeName  : ID
+|          QualifiedIdent  ;
 
-TypeLit   : ArrayType ;
-|           StructType ;
-|           PointerType ;
+TypeLit   : ArrayType
+|           StructType
+|           PointerType
 |           FunctionType ;
 
-ArrayType   : "[" ArrayLength "]" ElementType ;
+/*
+[32]byte
+[2*N] struct { x, y int32 }
+[1000]*float64
+[3][5]int
+[2][2][2]float64  // same as [2]([2]([2]float64))
+*/
+ArrayType   : '[' ArrayLength ']' ElementType ;
 ArrayLength : Expression ;
 ElementType : Type ;
 
+/* struct {
+	x, y int
+	u float32
+	_ float32  // padding
+	A *[]int
+	F func()
+}*/
+StructType    : STRUCT '{' STAR_FieldDecl_SC '}' ;
+FieldDecl     : IdentifierList Type Tag
+|               IdentifierList Type ;
+Tag           : STRING_LIT
 
-StructType    : "struct" "{" { FieldDecl ";" } "}" ;
-FieldDecl     : (IdentifierList Type | EmbeddedField) [ Tag ] ;
-EmbeddedField : [ "*" ] TypeName ;
-Tag           : string_lit
-
-PointerType : "*" BaseType ;
+/*
+*Point
+*[4]int
+*/
+PointerType : '*' BaseType ;
 BaseType    : Type ;
 
+/*
+func()
+func(x int) int
+func(a, _ int, z float32) bool
+func(a, b int, z float32) (bool)
+*/
 
-FunctionType   : "func" Signature ;
-Signature      : Parameters [ Result ] ;
-Result         : Parameters ;
-|                Type ;
-Parameters     : "(" [ ParameterList [ "," ] ] ")" ;
-ParameterList  : ParameterDecl { "," ParameterDecl } ;
-ParameterDecl  : [ IdentifierList ] [ "..." ] Type ;
+FunctionType   : FUNC Signature ;
+Signature		: 	Parameters
+|					Parameters Result ;
+Result			: 	Parameters
+|                   TypeName
+|                   TypeLit ;
+
+Parameters		: 	'(' ')'
+|					'(' ParameterList  ')' ; 	/*what is up with last , ?? */
+
+ParameterList	:	ParameterDecl STAR_CM_ParameterDecl ;
+ParameterDecl	:	IdentifierList Type ;
+|                   IdentifierList ELIPSIS Type
+|                   ELIPSIS Type;
+/* no ... operator */
+
+%%
+void yyerror(char* s){
+    printf("ERROR: %s\n", s);
+}
+
+int main(){
+    while(1){
+        yyparse();
+    }
+    return 0;
+}
