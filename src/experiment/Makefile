@@ -1,6 +1,6 @@
 
 all:
-	bison -d -v parse.y
+	bison -d -v -Wconflicts-sr parse.y
 	bison --graph parse.y
 	# dot -Tpdf parse.dot -o parser.pdf
 	flex  lex.l

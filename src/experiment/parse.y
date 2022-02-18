@@ -220,12 +220,11 @@ KeyedElement  : Key ':' Element
 |               Element
 ;
 
-Key           : FieldName
+Key           : ID
 |               Expression
 |               LiteralValue
 ;
 
-FieldName     : ID ;
 Element       : Expression
 |               LiteralValue
 ;
@@ -240,19 +239,6 @@ FunctionDecl	:	FUNC FunctionName Signature  FunctionBody
 FunctionName 	:	ID;
 FunctionBody	:	Block ;
 Block			:	'{' STAR_Statement_SC '}' ;
-
-Signature		: 	Parameters
-|					Parameters Result ;
-Result			: 	Parameters
-|					Type ;
-
-Parameters		: 	'(' ')'
-|					'(' ParameterList  ')'
-|					'(' ParameterList ',' ')' ; 	/*what is up with last , ?? */
-
-ParameterList	:	ParameterDecl STAR_CM_ParameterDecl ;
-ParameterDecl	:	Type
-|					IdentifierList Type ;
 /* no ... operator */
 
 
@@ -408,18 +394,21 @@ func(a, b int, z float32) (bool)
 */
 
 FunctionType   : FUNC Signature ;
-Signature      : Parameters
-|                Parameters Result ;
-Result         : Parameters
-|                Type ;
-Parameters     : '(' ')'
-|                 ParameterList ','
-|                 ParameterList ;
-ParameterList  : ParameterDecl  STAR_CM_ParameterDecl;
-ParameterDecl  : Type
-|                IdentifierList Type
-|                IdentifierList ELIPSIS Type
-|                ELIPSIS Type;
+Signature		: 	Parameters
+|					Parameters Result ;
+Result			: 	Parameters
+|					Type ;
+
+Parameters		: 	'(' ')'
+|					'(' ParameterList  ')'
+|					'(' ParameterList ',' ')' ; 	/*what is up with last , ?? */
+
+ParameterList	:	ParameterDecl STAR_CM_ParameterDecl ;
+ParameterDecl	:	Type
+|					IdentifierList Type ;
+|                   IdentifierList ELIPSIS Type
+|                   ELIPSIS Type;
+/* no ... operator */
 
 %%
 void yyerror(char* s){
