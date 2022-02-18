@@ -1,23 +1,19 @@
 %{
-#include<iostream>
-using namespace std;
-#include "y.tab.h"
-void yyerror(string s);
+#include <stdio.h>
+#include "parse.tab.h"
 int yylex();
-int row = 1, column = 1;
-char ** a[256] = ["FLOAT", "HEX", ]
+extern void yyerror(char* s);
 %}
 
-%option noyywrap 
+%option noyywrap
 letter [a-zA-Z_]
-dec_digit [0-9]
-binary_digit [01]
-hex_digit [[:xdigit:]]
+digit [[:digit:]]
+hexdigit [[:xdigit:]]
+bindigit [01]
 ws [ ]
 tab [\t]
 newline [\n]
 
-// TODO: define GE, LE, NE, EQ
 %%
 "break"  { return BREAK; }
 "func" { return FUNC; }
@@ -34,7 +30,11 @@ newline [\n]
 "continue" { return CONTINUE; }
 "for" { return FOR; }
 "import" { return IMPORT; }
-
+"select" {return SELECT;}
+"default" {return DEFAULT;}
+"fallthrough" { return FALLTHROUGH;}
+"go" { return GO;}
+"type" {return TYPE_TOK; }
 "int8" { return INT8; }
 "int16" { return INT16; }
 "int32" { return INT32; }
@@ -48,176 +48,50 @@ newline [\n]
 "byte" { return BYTE; }
 "true" { return TRUE; }
 "false" { return FALSE; }
-"string" { return STRING_LIT; }
+"string" { return STRING; }
+"..." { return ELIPSIS;}
 
-{letter}({letter}|{dec_digit})*     { //yylval.id = strdup(lexer->YYText());
-                                  return ID; }
+">=" {return GE;}
+"<=" {return LE;}
+"||" { return DOUBLE_OR;}
+"&&" {return DOUBLE_AND;}
+"==" {return EQ;}
+"!=" {return NE;}
+"<<" {return LEFT_SHIFT;}
+">>" { return RIGHT_SHIFT;}
+"++" { return INCMNT;}
+"--" { return DECMNT;}
+"+="  {return PLUS_EQ;}
+"-=" {return MINUS_EQ;}
+"|="  { return OR_EQ;}
+"^=" { return XOR_EQ;}
+"*=" { return MUL_EQ;}
+"/=" { return DIV_EQ;}
+"%=" { return MOD_EQ;}
+"<<=" { return LS_EQ;}
+">>=" { return RS_EQ;}
+"&=" { return AND_EQ;}
 
-// TODO: Define YYLTYPE as union and Assign relevant values to yylval
-// For integer values use strtol() function with relevant base
-{dec_digit}+ {return DEC_LIT;}
-(0)[bB]{binary_digit}+ {return BINARY_LIT;}
-(0)[xX]{hex_digit}+ {return HEX_LIT;}
-{dec_digit}*+"."{dec_digit}+|{dec_digit}*+"."{dec_digit}*+[eE][-+]?{dec_digit}*|{dec_digit}*+[eE][-+    ]?{dec_digit}*|"."{dec_digit}*+[eE][-+]?{dec_digit}*  { return FLOAT_LIT;} 
-
-// TODO: Use BEGIN for recognizing string
+{letter}({letter}|{digit})*     { return ID; }
+{digit}+ {return DEC_LIT;}
+(0)[bB]{bindigit}+ {return BINARY_LIT;}
+(0)[xX]{hexdigit}+ {return HEX_LIT;}
+{digit}*+"."{digit}+|{digit}*+"."{digit}*+[eE][-+]?{digit}*|{digit}*+[eE][-+    ]?{digit}*|"."{digit}*+[eE][-+]?{digit}*  { return FLOAT_LIT;}
 \"(\\.|[^"\\])*\"	{ return STRING_LIT; }
 
-[+\-/\*%]       { // yylval.num = atoi(lexer->YYText());
-			//cout<<lexer->YYText()<<"\n"; 
-                 return OPERATOR; }
-[&|!\^]        { // yylval.num = atoi(lexer->YYText()); 
-                 return OPERATOR; }
-[<>=]          { // yylval.num = atoi(lexer->YYText()); 
-                 return OPERATOR; }
-[()\[\]\{\}]   { // yylval.num = atoi(lexer->YYText()); 
-                 return OPERATOR; }
-[\"\',;]       { // yylval.num = atoi(lexer->YYText()); 
-                 return OPERATOR; }
-[.]            { // yylval.num = atoi(lexer->YYText()); 
-                 return OPERATOR; }
+[-+/\*%]      { return *yytext; }
+[&|!\^]        { return *yytext; }
+[<>=]          { return *yytext; }
+[\(\)\[\]\{\}]   { return *yytext; }
+["',;:]       { return *yytext; }
+[.]            { return *yytext; }
 
-{ws}           { return SPACE; }    // +1 column
-{tab}          { return TAB; }      // +4 column
-{newline}      { return NEWLINE; }  // +1 line , column = 0
+{ws}          ;
+{tab}         ;
+{newline}     ;
 
-.                        { ECHO; 
+.                        { ECHO;
                            yyerror("...NOT RECOGNIZED...") ;
                          }
 
 %%
-
-void yyerror(string s) {
-	cout<<"ERROR: "<<s<<"\n";
-}
-
-// TODO: Use macro in place of macro values e.g. 1059 -> HEX_LIT because we are going to use
-// TODO: yacc generated y.tab.h file so we should not depend on the numbers assigned to macros
-// TODO: Find Alternative way to print information about token rather than using switch-case 
-int main()
-{
-  FlexLexer* lexer = new yyFlexLexer;
-  int val, total = 0, n = 0;
-  while ((val = lexer->yylex()) > 0)
-  {
-    switch (val)
-    {
-    case 1023:
-      cout<<"CASE"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
-      break;
-    case 1024:
-      cout<<"BREAK"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";	
-      break;
-    case 1025:
-      cout<<"FUNC"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
-      break;
-    case 1026:
-      cout<<"VAR"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
-      break;
-    case 1027:
-      cout<<"STRUCT"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
-      break;
-    case 1028:
-    	cout<<"RETURN"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
-      break;
-    case 1029:
-    	cout<<"ELSE"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
-      break;
-    case 1030:
-    	cout<<"GOTO"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
-      break;
-    case 1031:
-    	cout<<"PACKAGE"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
-      break;
-    case 1032:
-    	cout<<"CONST"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
-      break;
-    case 1033:
-    	cout<<"IF"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
-      break;
-    case 1034:
-    	cout<<"RANGE"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
-      break;
-    case 1035:
-    	cout<<"CONTINUE"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
-      break;
-    case 1036:
-    	cout<<"FOR"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
-      break;
-    case 1037:
-    	cout<< lexer->YYText() <<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
-      //printf("%s\t%s\t%d\t%d\n", lexer->YYText(), lexer->YYText(), row, column);
-      break;
-    case 1038:
-    	cout<<"IMPORT"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
-      break;
-    case 1040: column+=3; break;
-    case 1041: row++; column=0; break; //will be updated with yyleng
-    case 1042:
-    	cout<<"ID"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n";
-      break;
-    case 1043:
-    	cout<<"VAR"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
-      break;
-
-    case 1044:
-    	cout<<"INT8"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
-      break;
-    case 1045:
-    	cout<<"INT16"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
-      break;
-    case 1046:
-    	cout<<"INT32"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
-      break;
-    case 1047:
-    	cout<<"INT64"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
-      break;
-
-    case 1048:
-    	cout<<"UINT8"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
-      break;
-    case 1049:
-    	cout<<"UINT16"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
-      break;
-    case 1050:
-    	cout<<"UINT32"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
-      break;
-    case 1051:
-    	cout<<"UINT64"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
-      break;
-
-    case 1052:
-    	cout<<"FLOAT32"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
-      break;
-    case 1053:
-    	cout<<"FLOAT64"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
-      break;
-
-    case 1054:
-    	cout<<"BYTE"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
-      break;
-    case 1055:
-    	cout<<"TRUE"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
-      break;
-    case 1056:
-    	cout<<"FALSE"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
-      break;
-    case 1057:
-    	cout<<"STRING_LIT"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
-      break;
-    case 1058:
-    	cout<<"BINARY_LIT"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
-      break;  
-    case 1059:
-    	cout<<"HEX_LIT"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
-      break; 
-    case 1060:
-    	cout<<"FLOAT_LIT"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
-      break; 
-    case 1061:
-      cout<<"DEC_LIT"<<"\t"<<lexer->YYText() <<"\t"<<row << "\t" << column<<"\n"; 
-      break;
-    }
-    column+=lexer->YYLeng();
-  }
-}
