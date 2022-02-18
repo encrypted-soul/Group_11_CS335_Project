@@ -5,7 +5,7 @@ void yyerror(char* s);
 int yydebug = 1;
 %}
 %define parse.trace
-%token CASE BREAK FUNC VARCASE STRUCT RETURN ELSE GOTO PACKAGE CONST IF RANGE CONTINUE FOR SPACE TAB ID VAR INT8 INT16 INT32 INT64 UINT8 UINT16 UINT32 UINT64 FLOAT32 FLOAT64 BYTE TRUE FALSE STRING_LIT BINARY_LIT HEX_LIT FLOAT_LIT DEC_LIT IMPORT STRING ELIPSIS SELECT GO FALLTHROUGH DEFAULT TYPE_TOK
+%token CASE BREAK FUNC VARCASE STRUCT RETURN ELSE GOTO PACKAGE CONST IF RANGE CONTINUE FOR SPACE TAB ID VAR INT8 INT16 INT32 INT64 UINT8 UINT16 UINT32 UINT64 FLOAT32 FLOAT64 BYTE TRUE FALSE STRING_LIT BINARY_LIT HEX_LIT FLOAT_LIT DEC_LIT IMPORT STRING ELIPSIS SELECT GO FALLTHROUGH DEFAULT TYPE_TOK IMPORT_NAME
 
 %left ','
 %right '=' "+=" "-=" "|=" "^=" "*=" "/=" "%=" "<<=" ">>=" "&="
@@ -230,10 +230,9 @@ ArgumentInBracketFirst : Type
 
 ArgumentInBracketEnd : ELIPSIS ','
 |                      ELIPSIS
-|                      ','
 |                      %empty
 ;
-
+/*Arugument removed CM*/
 /* TODO: Literal -> token name */
 Operand     : Literal ;
 |             OperandName ;
@@ -275,7 +274,6 @@ LiteralType   : StructType
 
 LiteralValue  : '{' '}'
 |               '{' ElementList '}'
-|               '{' ElementList ',' '}'
 ;
 
 ElementList   : KeyedElement STAR_CM_KeyedElement ;
@@ -337,6 +335,26 @@ SimpleStmt		:	EmptyStmt
 /*|					ShortVarDecl ;	*/
 
 /* Create new tokens for ++ and -- */
+/*
+Productions leading up to the conflict state found.  Still finding a possible unifying counterexample...time limit exceeded: 6.000000
+  First example: '{' '}' '}'
+  First reduce derivation
+    IfStmt
+    ↳ 166: '{' STAR_Statement_SC Block
+               ↳ 142: ε          ↳ 142: '}' '}'
+  Second example: QualifiedIdent • '{' '}' Block
+  Second reduce derivation
+    IfStmt
+    ↳ 166: Expression                                                                           Block
+           ↳ 51: UnaryExpr
+                 ↳ 53: PrimaryExpr
+                       ↳ 92: Operand
+                             ↳ 106: Literal
+                                    ↳ 110: CompositeLit
+                                           ↳ 121: LiteralType                    LiteralValue
+                                                  ↳ 125: TypeName                ↳ 126: '{' '}'
+
+*/
 EmptyStmt		: 	%empty ;
 ExpressionStmt	:	Expression ;
 IncDecStmt		:	Expression "++"
@@ -479,12 +497,10 @@ Result			: 	Parameters
 |                   TypeLit ;
 
 Parameters		: 	'(' ')'
-|					'(' ParameterList  ')'
-|					'(' ParameterList ',' ')' ; 	/*what is up with last , ?? */
+|					'(' ParameterList  ')' ; 	/*what is up with last , ?? */
 
 ParameterList	:	ParameterDecl STAR_CM_ParameterDecl ;
-ParameterDecl	:	Type
-|					IdentifierList Type ;
+ParameterDecl	:	IdentifierList Type ;
 |                   IdentifierList ELIPSIS Type
 |                   ELIPSIS Type;
 /* no ... operator */

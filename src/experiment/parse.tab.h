@@ -98,8 +98,9 @@ extern int yydebug;
     FALLTHROUGH = 299,             /* FALLTHROUGH  */
     DEFAULT = 300,                 /* DEFAULT  */
     TYPE_TOK = 301,                /* TYPE_TOK  */
-    EXPR = 320,                    /* EXPR  */
-    UNARY = 321                    /* UNARY  */
+    IMPORT_NAME = 302,             /* IMPORT_NAME  */
+    EXPR = 321,                    /* EXPR  */
+    UNARY = 322                    /* UNARY  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
