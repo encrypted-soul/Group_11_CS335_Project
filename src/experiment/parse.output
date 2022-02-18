@@ -22,33 +22,14 @@ Terminals unused in grammar
     DEFAULT
 
 
-Rules useless in parser due to conflicts
-
-  126 Key: ID
-
-  174 OPT_InitStmt: %empty
-
-  178 OPT_PostStmt: %empty
-
-
 State 74 conflicts: 1 reduce/reduce
-State 94 conflicts: 5 reduce/reduce
-State 118 conflicts: 4 reduce/reduce
+State 94 conflicts: 2 reduce/reduce
+State 118 conflicts: 1 reduce/reduce
 State 141 conflicts: 1 shift/reduce
-State 143 conflicts: 1 shift/reduce
-State 168 conflicts: 1 shift/reduce
+State 167 conflicts: 1 shift/reduce
 State 194 conflicts: 1 reduce/reduce
-State 195 conflicts: 1 reduce/reduce
-State 201 conflicts: 10 shift/reduce
-State 223 conflicts: 18 shift/reduce
-State 225 conflicts: 4 shift/reduce
-State 230 conflicts: 1 shift/reduce
-State 236 conflicts: 2 reduce/reduce
-State 254 conflicts: 10 shift/reduce
-State 259 conflicts: 10 shift/reduce
-State 277 conflicts: 10 shift/reduce
-State 287 conflicts: 1 shift/reduce
-State 318 conflicts: 1 reduce/reduce
+State 226 conflicts: 1 shift/reduce
+State 286 conflicts: 1 shift/reduce
 
 
 Grammar
@@ -74,37 +55,37 @@ Grammar
    11             | FunctionDecl
 
    12 STAR_TopLevelDecl_SC: STAR_TopLevelDecl_SC TopLevelDecl ';'
-   13                     | %empty
+   13                     | ε
 
    14 STAR_ImportDecl_SC: STAR_ImportDecl_SC ImportDecl ';'
-   15                   | %empty
+   15                   | ε
 
    16 STAR_ImportSpec_SC: STAR_ImportSpec_SC ImportSpec ';'
-   17                   | %empty
+   17                   | ε
 
    18 STAR_CM_ID: STAR_CM_ID ',' ID
-   19           | %empty
+   19           | ε
 
    20 STAR_ConstSpec_SC: STAR_ConstSpec_SC ConstSpec ';'
-   21                  | %empty
+   21                  | ε
 
    22 STAR_VarSpec_SC: STAR_VarSpec_SC VarSpec ';'
-   23                | %empty
+   23                | ε
 
    24 STAR_CM_EXP: STAR_CM_EXP ',' Expression
-   25            | %empty
+   25            | ε
 
    26 STAR_TypeSpec_SC: STAR_TypeSpec_SC ';'
-   27                 | %empty
+   27                 | ε
 
    28 STAR_Statement_SC: STAR_Statement_SC Statement ';'
-   29                  | %empty
+   29                  | ε
 
    30 STAR_CM_ParameterDecl: STAR_CM_ParameterDecl ',' ParameterDecl
-   31                      | %empty
+   31                      | ε
 
    32 STAR_FieldDecl_SC: STAR_FieldDecl_SC FieldDecl ';'
-   33                  | %empty
+   33                  | ε
 
    34 Declaration: ConstDecl
    35            | TypeDecl
@@ -158,274 +139,279 @@ Grammar
    68       | '|'
    69       | '^'
 
-   70 mul_op: '*'
-   71       | '/'
-   72       | '%'
-   73       | "<<"
-   74       | ">>"
-   75       | '&'
+   70 assign_op: "+="
+   71          | "-="
+   72          | "|="
+   73          | "^="
+   74          | "*="
+   75          | "/="
+   76          | "%="
+   77          | "<<="
+   78          | ">>="
+   79          | "&="
 
-   76 unary_op: '+'
-   77         | '-'
-   78         | '!'
-   79         | '^'
-   80         | '*'
-   81         | '&'
+   80 mul_op: '*'
+   81       | '/'
+   82       | '%'
+   83       | "<<"
+   84       | ">>"
+   85       | '&'
 
-   82 PrimaryExpr: Operand
-   83            | PrimaryExpr Index
-   84            | PrimaryExpr Selector
-   85            | PrimaryExpr Arguments
+   86 unary_op: '+'
+   87         | '-'
+   88         | '!'
+   89         | '^'
+   90         | '*'
+   91         | '&'
 
-   86 Selector: '.' ID
+   92 PrimaryExpr: Operand
+   93            | PrimaryExpr Index
+   94            | PrimaryExpr Selector
+   95            | PrimaryExpr Arguments
 
-   87 Index: '[' Expression ']'
+   96 Selector: '.' ID
 
-   88 Arguments: '(' ')'
-   89          | '(' ArgumentInBracket ')'
+   97 Index: '[' Expression ']'
 
-   90 ArgumentInBracket: ArgumentInBracketFirst ArgumentInBracketEnd
+   98 Arguments: '(' ')'
+   99          | '(' ArgumentInBracket ')'
 
-   91 ArgumentInBracketFirst: ExpressionList
-   92                       | Type
-   93                       | Type ',' ExpressionList
+  100 ArgumentInBracket: ArgumentInBracketFirst ArgumentInBracketEnd
 
-   94 ArgumentInBracketEnd: ELIPSIS ','
-   95                     | ELIPSIS
-   96                     | ','
-   97                     | %empty
+  101 ArgumentInBracketFirst: Type
+  102                       | Type ',' ExpressionList
 
-   98 Operand: Literal
-   99        | OperandName
-  100        | "(" Expression ")"
+  103 ArgumentInBracketEnd: ELIPSIS ','
+  104                     | ELIPSIS
+  105                     | ','
+  106                     | ε
 
-  101 Literal: BasicLit
-  102        | CompositeLit
-  103        | FunctionLit
+  107 Operand: Literal
+  108        | OperandName
+  109        | "(" Expression ")"
 
-  104 INT_LIT: DEC_LIT
-  105        | BINARY_LIT
-  106        | HEX_LIT
+  110 Literal: BasicLit
+  111        | CompositeLit
+  112        | FunctionLit
 
-  107 BasicLit: INT_LIT
-  108         | FLOAT_LIT
-  109         | STRING_LIT
+  113 INT_LIT: DEC_LIT
+  114        | BINARY_LIT
+  115        | HEX_LIT
 
-  110 OperandName: ID
-  111            | QualifiedIdent
+  116 BasicLit: INT_LIT
+  117         | FLOAT_LIT
+  118         | STRING_LIT
 
-  112 QualifiedIdent: PackageName '.' ID
+  119 OperandName: ID
+  120            | QualifiedIdent
 
-  113 CompositeLit: LiteralType LiteralValue
+  121 QualifiedIdent: PackageName '.' ID
 
-  114 LiteralType: StructType
-  115            | ArrayType
-  116            | '[' ELIPSIS ']' ElementType
-  117            | TypeName
+  122 CompositeLit: LiteralType LiteralValue
 
-  118 LiteralValue: '{' '}'
-  119             | '{' ElementList '}'
-  120             | '{' ElementList ',' '}'
+  123 LiteralType: StructType
+  124            | ArrayType
+  125            | '[' ELIPSIS ']' ElementType
+  126            | TypeName
 
-  121 ElementList: KeyedElement STAR_CM_KeyedElement
+  127 LiteralValue: '{' '}'
+  128             | '{' ElementList '}'
+  129             | '{' ElementList ',' '}'
 
-  122 STAR_CM_KeyedElement: STAR_CM_KeyedElement ',' KeyedElement
-  123                     | %empty
+  130 ElementList: KeyedElement STAR_CM_KeyedElement
 
-  124 KeyedElement: Key ':' Element
-  125             | Element
+  131 STAR_CM_KeyedElement: STAR_CM_KeyedElement ',' KeyedElement
+  132                     | ε
 
-  126 Key: ID
-  127    | Expression
-  128    | LiteralValue
+  133 KeyedElement: Key ':' Element
+  134             | Element
 
-  129 Element: Expression
-  130        | LiteralValue
+  135 Key: Expression
+  136    | LiteralValue
 
-  131 FunctionLit: FUNC Signature FunctionBody
+  137 Element: Expression
+  138        | LiteralValue
 
-  132 FunctionDecl: FUNC FunctionName Signature FunctionBody
-  133             | FUNC FunctionName Signature
+  139 FunctionLit: FUNC Signature FunctionBody
 
-  134 FunctionName: ID
+  140 FunctionDecl: FUNC FunctionName Signature FunctionBody
+  141             | FUNC FunctionName Signature
 
-  135 FunctionBody: Block
+  142 FunctionName: ID
 
-  136 Block: '{' STAR_Statement_SC '}'
+  143 FunctionBody: Block
 
-  137 Statement: Declaration
-  138          | LabeledStmt
-  139          | SimpleStmt
-  140          | GoStmt
-  141          | ReturnStmt
-  142          | BreakStmt
-  143          | ContinueStmt
-  144          | GotoStmt
-  145          | FallthroughStmt
-  146          | Block
-  147          | IfStmt
-  148          | ForStmt
+  144 Block: '{' STAR_Statement_SC '}'
 
-  149 LabeledStmt: Label ':' Statement
+  145 Statement: Declaration
+  146          | LabeledStmt
+  147          | SimpleStmt
+  148          | GoStmt
+  149          | ReturnStmt
+  150          | BreakStmt
+  151          | ContinueStmt
+  152          | GotoStmt
+  153          | FallthroughStmt
+  154          | Block
+  155          | IfStmt
+  156          | ForStmt
 
-  150 Label: ID
+  157 LabeledStmt: Label ':' Statement
 
-  151 SimpleStmt: EmptyStmt
-  152           | ExpressionStmt
-  153           | IncDecStmt
-  154           | Assignment
+  158 Label: ID
 
-  155 EmptyStmt: %empty
+  159 SimpleStmt: EmptyStmt
+  160           | ExpressionStmt
+  161           | IncDecStmt
+  162           | Assignment
 
-  156 ExpressionStmt: Expression
+  163 EmptyStmt: ε
 
-  157 IncDecStmt: Expression "++"
-  158           | Expression "--"
+  164 ExpressionStmt: Expression
 
-  159 Assignment: ExpressionList assign_op ExpressionList
+  165 IncDecStmt: Expression "++"
+  166           | Expression "--"
 
-  160 assign_op: add_op '='
-  161          | mul_op '='
+  167 Assignment: ExpressionList assign_op ExpressionList
 
-  162 IfStmt: IF Expression Block
-  163       | IF SimpleStmt ';' Expression Block
-  164       | IF SimpleStmt ';' Expression Block ELSE Block
-  165       | IF SimpleStmt ';' Expression Block ELSE IfStmt
+  168 IfStmt: IF Expression Block
+  169       | IF SimpleStmt ';' Expression Block
+  170       | IF SimpleStmt ';' Expression Block ELSE Block
+  171       | IF SimpleStmt ';' Expression Block ELSE IfStmt
 
-  166 ForStmt: FOR Block
-  167        | FOR ForStmtAfter Block
+  172 ForStmt: FOR Block
+  173        | FOR ForStmtAfter Block
 
-  168 ForStmtAfter: Condition
-  169             | ForClause
-  170             | RangeClause
+  174 ForStmtAfter: Condition
+  175             | ForClause
+  176             | RangeClause
 
-  171 Condition: Expression
+  177 Condition: Expression
 
-  172 ForClause: OPT_InitStmt ';' OPT_Condition ';' OPT_PostStmt
+  178 ForClause: OPT_InitStmt ';' OPT_Condition ';' OPT_PostStmt
 
-  173 OPT_InitStmt: InitStmt
-  174             | %empty
+  179 OPT_InitStmt: InitStmt
 
-  175 OPT_Condition: Condition
-  176              | %empty
+  180 OPT_Condition: Condition
+  181              | ε
 
-  177 OPT_PostStmt: PostStmt
-  178             | %empty
+  182 OPT_PostStmt: PostStmt
 
-  179 InitStmt: SimpleStmt
+  183 InitStmt: SimpleStmt
 
-  180 PostStmt: SimpleStmt
+  184 PostStmt: SimpleStmt
 
-  181 RangeClause: RANGE Expression
-  182            | ExpressionList '=' RANGE Expression
+  185 RangeClause: RANGE Expression
+  186            | ExpressionList '=' RANGE Expression
 
-  183 GoStmt: GO Expression
+  187 GoStmt: GO Expression
 
-  184 ReturnStmt: RETURN ExpressionList
-  185           | RETURN
+  188 ReturnStmt: RETURN ExpressionList
+  189           | RETURN
 
-  186 BreakStmt: BREAK Label
-  187          | BREAK
+  190 BreakStmt: BREAK Label
+  191          | BREAK
 
-  188 ContinueStmt: CONTINUE Label
-  189             | CONTINUE
+  192 ContinueStmt: CONTINUE Label
+  193             | CONTINUE
 
-  190 GotoStmt: GOTO Label
+  194 GotoStmt: GOTO Label
 
-  191 FallthroughStmt: FALLTHROUGH
+  195 FallthroughStmt: FALLTHROUGH
 
-  192 Type: TypeName
-  193     | TypeLit
-  194     | '(' Type ')'
+  196 Type: TypeName
+  197     | TypeLit
+  198     | '(' Type ')'
 
-  195 TypeName: ID
-  196         | QualifiedIdent
+  199 TypeName: ID
+  200         | QualifiedIdent
 
-  197 TypeLit: ArrayType
-  198        | StructType
-  199        | PointerType
-  200        | FunctionType
+  201 TypeLit: ArrayType
+  202        | StructType
+  203        | PointerType
+  204        | FunctionType
 
-  201 ArrayType: '[' ArrayLength ']' ElementType
+  205 ArrayType: '[' ArrayLength ']' ElementType
 
-  202 ArrayLength: Expression
+  206 ArrayLength: Expression
 
-  203 ElementType: Type
+  207 ElementType: Type
 
-  204 StructType: STRUCT '{' STAR_FieldDecl_SC '}'
+  208 StructType: STRUCT '{' STAR_FieldDecl_SC '}'
 
-  205 FieldDecl: IdentifierList Type Tag
-  206          | IdentifierList Type
+  209 FieldDecl: IdentifierList Type Tag
+  210          | IdentifierList Type
 
-  207 Tag: STRING_LIT
+  211 Tag: STRING_LIT
 
-  208 PointerType: '*' BaseType
+  212 PointerType: '*' BaseType
 
-  209 BaseType: Type
+  213 BaseType: Type
 
-  210 FunctionType: FUNC Signature
+  214 FunctionType: FUNC Signature
 
-  211 Signature: Parameters
-  212          | Parameters Result
+  215 Signature: Parameters
+  216          | Parameters Result
 
-  213 Result: Parameters
-  214       | Type
+  217 Result: Parameters
+  218       | TypeName
+  219       | TypeLit
 
-  215 Parameters: '(' ')'
-  216           | '(' ParameterList ')'
-  217           | '(' ParameterList ',' ')'
+  220 Parameters: '(' ')'
+  221           | '(' ParameterList ')'
+  222           | '(' ParameterList ',' ')'
 
-  218 ParameterList: ParameterDecl STAR_CM_ParameterDecl
+  223 ParameterList: ParameterDecl STAR_CM_ParameterDecl
 
-  219 ParameterDecl: Type
-  220              | IdentifierList Type
-  221              | IdentifierList ELIPSIS Type
-  222              | ELIPSIS Type
+  224 ParameterDecl: Type
+  225              | IdentifierList Type
+  226              | IdentifierList ELIPSIS Type
+  227              | ELIPSIS Type
 
 
 Terminals, with rules where they appear
 
     $end (0) 0
-    '!' (33) 78
-    '%' (37) 72
-    '&' (38) 75 81
-    '(' (40) 5 38 42 48 88 89 194 215 216 217
-    ')' (41) 5 38 42 48 88 89 194 215 216 217
-    '*' (42) 70 80 208
-    '+' (43) 66 76
-    ',' (44) 18 24 30 93 94 96 120 122 217
-    '-' (45) 67 77
-    '.' (46) 7 86 112
-    '/' (47) 71
-    ':' (58) 124 149
-    ';' (59) 1 12 14 16 20 22 26 28 32 163 164 165 172
+    '!' (33) 88
+    '%' (37) 82
+    '&' (38) 85 91
+    '(' (40) 5 38 42 48 98 99 198 220 221 222
+    ')' (41) 5 38 42 48 98 99 198 220 221 222
+    '*' (42) 80 90 212
+    '+' (43) 66 86
+    ',' (44) 18 24 30 102 103 105 129 131 222
+    '-' (45) 67 87
+    '.' (46) 7 96 121
+    '/' (47) 81
+    ':' (58) 133 157
+    ';' (59) 1 12 14 16 20 22 26 28 32 169 170 171 178
     '<' (60) 62
-    '=' (61) 45 160 161 182
+    '=' (61) 45 186
     '>' (62) 64
-    '[' (91) 87 116 201
-    ']' (93) 87 116 201
-    '^' (94) 69 79
-    '{' (123) 118 119 120 136 204
+    '[' (91) 97 125 205
+    ']' (93) 97 125 205
+    '^' (94) 69 89
+    '{' (123) 127 128 129 144 208
     '|' (124) 68
-    '}' (125) 118 119 120 136 204
+    '}' (125) 127 128 129 144 208
     error (256)
     CASE (258)
-    BREAK (259) 186 187
-    FUNC (260) 131 132 133 210
+    BREAK (259) 190 191
+    FUNC (260) 139 140 141 214
     VARCASE (261)
-    STRUCT (262) 204
-    RETURN (263) 184 185
-    ELSE (264) 164 165
-    GOTO (265) 190
+    STRUCT (262) 208
+    RETURN (263) 188 189
+    ELSE (264) 170 171
+    GOTO (265) 194
     PACKAGE (266) 2
     CONST (267) 37 38
-    IF (268) 162 163 164 165
-    RANGE (269) 181 182
-    CONTINUE (270) 188 189
-    FOR (271) 166 167
+    IF (268) 168 169 170 171
+    RANGE (269) 185 186
+    CONTINUE (270) 192 193
+    FOR (271) 172 173
     SPACE (272)
     TAB (273)
-    ID (274) 3 18 40 45 46 86 110 112 126 134 150 195
+    ID (274) 3 18 40 45 46 96 119 121 142 158 199
     VAR (275) 47 48
     INT8 (276)
     INT16 (277)
@@ -440,358 +426,370 @@ Terminals, with rules where they appear
     BYTE (286)
     TRUE (287)
     FALSE (288)
-    STRING_LIT (289) 9 109 207
-    BINARY_LIT (290) 105
-    HEX_LIT (291) 106
-    FLOAT_LIT (292) 108
-    DEC_LIT (293) 104
+    STRING_LIT (289) 9 118 211
+    BINARY_LIT (290) 114
+    HEX_LIT (291) 115
+    FLOAT_LIT (292) 117
+    DEC_LIT (293) 113
     IMPORT (294) 4 5
     STRING (295)
-    ELIPSIS (296) 94 95 116 221 222
+    ELIPSIS (296) 103 104 125 226 227
     SELECT (297)
-    GO (298) 183
-    FALLTHROUGH (299) 191
+    GO (298) 187
+    FALLTHROUGH (299) 195
     DEFAULT (300)
     TYPE_TOK (301) 41 42
-    "=" (302) 49
-    "||" (303) 55
-    "&&" (304) 56
-    "==" (305) 60
-    "!=" (306) 61
-    "<=" (307) 63
-    ">=" (308) 65
-    "<<" (309) 73
-    ">>" (310) 74
-    "(" (311) 100
-    ")" (312) 100
-    "++" (313) 157
-    "--" (314) 158
+    "+=" (302) 70
+    "-=" (303) 71
+    "|=" (304) 72
+    "^=" (305) 73
+    "*=" (306) 74
+    "/=" (307) 75
+    "%=" (308) 76
+    "<<=" (309) 77
+    ">>=" (310) 78
+    "&=" (311) 79
+    "||" (312) 55
+    "&&" (313) 56
+    "==" (314) 60
+    "!=" (315) 61
+    ">=" (316) 65
+    "<=" (317) 63
+    ">>" (318) 84
+    "<<" (319) 83
+    EXPR (320)
+    UNARY (321)
+    "=" (322) 49
+    "(" (323) 109
+    ")" (324) 109
+    "++" (325) 165
+    "--" (326) 166
 
 
 Nonterminals, with rules where they appear
 
-    $accept (82)
+    $accept (94)
         on left: 0
-    SourceFile (83)
+    SourceFile (95)
         on left: 1
         on right: 0
-    PackageClause (84)
+    PackageClause (96)
         on left: 2
         on right: 1
-    PackageName (85)
+    PackageName (97)
         on left: 3
-        on right: 2 8 112
-    ImportDecl (86)
+        on right: 2 8 121
+    ImportDecl (98)
         on left: 4 5
         on right: 14
-    ImportSpec (87)
+    ImportSpec (99)
         on left: 6 7 8
         on right: 4 16
-    ImportPath (88)
+    ImportPath (100)
         on left: 9
         on right: 6 7 8
-    TopLevelDecl (89)
+    TopLevelDecl (101)
         on left: 10 11
         on right: 12
-    STAR_TopLevelDecl_SC (90)
+    STAR_TopLevelDecl_SC (102)
         on left: 12 13
         on right: 1 12
-    STAR_ImportDecl_SC (91)
+    STAR_ImportDecl_SC (103)
         on left: 14 15
         on right: 1 14
-    STAR_ImportSpec_SC (92)
+    STAR_ImportSpec_SC (104)
         on left: 16 17
         on right: 5 16
-    STAR_CM_ID (93)
+    STAR_CM_ID (105)
         on left: 18 19
         on right: 18 40
-    STAR_ConstSpec_SC (94)
+    STAR_ConstSpec_SC (106)
         on left: 20 21
         on right: 20 38
-    STAR_VarSpec_SC (95)
+    STAR_VarSpec_SC (107)
         on left: 22 23
         on right: 22 48
-    STAR_CM_EXP (96)
+    STAR_CM_EXP (108)
         on left: 24 25
         on right: 24 50
-    STAR_TypeSpec_SC (97)
+    STAR_TypeSpec_SC (109)
         on left: 26 27
         on right: 26 42
-    STAR_Statement_SC (98)
+    STAR_Statement_SC (110)
         on left: 28 29
-        on right: 28 136
-    STAR_CM_ParameterDecl (99)
+        on right: 28 144
+    STAR_CM_ParameterDecl (111)
         on left: 30 31
-        on right: 30 218
-    STAR_FieldDecl_SC (100)
+        on right: 30 223
+    STAR_FieldDecl_SC (112)
         on left: 32 33
-        on right: 32 204
-    Declaration (101)
+        on right: 32 208
+    Declaration (113)
         on left: 34 35 36
-        on right: 10 137
-    ConstDecl (102)
+        on right: 10 145
+    ConstDecl (114)
         on left: 37 38
         on right: 34
-    ConstSpec (103)
+    ConstSpec (115)
         on left: 39
         on right: 20 37
-    IdentifierList (104)
+    IdentifierList (116)
         on left: 40
-        on right: 39 49 205 206 220 221
-    TypeDecl (105)
+        on right: 39 49 209 210 225 226
+    TypeDecl (117)
         on left: 41 42
         on right: 35
-    TypeSpec (106)
+    TypeSpec (118)
         on left: 43 44
         on right: 41
-    AliasDecl (107)
+    AliasDecl (119)
         on left: 45
         on right: 43
-    TypeDef (108)
+    TypeDef (120)
         on left: 46
         on right: 44
-    VarDecl (109)
+    VarDecl (121)
         on left: 47 48
         on right: 36
-    VarSpec (110)
+    VarSpec (122)
         on left: 49
         on right: 22 47
-    ExpressionList (111)
+    ExpressionList (123)
         on left: 50
-        on right: 49 91 93 159 182 184
-    Expression (112)
+        on right: 49 102 167 186 188
+    Expression (124)
         on left: 51 52
-        on right: 24 50 52 87 100 127 129 156 157 158 162 163 164 165 171 181 182 183 202
-    UnaryExpr (113)
+        on right: 24 50 52 97 109 135 137 164 165 166 168 169 170 171 177 185 186 187 206
+    UnaryExpr (125)
         on left: 53 54
         on right: 51 54
-    binary_op (114)
+    binary_op (126)
         on left: 55 56 57 58 59
         on right: 52
-    rel_op (115)
+    rel_op (127)
         on left: 60 61 62 63 64 65
         on right: 57
-    add_op (116)
+    add_op (128)
         on left: 66 67 68 69
-        on right: 58 160
-    mul_op (117)
-        on left: 70 71 72 73 74 75
-        on right: 59 161
-    unary_op (118)
-        on left: 76 77 78 79 80 81
-        on right: 54
-    PrimaryExpr (119)
-        on left: 82 83 84 85
-        on right: 53 83 84 85
-    Selector (120)
-        on left: 86
-        on right: 84
-    Index (121)
-        on left: 87
-        on right: 83
-    Arguments (122)
-        on left: 88 89
-        on right: 85
-    ArgumentInBracket (123)
-        on left: 90
-        on right: 89
-    ArgumentInBracketFirst (124)
-        on left: 91 92 93
-        on right: 90
-    ArgumentInBracketEnd (125)
-        on left: 94 95 96 97
-        on right: 90
-    Operand (126)
-        on left: 98 99 100
-        on right: 82
-    Literal (127)
-        on left: 101 102 103
-        on right: 98
-    INT_LIT (128)
-        on left: 104 105 106
-        on right: 107
-    BasicLit (129)
-        on left: 107 108 109
-        on right: 101
-    OperandName (130)
-        on left: 110 111
-        on right: 99
-    QualifiedIdent (131)
-        on left: 112
-        on right: 111 196
-    CompositeLit (132)
-        on left: 113
-        on right: 102
-    LiteralType (133)
-        on left: 114 115 116 117
-        on right: 113
-    LiteralValue (134)
-        on left: 118 119 120
-        on right: 113 128 130
-    ElementList (135)
-        on left: 121
-        on right: 119 120
-    STAR_CM_KeyedElement (136)
-        on left: 122 123
-        on right: 121 122
-    KeyedElement (137)
-        on left: 124 125
-        on right: 121 122
-    Key (138)
-        on left: 126 127 128
-        on right: 124
-    Element (139)
-        on left: 129 130
-        on right: 124 125
-    FunctionLit (140)
-        on left: 131
-        on right: 103
-    FunctionDecl (141)
-        on left: 132 133
-        on right: 11
-    FunctionName (142)
-        on left: 134
-        on right: 132 133
-    FunctionBody (143)
-        on left: 135
-        on right: 131 132
-    Block (144)
-        on left: 136
-        on right: 135 146 162 163 164 165 166 167
-    Statement (145)
-        on left: 137 138 139 140 141 142 143 144 145 146 147 148
-        on right: 28 149
-    LabeledStmt (146)
-        on left: 149
-        on right: 138
-    Label (147)
-        on left: 150
-        on right: 149 186 188 190
-    SimpleStmt (148)
-        on left: 151 152 153 154
-        on right: 139 163 164 165 179 180
-    EmptyStmt (149)
-        on left: 155
-        on right: 151
-    ExpressionStmt (150)
-        on left: 156
-        on right: 152
-    IncDecStmt (151)
-        on left: 157 158
-        on right: 153
-    Assignment (152)
-        on left: 159
-        on right: 154
-    assign_op (153)
-        on left: 160 161
-        on right: 159
-    IfStmt (154)
-        on left: 162 163 164 165
-        on right: 147 165
-    ForStmt (155)
-        on left: 166 167
-        on right: 148
-    ForStmtAfter (156)
-        on left: 168 169 170
+        on right: 58
+    assign_op (129)
+        on left: 70 71 72 73 74 75 76 77 78 79
         on right: 167
-    Condition (157)
-        on left: 171
-        on right: 168 175
-    ForClause (158)
-        on left: 172
-        on right: 169
-    OPT_InitStmt (159)
-        on left: 173 174
-        on right: 172
-    OPT_Condition (160)
-        on left: 175 176
-        on right: 172
-    OPT_PostStmt (161)
-        on left: 177 178
-        on right: 172
-    InitStmt (162)
-        on left: 179
+    mul_op (130)
+        on left: 80 81 82 83 84 85
+        on right: 59
+    unary_op (131)
+        on left: 86 87 88 89 90 91
+        on right: 54
+    PrimaryExpr (132)
+        on left: 92 93 94 95
+        on right: 53 93 94 95
+    Selector (133)
+        on left: 96
+        on right: 94
+    Index (134)
+        on left: 97
+        on right: 93
+    Arguments (135)
+        on left: 98 99
+        on right: 95
+    ArgumentInBracket (136)
+        on left: 100
+        on right: 99
+    ArgumentInBracketFirst (137)
+        on left: 101 102
+        on right: 100
+    ArgumentInBracketEnd (138)
+        on left: 103 104 105 106
+        on right: 100
+    Operand (139)
+        on left: 107 108 109
+        on right: 92
+    Literal (140)
+        on left: 110 111 112
+        on right: 107
+    INT_LIT (141)
+        on left: 113 114 115
+        on right: 116
+    BasicLit (142)
+        on left: 116 117 118
+        on right: 110
+    OperandName (143)
+        on left: 119 120
+        on right: 108
+    QualifiedIdent (144)
+        on left: 121
+        on right: 120 200
+    CompositeLit (145)
+        on left: 122
+        on right: 111
+    LiteralType (146)
+        on left: 123 124 125 126
+        on right: 122
+    LiteralValue (147)
+        on left: 127 128 129
+        on right: 122 136 138
+    ElementList (148)
+        on left: 130
+        on right: 128 129
+    STAR_CM_KeyedElement (149)
+        on left: 131 132
+        on right: 130 131
+    KeyedElement (150)
+        on left: 133 134
+        on right: 130 131
+    Key (151)
+        on left: 135 136
+        on right: 133
+    Element (152)
+        on left: 137 138
+        on right: 133 134
+    FunctionLit (153)
+        on left: 139
+        on right: 112
+    FunctionDecl (154)
+        on left: 140 141
+        on right: 11
+    FunctionName (155)
+        on left: 142
+        on right: 140 141
+    FunctionBody (156)
+        on left: 143
+        on right: 139 140
+    Block (157)
+        on left: 144
+        on right: 143 154 168 169 170 171 172 173
+    Statement (158)
+        on left: 145 146 147 148 149 150 151 152 153 154 155 156
+        on right: 28 157
+    LabeledStmt (159)
+        on left: 157
+        on right: 146
+    Label (160)
+        on left: 158
+        on right: 157 190 192 194
+    SimpleStmt (161)
+        on left: 159 160 161 162
+        on right: 147 169 170 171 183 184
+    EmptyStmt (162)
+        on left: 163
+        on right: 159
+    ExpressionStmt (163)
+        on left: 164
+        on right: 160
+    IncDecStmt (164)
+        on left: 165 166
+        on right: 161
+    Assignment (165)
+        on left: 167
+        on right: 162
+    IfStmt (166)
+        on left: 168 169 170 171
+        on right: 155 171
+    ForStmt (167)
+        on left: 172 173
+        on right: 156
+    ForStmtAfter (168)
+        on left: 174 175 176
         on right: 173
-    PostStmt (163)
-        on left: 180
-        on right: 177
-    RangeClause (164)
-        on left: 181 182
-        on right: 170
-    GoStmt (165)
+    Condition (169)
+        on left: 177
+        on right: 174 180
+    ForClause (170)
+        on left: 178
+        on right: 175
+    OPT_InitStmt (171)
+        on left: 179
+        on right: 178
+    OPT_Condition (172)
+        on left: 180 181
+        on right: 178
+    OPT_PostStmt (173)
+        on left: 182
+        on right: 178
+    InitStmt (174)
         on left: 183
-        on right: 140
-    ReturnStmt (166)
-        on left: 184 185
-        on right: 141
-    BreakStmt (167)
-        on left: 186 187
-        on right: 142
-    ContinueStmt (168)
+        on right: 179
+    PostStmt (175)
+        on left: 184
+        on right: 182
+    RangeClause (176)
+        on left: 185 186
+        on right: 176
+    GoStmt (177)
+        on left: 187
+        on right: 148
+    ReturnStmt (178)
         on left: 188 189
-        on right: 143
-    GotoStmt (169)
-        on left: 190
-        on right: 144
-    FallthroughStmt (170)
-        on left: 191
-        on right: 145
-    Type (171)
-        on left: 192 193 194
-        on right: 45 46 92 93 194 203 205 206 209 214 219 220 221 222
-    TypeName (172)
-        on left: 195 196
-        on right: 117 192
-    TypeLit (173)
-        on left: 197 198 199 200
-        on right: 193
-    ArrayType (174)
-        on left: 201
-        on right: 115 197
-    ArrayLength (175)
-        on left: 202
-        on right: 201
-    ElementType (176)
-        on left: 203
-        on right: 116 201
-    StructType (177)
-        on left: 204
-        on right: 114 198
-    FieldDecl (178)
-        on left: 205 206
-        on right: 32
-    Tag (179)
-        on left: 207
+        on right: 149
+    BreakStmt (179)
+        on left: 190 191
+        on right: 150
+    ContinueStmt (180)
+        on left: 192 193
+        on right: 151
+    GotoStmt (181)
+        on left: 194
+        on right: 152
+    FallthroughStmt (182)
+        on left: 195
+        on right: 153
+    Type (183)
+        on left: 196 197 198
+        on right: 45 46 101 102 198 207 209 210 213 224 225 226 227
+    TypeName (184)
+        on left: 199 200
+        on right: 126 196 218
+    TypeLit (185)
+        on left: 201 202 203 204
+        on right: 197 219
+    ArrayType (186)
+        on left: 205
+        on right: 124 201
+    ArrayLength (187)
+        on left: 206
         on right: 205
-    PointerType (180)
+    ElementType (188)
+        on left: 207
+        on right: 125 205
+    StructType (189)
         on left: 208
-        on right: 199
-    BaseType (181)
-        on left: 209
-        on right: 208
-    FunctionType (182)
-        on left: 210
-        on right: 200
-    Signature (183)
-        on left: 211 212
-        on right: 131 132 133 210
-    Result (184)
-        on left: 213 214
+        on right: 123 202
+    FieldDecl (190)
+        on left: 209 210
+        on right: 32
+    Tag (191)
+        on left: 211
+        on right: 209
+    PointerType (192)
+        on left: 212
+        on right: 203
+    BaseType (193)
+        on left: 213
         on right: 212
-    Parameters (185)
-        on left: 215 216 217
-        on right: 211 212 213
-    ParameterList (186)
-        on left: 218
-        on right: 216 217
-    ParameterDecl (187)
-        on left: 219 220 221 222
-        on right: 30 218
+    FunctionType (194)
+        on left: 214
+        on right: 204
+    Signature (195)
+        on left: 215 216
+        on right: 139 140 141 214
+    Result (196)
+        on left: 217 218 219
+        on right: 216
+    Parameters (197)
+        on left: 220 221 222
+        on right: 215 216 217
+    ParameterList (198)
+        on left: 223
+        on right: 221 222
+    ParameterDecl (199)
+        on left: 224 225 226 227
+        on right: 30 223
 
 
 State 0
 
-    0 $accept: . SourceFile $end
+    0 $accept: • SourceFile $end
 
     PACKAGE  shift, and go to state 1
 
@@ -801,7 +799,7 @@ State 0
 
 State 1
 
-    2 PackageClause: PACKAGE . PackageName
+    2 PackageClause: PACKAGE • PackageName
 
     ID  shift, and go to state 4
 
@@ -810,42 +808,42 @@ State 1
 
 State 2
 
-    0 $accept: SourceFile . $end
+    0 $accept: SourceFile • $end
 
     $end  shift, and go to state 6
 
 
 State 3
 
-    1 SourceFile: PackageClause . ';' STAR_ImportDecl_SC STAR_TopLevelDecl_SC
+    1 SourceFile: PackageClause • ';' STAR_ImportDecl_SC STAR_TopLevelDecl_SC
 
     ';'  shift, and go to state 7
 
 
 State 4
 
-    3 PackageName: ID .
+    3 PackageName: ID •
 
     $default  reduce using rule 3 (PackageName)
 
 
 State 5
 
-    2 PackageClause: PACKAGE PackageName .
+    2 PackageClause: PACKAGE PackageName •
 
     $default  reduce using rule 2 (PackageClause)
 
 
 State 6
 
-    0 $accept: SourceFile $end .
+    0 $accept: SourceFile $end •
 
     $default  accept
 
 
 State 7
 
-    1 SourceFile: PackageClause ';' . STAR_ImportDecl_SC STAR_TopLevelDecl_SC
+    1 SourceFile: PackageClause ';' • STAR_ImportDecl_SC STAR_TopLevelDecl_SC
 
     $default  reduce using rule 15 (STAR_ImportDecl_SC)
 
@@ -854,8 +852,8 @@ State 7
 
 State 8
 
-    1 SourceFile: PackageClause ';' STAR_ImportDecl_SC . STAR_TopLevelDecl_SC
-   14 STAR_ImportDecl_SC: STAR_ImportDecl_SC . ImportDecl ';'
+    1 SourceFile: PackageClause ';' STAR_ImportDecl_SC • STAR_TopLevelDecl_SC
+   14 STAR_ImportDecl_SC: STAR_ImportDecl_SC • ImportDecl ';'
 
     IMPORT  shift, and go to state 9
 
@@ -867,8 +865,8 @@ State 8
 
 State 9
 
-    4 ImportDecl: IMPORT . ImportSpec
-    5           | IMPORT . '(' STAR_ImportSpec_SC ')'
+    4 ImportDecl: IMPORT • ImportSpec
+    5           | IMPORT • '(' STAR_ImportSpec_SC ')'
 
     ID          shift, and go to state 4
     STRING_LIT  shift, and go to state 12
@@ -882,15 +880,15 @@ State 9
 
 State 10
 
-   14 STAR_ImportDecl_SC: STAR_ImportDecl_SC ImportDecl . ';'
+   14 STAR_ImportDecl_SC: STAR_ImportDecl_SC ImportDecl • ';'
 
     ';'  shift, and go to state 18
 
 
 State 11
 
-    1 SourceFile: PackageClause ';' STAR_ImportDecl_SC STAR_TopLevelDecl_SC .
-   12 STAR_TopLevelDecl_SC: STAR_TopLevelDecl_SC . TopLevelDecl ';'
+    1 SourceFile: PackageClause ';' STAR_ImportDecl_SC STAR_TopLevelDecl_SC •
+   12 STAR_TopLevelDecl_SC: STAR_TopLevelDecl_SC • TopLevelDecl ';'
 
     FUNC      shift, and go to state 19
     CONST     shift, and go to state 20
@@ -909,14 +907,14 @@ State 11
 
 State 12
 
-    9 ImportPath: STRING_LIT .
+    9 ImportPath: STRING_LIT •
 
     $default  reduce using rule 9 (ImportPath)
 
 
 State 13
 
-    5 ImportDecl: IMPORT '(' . STAR_ImportSpec_SC ')'
+    5 ImportDecl: IMPORT '(' • STAR_ImportSpec_SC ')'
 
     $default  reduce using rule 17 (STAR_ImportSpec_SC)
 
@@ -925,7 +923,7 @@ State 13
 
 State 14
 
-    7 ImportSpec: '.' . ImportPath
+    7 ImportSpec: '.' • ImportPath
 
     STRING_LIT  shift, and go to state 12
 
@@ -934,7 +932,7 @@ State 14
 
 State 15
 
-    8 ImportSpec: PackageName . ImportPath
+    8 ImportSpec: PackageName • ImportPath
 
     STRING_LIT  shift, and go to state 12
 
@@ -943,29 +941,29 @@ State 15
 
 State 16
 
-    4 ImportDecl: IMPORT ImportSpec .
+    4 ImportDecl: IMPORT ImportSpec •
 
     $default  reduce using rule 4 (ImportDecl)
 
 
 State 17
 
-    6 ImportSpec: ImportPath .
+    6 ImportSpec: ImportPath •
 
     $default  reduce using rule 6 (ImportSpec)
 
 
 State 18
 
-   14 STAR_ImportDecl_SC: STAR_ImportDecl_SC ImportDecl ';' .
+   14 STAR_ImportDecl_SC: STAR_ImportDecl_SC ImportDecl ';' •
 
     $default  reduce using rule 14 (STAR_ImportDecl_SC)
 
 
 State 19
 
-  132 FunctionDecl: FUNC . FunctionName Signature FunctionBody
-  133             | FUNC . FunctionName Signature
+  140 FunctionDecl: FUNC • FunctionName Signature FunctionBody
+  141             | FUNC • FunctionName Signature
 
     ID  shift, and go to state 32
 
@@ -974,8 +972,8 @@ State 19
 
 State 20
 
-   37 ConstDecl: CONST . ConstSpec
-   38          | CONST . '(' STAR_ConstSpec_SC ')'
+   37 ConstDecl: CONST • ConstSpec
+   38          | CONST • '(' STAR_ConstSpec_SC ')'
 
     ID   shift, and go to state 34
     '('  shift, and go to state 35
@@ -986,8 +984,8 @@ State 20
 
 State 21
 
-   47 VarDecl: VAR . VarSpec
-   48        | VAR . '(' STAR_VarSpec_SC ')'
+   47 VarDecl: VAR • VarSpec
+   48        | VAR • '(' STAR_VarSpec_SC ')'
 
     ID   shift, and go to state 34
     '('  shift, and go to state 38
@@ -998,8 +996,8 @@ State 21
 
 State 22
 
-   41 TypeDecl: TYPE_TOK . TypeSpec
-   42         | TYPE_TOK . '(' STAR_TypeSpec_SC ')'
+   41 TypeDecl: TYPE_TOK • TypeSpec
+   42         | TYPE_TOK • '(' STAR_TypeSpec_SC ')'
 
     ID   shift, and go to state 41
     '('  shift, and go to state 42
@@ -1011,50 +1009,50 @@ State 22
 
 State 23
 
-   12 STAR_TopLevelDecl_SC: STAR_TopLevelDecl_SC TopLevelDecl . ';'
+   12 STAR_TopLevelDecl_SC: STAR_TopLevelDecl_SC TopLevelDecl • ';'
 
     ';'  shift, and go to state 46
 
 
 State 24
 
-   10 TopLevelDecl: Declaration .
+   10 TopLevelDecl: Declaration •
 
     $default  reduce using rule 10 (TopLevelDecl)
 
 
 State 25
 
-   34 Declaration: ConstDecl .
+   34 Declaration: ConstDecl •
 
     $default  reduce using rule 34 (Declaration)
 
 
 State 26
 
-   35 Declaration: TypeDecl .
+   35 Declaration: TypeDecl •
 
     $default  reduce using rule 35 (Declaration)
 
 
 State 27
 
-   36 Declaration: VarDecl .
+   36 Declaration: VarDecl •
 
     $default  reduce using rule 36 (Declaration)
 
 
 State 28
 
-   11 TopLevelDecl: FunctionDecl .
+   11 TopLevelDecl: FunctionDecl •
 
     $default  reduce using rule 11 (TopLevelDecl)
 
 
 State 29
 
-    5 ImportDecl: IMPORT '(' STAR_ImportSpec_SC . ')'
-   16 STAR_ImportSpec_SC: STAR_ImportSpec_SC . ImportSpec ';'
+    5 ImportDecl: IMPORT '(' STAR_ImportSpec_SC • ')'
+   16 STAR_ImportSpec_SC: STAR_ImportSpec_SC • ImportSpec ';'
 
     ID          shift, and go to state 4
     STRING_LIT  shift, and go to state 12
@@ -1068,29 +1066,29 @@ State 29
 
 State 30
 
-    7 ImportSpec: '.' ImportPath .
+    7 ImportSpec: '.' ImportPath •
 
     $default  reduce using rule 7 (ImportSpec)
 
 
 State 31
 
-    8 ImportSpec: PackageName ImportPath .
+    8 ImportSpec: PackageName ImportPath •
 
     $default  reduce using rule 8 (ImportSpec)
 
 
 State 32
 
-  134 FunctionName: ID .
+  142 FunctionName: ID •
 
-    $default  reduce using rule 134 (FunctionName)
+    $default  reduce using rule 142 (FunctionName)
 
 
 State 33
 
-  132 FunctionDecl: FUNC FunctionName . Signature FunctionBody
-  133             | FUNC FunctionName . Signature
+  140 FunctionDecl: FUNC FunctionName • Signature FunctionBody
+  141             | FUNC FunctionName • Signature
 
     '('  shift, and go to state 49
 
@@ -1100,7 +1098,7 @@ State 33
 
 State 34
 
-   40 IdentifierList: ID . STAR_CM_ID
+   40 IdentifierList: ID • STAR_CM_ID
 
     $default  reduce using rule 19 (STAR_CM_ID)
 
@@ -1109,7 +1107,7 @@ State 34
 
 State 35
 
-   38 ConstDecl: CONST '(' . STAR_ConstSpec_SC ')'
+   38 ConstDecl: CONST '(' • STAR_ConstSpec_SC ')'
 
     $default  reduce using rule 21 (STAR_ConstSpec_SC)
 
@@ -1118,21 +1116,21 @@ State 35
 
 State 36
 
-   37 ConstDecl: CONST ConstSpec .
+   37 ConstDecl: CONST ConstSpec •
 
     $default  reduce using rule 37 (ConstDecl)
 
 
 State 37
 
-   39 ConstSpec: IdentifierList .
+   39 ConstSpec: IdentifierList •
 
     $default  reduce using rule 39 (ConstSpec)
 
 
 State 38
 
-   48 VarDecl: VAR '(' . STAR_VarSpec_SC ')'
+   48 VarDecl: VAR '(' • STAR_VarSpec_SC ')'
 
     $default  reduce using rule 23 (STAR_VarSpec_SC)
 
@@ -1141,29 +1139,29 @@ State 38
 
 State 39
 
-   49 VarSpec: IdentifierList . "=" ExpressionList
+   49 VarSpec: IdentifierList • "=" ExpressionList
 
     "="  shift, and go to state 55
 
 
 State 40
 
-   47 VarDecl: VAR VarSpec .
+   47 VarDecl: VAR VarSpec •
 
     $default  reduce using rule 47 (VarDecl)
 
 
 State 41
 
-   45 AliasDecl: ID . '=' Type
-   46 TypeDef: ID . Type
+   45 AliasDecl: ID • '=' Type
+   46 TypeDef: ID • Type
 
     FUNC    shift, and go to state 56
     STRUCT  shift, and go to state 57
     ID      shift, and go to state 58
-    '*'     shift, and go to state 59
-    '('     shift, and go to state 60
-    '='     shift, and go to state 61
+    '='     shift, and go to state 59
+    '*'     shift, and go to state 60
+    '('     shift, and go to state 61
     '['     shift, and go to state 62
 
     PackageName     go to state 63
@@ -1179,7 +1177,7 @@ State 41
 
 State 42
 
-   42 TypeDecl: TYPE_TOK '(' . STAR_TypeSpec_SC ')'
+   42 TypeDecl: TYPE_TOK '(' • STAR_TypeSpec_SC ')'
 
     $default  reduce using rule 27 (STAR_TypeSpec_SC)
 
@@ -1188,58 +1186,58 @@ State 42
 
 State 43
 
-   41 TypeDecl: TYPE_TOK TypeSpec .
+   41 TypeDecl: TYPE_TOK TypeSpec •
 
     $default  reduce using rule 41 (TypeDecl)
 
 
 State 44
 
-   43 TypeSpec: AliasDecl .
+   43 TypeSpec: AliasDecl •
 
     $default  reduce using rule 43 (TypeSpec)
 
 
 State 45
 
-   44 TypeSpec: TypeDef .
+   44 TypeSpec: TypeDef •
 
     $default  reduce using rule 44 (TypeSpec)
 
 
 State 46
 
-   12 STAR_TopLevelDecl_SC: STAR_TopLevelDecl_SC TopLevelDecl ';' .
+   12 STAR_TopLevelDecl_SC: STAR_TopLevelDecl_SC TopLevelDecl ';' •
 
     $default  reduce using rule 12 (STAR_TopLevelDecl_SC)
 
 
 State 47
 
-    5 ImportDecl: IMPORT '(' STAR_ImportSpec_SC ')' .
+    5 ImportDecl: IMPORT '(' STAR_ImportSpec_SC ')' •
 
     $default  reduce using rule 5 (ImportDecl)
 
 
 State 48
 
-   16 STAR_ImportSpec_SC: STAR_ImportSpec_SC ImportSpec . ';'
+   16 STAR_ImportSpec_SC: STAR_ImportSpec_SC ImportSpec • ';'
 
     ';'  shift, and go to state 73
 
 
 State 49
 
-  215 Parameters: '(' . ')'
-  216           | '(' . ParameterList ')'
-  217           | '(' . ParameterList ',' ')'
+  220 Parameters: '(' • ')'
+  221           | '(' • ParameterList ')'
+  222           | '(' • ParameterList ',' ')'
 
     FUNC     shift, and go to state 56
     STRUCT   shift, and go to state 57
     ID       shift, and go to state 74
     ELIPSIS  shift, and go to state 75
-    '*'      shift, and go to state 59
-    '('      shift, and go to state 60
+    '*'      shift, and go to state 60
+    '('      shift, and go to state 61
     ')'      shift, and go to state 76
     '['      shift, and go to state 62
 
@@ -1259,12 +1257,12 @@ State 49
 
 State 50
 
-  132 FunctionDecl: FUNC FunctionName Signature . FunctionBody
-  133             | FUNC FunctionName Signature .
+  140 FunctionDecl: FUNC FunctionName Signature • FunctionBody
+  141             | FUNC FunctionName Signature •
 
     '{'  shift, and go to state 81
 
-    $default  reduce using rule 133 (FunctionDecl)
+    $default  reduce using rule 141 (FunctionDecl)
 
     FunctionBody  go to state 82
     Block         go to state 83
@@ -1272,23 +1270,22 @@ State 50
 
 State 51
 
-  211 Signature: Parameters .
-  212          | Parameters . Result
+  215 Signature: Parameters •
+  216          | Parameters • Result
 
     FUNC    shift, and go to state 56
     STRUCT  shift, and go to state 57
     ID      shift, and go to state 58
-    '*'     shift, and go to state 59
-    '('     shift, and go to state 84
+    '*'     shift, and go to state 60
+    '('     shift, and go to state 49
     '['     shift, and go to state 62
 
-    $default  reduce using rule 211 (Signature)
+    $default  reduce using rule 215 (Signature)
 
     PackageName     go to state 63
     QualifiedIdent  go to state 64
-    Type            go to state 85
-    TypeName        go to state 66
-    TypeLit         go to state 67
+    TypeName        go to state 84
+    TypeLit         go to state 85
     ArrayType       go to state 68
     StructType      go to state 69
     PointerType     go to state 70
@@ -1299,8 +1296,8 @@ State 51
 
 State 52
 
-   18 STAR_CM_ID: STAR_CM_ID . ',' ID
-   40 IdentifierList: ID STAR_CM_ID .
+   18 STAR_CM_ID: STAR_CM_ID • ',' ID
+   40 IdentifierList: ID STAR_CM_ID •
 
     ','  shift, and go to state 88
 
@@ -1309,8 +1306,8 @@ State 52
 
 State 53
 
-   20 STAR_ConstSpec_SC: STAR_ConstSpec_SC . ConstSpec ';'
-   38 ConstDecl: CONST '(' STAR_ConstSpec_SC . ')'
+   20 STAR_ConstSpec_SC: STAR_ConstSpec_SC • ConstSpec ';'
+   38 ConstDecl: CONST '(' STAR_ConstSpec_SC • ')'
 
     ID   shift, and go to state 34
     ')'  shift, and go to state 89
@@ -1321,8 +1318,8 @@ State 53
 
 State 54
 
-   22 STAR_VarSpec_SC: STAR_VarSpec_SC . VarSpec ';'
-   48 VarDecl: VAR '(' STAR_VarSpec_SC . ')'
+   22 STAR_VarSpec_SC: STAR_VarSpec_SC • VarSpec ';'
+   48 VarDecl: VAR '(' STAR_VarSpec_SC • ')'
 
     ID   shift, and go to state 34
     ')'  shift, and go to state 91
@@ -1333,7 +1330,7 @@ State 54
 
 State 55
 
-   49 VarSpec: IdentifierList "=" . ExpressionList
+   49 VarSpec: IdentifierList "=" • ExpressionList
 
     FUNC        shift, and go to state 93
     STRUCT      shift, and go to state 57
@@ -1343,11 +1340,11 @@ State 55
     HEX_LIT     shift, and go to state 97
     FLOAT_LIT   shift, and go to state 98
     DEC_LIT     shift, and go to state 99
-    '+'         shift, and go to state 100
-    '-'         shift, and go to state 101
-    '*'         shift, and go to state 102
-    '^'         shift, and go to state 103
-    '&'         shift, and go to state 104
+    '^'         shift, and go to state 100
+    '&'         shift, and go to state 101
+    '+'         shift, and go to state 102
+    '-'         shift, and go to state 103
+    '*'         shift, and go to state 104
     '!'         shift, and go to state 105
     '['         shift, and go to state 106
     "("         shift, and go to state 107
@@ -1374,7 +1371,7 @@ State 55
 
 State 56
 
-  210 FunctionType: FUNC . Signature
+  214 FunctionType: FUNC • Signature
 
     '('  shift, and go to state 49
 
@@ -1384,29 +1381,29 @@ State 56
 
 State 57
 
-  204 StructType: STRUCT . '{' STAR_FieldDecl_SC '}'
+  208 StructType: STRUCT • '{' STAR_FieldDecl_SC '}'
 
     '{'  shift, and go to state 126
 
 
 State 58
 
-    3 PackageName: ID .
-  195 TypeName: ID .
+    3 PackageName: ID •
+  199 TypeName: ID •
 
     '.'       reduce using rule 3 (PackageName)
-    $default  reduce using rule 195 (TypeName)
+    $default  reduce using rule 199 (TypeName)
 
 
 State 59
 
-  208 PointerType: '*' . BaseType
+   45 AliasDecl: ID '=' • Type
 
     FUNC    shift, and go to state 56
     STRUCT  shift, and go to state 57
     ID      shift, and go to state 58
-    '*'     shift, and go to state 59
-    '('     shift, and go to state 60
+    '*'     shift, and go to state 60
+    '('     shift, and go to state 61
     '['     shift, and go to state 62
 
     PackageName     go to state 63
@@ -1417,41 +1414,41 @@ State 59
     ArrayType       go to state 68
     StructType      go to state 69
     PointerType     go to state 70
-    BaseType        go to state 128
     FunctionType    go to state 71
 
 
 State 60
 
-  194 Type: '(' . Type ')'
+  212 PointerType: '*' • BaseType
 
     FUNC    shift, and go to state 56
     STRUCT  shift, and go to state 57
     ID      shift, and go to state 58
-    '*'     shift, and go to state 59
-    '('     shift, and go to state 60
+    '*'     shift, and go to state 60
+    '('     shift, and go to state 61
     '['     shift, and go to state 62
 
     PackageName     go to state 63
     QualifiedIdent  go to state 64
-    Type            go to state 129
+    Type            go to state 128
     TypeName        go to state 66
     TypeLit         go to state 67
     ArrayType       go to state 68
     StructType      go to state 69
     PointerType     go to state 70
+    BaseType        go to state 129
     FunctionType    go to state 71
 
 
 State 61
 
-   45 AliasDecl: ID '=' . Type
+  198 Type: '(' • Type ')'
 
     FUNC    shift, and go to state 56
     STRUCT  shift, and go to state 57
     ID      shift, and go to state 58
-    '*'     shift, and go to state 59
-    '('     shift, and go to state 60
+    '*'     shift, and go to state 60
+    '('     shift, and go to state 61
     '['     shift, and go to state 62
 
     PackageName     go to state 63
@@ -1467,7 +1464,7 @@ State 61
 
 State 62
 
-  201 ArrayType: '[' . ArrayLength ']' ElementType
+  205 ArrayType: '[' • ArrayLength ']' ElementType
 
     FUNC        shift, and go to state 93
     STRUCT      shift, and go to state 57
@@ -1477,11 +1474,11 @@ State 62
     HEX_LIT     shift, and go to state 97
     FLOAT_LIT   shift, and go to state 98
     DEC_LIT     shift, and go to state 99
-    '+'         shift, and go to state 100
-    '-'         shift, and go to state 101
-    '*'         shift, and go to state 102
-    '^'         shift, and go to state 103
-    '&'         shift, and go to state 104
+    '^'         shift, and go to state 100
+    '&'         shift, and go to state 101
+    '+'         shift, and go to state 102
+    '-'         shift, and go to state 103
+    '*'         shift, and go to state 104
     '!'         shift, and go to state 105
     '['         shift, and go to state 106
     "("         shift, and go to state 107
@@ -1508,71 +1505,71 @@ State 62
 
 State 63
 
-  112 QualifiedIdent: PackageName . '.' ID
+  121 QualifiedIdent: PackageName • '.' ID
 
     '.'  shift, and go to state 133
 
 
 State 64
 
-  196 TypeName: QualifiedIdent .
+  200 TypeName: QualifiedIdent •
 
-    $default  reduce using rule 196 (TypeName)
+    $default  reduce using rule 200 (TypeName)
 
 
 State 65
 
-   46 TypeDef: ID Type .
+   46 TypeDef: ID Type •
 
     $default  reduce using rule 46 (TypeDef)
 
 
 State 66
 
-  192 Type: TypeName .
+  196 Type: TypeName •
 
-    $default  reduce using rule 192 (Type)
+    $default  reduce using rule 196 (Type)
 
 
 State 67
 
-  193 Type: TypeLit .
+  197 Type: TypeLit •
 
-    $default  reduce using rule 193 (Type)
+    $default  reduce using rule 197 (Type)
 
 
 State 68
 
-  197 TypeLit: ArrayType .
+  201 TypeLit: ArrayType •
 
-    $default  reduce using rule 197 (TypeLit)
+    $default  reduce using rule 201 (TypeLit)
 
 
 State 69
 
-  198 TypeLit: StructType .
+  202 TypeLit: StructType •
 
-    $default  reduce using rule 198 (TypeLit)
+    $default  reduce using rule 202 (TypeLit)
 
 
 State 70
 
-  199 TypeLit: PointerType .
+  203 TypeLit: PointerType •
 
-    $default  reduce using rule 199 (TypeLit)
+    $default  reduce using rule 203 (TypeLit)
 
 
 State 71
 
-  200 TypeLit: FunctionType .
+  204 TypeLit: FunctionType •
 
-    $default  reduce using rule 200 (TypeLit)
+    $default  reduce using rule 204 (TypeLit)
 
 
 State 72
 
-   26 STAR_TypeSpec_SC: STAR_TypeSpec_SC . ';'
-   42 TypeDecl: TYPE_TOK '(' STAR_TypeSpec_SC . ')'
+   26 STAR_TypeSpec_SC: STAR_TypeSpec_SC • ';'
+   42 TypeDecl: TYPE_TOK '(' STAR_TypeSpec_SC • ')'
 
     ';'  shift, and go to state 134
     ')'  shift, and go to state 135
@@ -1580,21 +1577,21 @@ State 72
 
 State 73
 
-   16 STAR_ImportSpec_SC: STAR_ImportSpec_SC ImportSpec ';' .
+   16 STAR_ImportSpec_SC: STAR_ImportSpec_SC ImportSpec ';' •
 
     $default  reduce using rule 16 (STAR_ImportSpec_SC)
 
 
 State 74
 
-    3 PackageName: ID .
-   40 IdentifierList: ID . STAR_CM_ID
-  195 TypeName: ID .
+    3 PackageName: ID •
+   40 IdentifierList: ID • STAR_CM_ID
+  199 TypeName: ID •
 
-    ')'       reduce using rule 195 (TypeName)
-    '.'       reduce using rule 3 (PackageName)
     ','       reduce using rule 19 (STAR_CM_ID)
-    ','       [reduce using rule 195 (TypeName)]
+    ','       [reduce using rule 199 (TypeName)]
+    ')'       reduce using rule 199 (TypeName)
+    '.'       reduce using rule 3 (PackageName)
     $default  reduce using rule 19 (STAR_CM_ID)
 
     STAR_CM_ID  go to state 52
@@ -1602,13 +1599,13 @@ State 74
 
 State 75
 
-  222 ParameterDecl: ELIPSIS . Type
+  227 ParameterDecl: ELIPSIS • Type
 
     FUNC    shift, and go to state 56
     STRUCT  shift, and go to state 57
     ID      shift, and go to state 58
-    '*'     shift, and go to state 59
-    '('     shift, and go to state 60
+    '*'     shift, and go to state 60
+    '('     shift, and go to state 61
     '['     shift, and go to state 62
 
     PackageName     go to state 63
@@ -1624,22 +1621,22 @@ State 75
 
 State 76
 
-  215 Parameters: '(' ')' .
+  220 Parameters: '(' ')' •
 
-    $default  reduce using rule 215 (Parameters)
+    $default  reduce using rule 220 (Parameters)
 
 
 State 77
 
-  220 ParameterDecl: IdentifierList . Type
-  221              | IdentifierList . ELIPSIS Type
+  225 ParameterDecl: IdentifierList • Type
+  226              | IdentifierList • ELIPSIS Type
 
     FUNC     shift, and go to state 56
     STRUCT   shift, and go to state 57
     ID       shift, and go to state 58
     ELIPSIS  shift, and go to state 137
-    '*'      shift, and go to state 59
-    '('      shift, and go to state 60
+    '*'      shift, and go to state 60
+    '('      shift, and go to state 61
     '['      shift, and go to state 62
 
     PackageName     go to state 63
@@ -1655,23 +1652,23 @@ State 77
 
 State 78
 
-  219 ParameterDecl: Type .
+  224 ParameterDecl: Type •
 
-    $default  reduce using rule 219 (ParameterDecl)
+    $default  reduce using rule 224 (ParameterDecl)
 
 
 State 79
 
-  216 Parameters: '(' ParameterList . ')'
-  217           | '(' ParameterList . ',' ')'
+  221 Parameters: '(' ParameterList • ')'
+  222           | '(' ParameterList • ',' ')'
 
-    ')'  shift, and go to state 139
-    ','  shift, and go to state 140
+    ','  shift, and go to state 139
+    ')'  shift, and go to state 140
 
 
 State 80
 
-  218 ParameterList: ParameterDecl . STAR_CM_ParameterDecl
+  223 ParameterList: ParameterDecl • STAR_CM_ParameterDecl
 
     $default  reduce using rule 31 (STAR_CM_ParameterDecl)
 
@@ -1680,7 +1677,7 @@ State 80
 
 State 81
 
-  136 Block: '{' . STAR_Statement_SC '}'
+  144 Block: '{' • STAR_Statement_SC '}'
 
     $default  reduce using rule 29 (STAR_Statement_SC)
 
@@ -1689,214 +1686,185 @@ State 81
 
 State 82
 
-  132 FunctionDecl: FUNC FunctionName Signature FunctionBody .
+  140 FunctionDecl: FUNC FunctionName Signature FunctionBody •
 
-    $default  reduce using rule 132 (FunctionDecl)
+    $default  reduce using rule 140 (FunctionDecl)
 
 
 State 83
 
-  135 FunctionBody: Block .
+  143 FunctionBody: Block •
 
-    $default  reduce using rule 135 (FunctionBody)
+    $default  reduce using rule 143 (FunctionBody)
 
 
 State 84
 
-  194 Type: '(' . Type ')'
-  215 Parameters: '(' . ')'
-  216           | '(' . ParameterList ')'
-  217           | '(' . ParameterList ',' ')'
+  218 Result: TypeName •
 
-    FUNC     shift, and go to state 56
-    STRUCT   shift, and go to state 57
-    ID       shift, and go to state 74
-    ELIPSIS  shift, and go to state 75
-    '*'      shift, and go to state 59
-    '('      shift, and go to state 60
-    ')'      shift, and go to state 76
-    '['      shift, and go to state 62
-
-    PackageName     go to state 63
-    IdentifierList  go to state 77
-    QualifiedIdent  go to state 64
-    Type            go to state 143
-    TypeName        go to state 66
-    TypeLit         go to state 67
-    ArrayType       go to state 68
-    StructType      go to state 69
-    PointerType     go to state 70
-    FunctionType    go to state 71
-    ParameterList   go to state 79
-    ParameterDecl   go to state 80
+    $default  reduce using rule 218 (Result)
 
 
 State 85
 
-  214 Result: Type .
+  219 Result: TypeLit •
 
-    $default  reduce using rule 214 (Result)
+    $default  reduce using rule 219 (Result)
 
 
 State 86
 
-  212 Signature: Parameters Result .
+  216 Signature: Parameters Result •
 
-    $default  reduce using rule 212 (Signature)
+    $default  reduce using rule 216 (Signature)
 
 
 State 87
 
-  213 Result: Parameters .
+  217 Result: Parameters •
 
-    $default  reduce using rule 213 (Result)
+    $default  reduce using rule 217 (Result)
 
 
 State 88
 
-   18 STAR_CM_ID: STAR_CM_ID ',' . ID
+   18 STAR_CM_ID: STAR_CM_ID ',' • ID
 
-    ID  shift, and go to state 144
+    ID  shift, and go to state 143
 
 
 State 89
 
-   38 ConstDecl: CONST '(' STAR_ConstSpec_SC ')' .
+   38 ConstDecl: CONST '(' STAR_ConstSpec_SC ')' •
 
     $default  reduce using rule 38 (ConstDecl)
 
 
 State 90
 
-   20 STAR_ConstSpec_SC: STAR_ConstSpec_SC ConstSpec . ';'
+   20 STAR_ConstSpec_SC: STAR_ConstSpec_SC ConstSpec • ';'
 
-    ';'  shift, and go to state 145
+    ';'  shift, and go to state 144
 
 
 State 91
 
-   48 VarDecl: VAR '(' STAR_VarSpec_SC ')' .
+   48 VarDecl: VAR '(' STAR_VarSpec_SC ')' •
 
     $default  reduce using rule 48 (VarDecl)
 
 
 State 92
 
-   22 STAR_VarSpec_SC: STAR_VarSpec_SC VarSpec . ';'
+   22 STAR_VarSpec_SC: STAR_VarSpec_SC VarSpec • ';'
 
-    ';'  shift, and go to state 146
+    ';'  shift, and go to state 145
 
 
 State 93
 
-  131 FunctionLit: FUNC . Signature FunctionBody
+  139 FunctionLit: FUNC • Signature FunctionBody
 
     '('  shift, and go to state 49
 
-    Signature   go to state 147
+    Signature   go to state 146
     Parameters  go to state 51
 
 
 State 94
 
-    3 PackageName: ID .
-  110 OperandName: ID .
-  195 TypeName: ID .
+    3 PackageName: ID •
+  119 OperandName: ID •
+  199 TypeName: ID •
 
-    ELIPSIS   reduce using rule 110 (OperandName)
-    ELIPSIS   [reduce using rule 195 (TypeName)]
-    ')'       reduce using rule 110 (OperandName)
-    ')'       [reduce using rule 195 (TypeName)]
     '.'       reduce using rule 3 (PackageName)
-    '.'       [reduce using rule 110 (OperandName)]
-    ','       reduce using rule 110 (OperandName)
-    ','       [reduce using rule 195 (TypeName)]
-    '{'       reduce using rule 110 (OperandName)
-    '{'       [reduce using rule 195 (TypeName)]
-    $default  reduce using rule 110 (OperandName)
+    '.'       [reduce using rule 119 (OperandName)]
+    '{'       reduce using rule 119 (OperandName)
+    '{'       [reduce using rule 199 (TypeName)]
+    $default  reduce using rule 119 (OperandName)
 
 
 State 95
 
-  109 BasicLit: STRING_LIT .
+  118 BasicLit: STRING_LIT •
 
-    $default  reduce using rule 109 (BasicLit)
+    $default  reduce using rule 118 (BasicLit)
 
 
 State 96
 
-  105 INT_LIT: BINARY_LIT .
+  114 INT_LIT: BINARY_LIT •
 
-    $default  reduce using rule 105 (INT_LIT)
+    $default  reduce using rule 114 (INT_LIT)
 
 
 State 97
 
-  106 INT_LIT: HEX_LIT .
+  115 INT_LIT: HEX_LIT •
 
-    $default  reduce using rule 106 (INT_LIT)
+    $default  reduce using rule 115 (INT_LIT)
 
 
 State 98
 
-  108 BasicLit: FLOAT_LIT .
+  117 BasicLit: FLOAT_LIT •
 
-    $default  reduce using rule 108 (BasicLit)
+    $default  reduce using rule 117 (BasicLit)
 
 
 State 99
 
-  104 INT_LIT: DEC_LIT .
+  113 INT_LIT: DEC_LIT •
 
-    $default  reduce using rule 104 (INT_LIT)
+    $default  reduce using rule 113 (INT_LIT)
 
 
 State 100
 
-   76 unary_op: '+' .
+   89 unary_op: '^' •
 
-    $default  reduce using rule 76 (unary_op)
+    $default  reduce using rule 89 (unary_op)
 
 
 State 101
 
-   77 unary_op: '-' .
+   91 unary_op: '&' •
 
-    $default  reduce using rule 77 (unary_op)
+    $default  reduce using rule 91 (unary_op)
 
 
 State 102
 
-   80 unary_op: '*' .
+   86 unary_op: '+' •
 
-    $default  reduce using rule 80 (unary_op)
+    $default  reduce using rule 86 (unary_op)
 
 
 State 103
 
-   79 unary_op: '^' .
+   87 unary_op: '-' •
 
-    $default  reduce using rule 79 (unary_op)
+    $default  reduce using rule 87 (unary_op)
 
 
 State 104
 
-   81 unary_op: '&' .
+   90 unary_op: '*' •
 
-    $default  reduce using rule 81 (unary_op)
+    $default  reduce using rule 90 (unary_op)
 
 
 State 105
 
-   78 unary_op: '!' .
+   88 unary_op: '!' •
 
-    $default  reduce using rule 78 (unary_op)
+    $default  reduce using rule 88 (unary_op)
 
 
 State 106
 
-  116 LiteralType: '[' . ELIPSIS ']' ElementType
-  201 ArrayType: '[' . ArrayLength ']' ElementType
+  125 LiteralType: '[' • ELIPSIS ']' ElementType
+  205 ArrayType: '[' • ArrayLength ']' ElementType
 
     FUNC        shift, and go to state 93
     STRUCT      shift, and go to state 57
@@ -1906,12 +1874,12 @@ State 106
     HEX_LIT     shift, and go to state 97
     FLOAT_LIT   shift, and go to state 98
     DEC_LIT     shift, and go to state 99
-    ELIPSIS     shift, and go to state 148
-    '+'         shift, and go to state 100
-    '-'         shift, and go to state 101
-    '*'         shift, and go to state 102
-    '^'         shift, and go to state 103
-    '&'         shift, and go to state 104
+    ELIPSIS     shift, and go to state 147
+    '^'         shift, and go to state 100
+    '&'         shift, and go to state 101
+    '+'         shift, and go to state 102
+    '-'         shift, and go to state 103
+    '*'         shift, and go to state 104
     '!'         shift, and go to state 105
     '['         shift, and go to state 106
     "("         shift, and go to state 107
@@ -1938,7 +1906,7 @@ State 106
 
 State 107
 
-  100 Operand: "(" . Expression ")"
+  109 Operand: "(" • Expression ")"
 
     FUNC        shift, and go to state 93
     STRUCT      shift, and go to state 57
@@ -1948,17 +1916,17 @@ State 107
     HEX_LIT     shift, and go to state 97
     FLOAT_LIT   shift, and go to state 98
     DEC_LIT     shift, and go to state 99
-    '+'         shift, and go to state 100
-    '-'         shift, and go to state 101
-    '*'         shift, and go to state 102
-    '^'         shift, and go to state 103
-    '&'         shift, and go to state 104
+    '^'         shift, and go to state 100
+    '&'         shift, and go to state 101
+    '+'         shift, and go to state 102
+    '-'         shift, and go to state 103
+    '*'         shift, and go to state 104
     '!'         shift, and go to state 105
     '['         shift, and go to state 106
     "("         shift, and go to state 107
 
     PackageName     go to state 63
-    Expression      go to state 149
+    Expression      go to state 148
     UnaryExpr       go to state 110
     unary_op        go to state 111
     PrimaryExpr     go to state 112
@@ -1978,54 +1946,54 @@ State 107
 
 State 108
 
-   49 VarSpec: IdentifierList "=" ExpressionList .
+   49 VarSpec: IdentifierList "=" ExpressionList •
 
     $default  reduce using rule 49 (VarSpec)
 
 
 State 109
 
-   50 ExpressionList: Expression . STAR_CM_EXP
-   52 Expression: Expression . binary_op Expression
+   50 ExpressionList: Expression • STAR_CM_EXP
+   52 Expression: Expression • binary_op Expression
 
-    '+'   shift, and go to state 150
-    '-'   shift, and go to state 151
-    '*'   shift, and go to state 152
-    '/'   shift, and go to state 153
-    "||"  shift, and go to state 154
-    "&&"  shift, and go to state 155
-    "=="  shift, and go to state 156
-    "!="  shift, and go to state 157
-    '<'   shift, and go to state 158
+    "||"  shift, and go to state 149
+    "&&"  shift, and go to state 150
+    '|'   shift, and go to state 151
+    '^'   shift, and go to state 152
+    '&'   shift, and go to state 153
+    "=="  shift, and go to state 154
+    "!="  shift, and go to state 155
+    '>'   shift, and go to state 156
+    '<'   shift, and go to state 157
+    ">="  shift, and go to state 158
     "<="  shift, and go to state 159
-    '>'   shift, and go to state 160
-    ">="  shift, and go to state 161
-    '|'   shift, and go to state 162
-    '^'   shift, and go to state 163
-    '%'   shift, and go to state 164
-    "<<"  shift, and go to state 165
-    ">>"  shift, and go to state 166
-    '&'   shift, and go to state 167
+    ">>"  shift, and go to state 160
+    "<<"  shift, and go to state 161
+    '+'   shift, and go to state 162
+    '-'   shift, and go to state 163
+    '*'   shift, and go to state 164
+    '/'   shift, and go to state 165
+    '%'   shift, and go to state 166
 
     $default  reduce using rule 25 (STAR_CM_EXP)
 
-    STAR_CM_EXP  go to state 168
-    binary_op    go to state 169
-    rel_op       go to state 170
-    add_op       go to state 171
-    mul_op       go to state 172
+    STAR_CM_EXP  go to state 167
+    binary_op    go to state 168
+    rel_op       go to state 169
+    add_op       go to state 170
+    mul_op       go to state 171
 
 
 State 110
 
-   51 Expression: UnaryExpr .
+   51 Expression: UnaryExpr •
 
     $default  reduce using rule 51 (Expression)
 
 
 State 111
 
-   54 UnaryExpr: unary_op . UnaryExpr
+   54 UnaryExpr: unary_op • UnaryExpr
 
     FUNC        shift, and go to state 93
     STRUCT      shift, and go to state 57
@@ -2035,17 +2003,17 @@ State 111
     HEX_LIT     shift, and go to state 97
     FLOAT_LIT   shift, and go to state 98
     DEC_LIT     shift, and go to state 99
-    '+'         shift, and go to state 100
-    '-'         shift, and go to state 101
-    '*'         shift, and go to state 102
-    '^'         shift, and go to state 103
-    '&'         shift, and go to state 104
+    '^'         shift, and go to state 100
+    '&'         shift, and go to state 101
+    '+'         shift, and go to state 102
+    '-'         shift, and go to state 103
+    '*'         shift, and go to state 104
     '!'         shift, and go to state 105
     '['         shift, and go to state 106
     "("         shift, and go to state 107
 
     PackageName     go to state 63
-    UnaryExpr       go to state 173
+    UnaryExpr       go to state 172
     unary_op        go to state 111
     PrimaryExpr     go to state 112
     Operand         go to state 113
@@ -2064,242 +2032,236 @@ State 111
 
 State 112
 
-   53 UnaryExpr: PrimaryExpr .
-   83 PrimaryExpr: PrimaryExpr . Index
-   84            | PrimaryExpr . Selector
-   85            | PrimaryExpr . Arguments
+   53 UnaryExpr: PrimaryExpr •
+   93 PrimaryExpr: PrimaryExpr • Index
+   94            | PrimaryExpr • Selector
+   95            | PrimaryExpr • Arguments
 
-    '('  shift, and go to state 174
-    '.'  shift, and go to state 175
-    '['  shift, and go to state 176
+    '('  shift, and go to state 173
+    '.'  shift, and go to state 174
+    '['  shift, and go to state 175
 
     $default  reduce using rule 53 (UnaryExpr)
 
-    Selector   go to state 177
-    Index      go to state 178
-    Arguments  go to state 179
+    Selector   go to state 176
+    Index      go to state 177
+    Arguments  go to state 178
 
 
 State 113
 
-   82 PrimaryExpr: Operand .
+   92 PrimaryExpr: Operand •
 
-    $default  reduce using rule 82 (PrimaryExpr)
+    $default  reduce using rule 92 (PrimaryExpr)
 
 
 State 114
 
-   98 Operand: Literal .
+  107 Operand: Literal •
 
-    $default  reduce using rule 98 (Operand)
+    $default  reduce using rule 107 (Operand)
 
 
 State 115
 
-  107 BasicLit: INT_LIT .
+  116 BasicLit: INT_LIT •
 
-    $default  reduce using rule 107 (BasicLit)
+    $default  reduce using rule 116 (BasicLit)
 
 
 State 116
 
-  101 Literal: BasicLit .
+  110 Literal: BasicLit •
 
-    $default  reduce using rule 101 (Literal)
+    $default  reduce using rule 110 (Literal)
 
 
 State 117
 
-   99 Operand: OperandName .
+  108 Operand: OperandName •
 
-    $default  reduce using rule 99 (Operand)
+    $default  reduce using rule 108 (Operand)
 
 
 State 118
 
-  111 OperandName: QualifiedIdent .
-  196 TypeName: QualifiedIdent .
+  120 OperandName: QualifiedIdent •
+  200 TypeName: QualifiedIdent •
 
-    ELIPSIS   reduce using rule 111 (OperandName)
-    ELIPSIS   [reduce using rule 196 (TypeName)]
-    ')'       reduce using rule 111 (OperandName)
-    ')'       [reduce using rule 196 (TypeName)]
-    ','       reduce using rule 111 (OperandName)
-    ','       [reduce using rule 196 (TypeName)]
-    '{'       reduce using rule 111 (OperandName)
-    '{'       [reduce using rule 196 (TypeName)]
-    $default  reduce using rule 111 (OperandName)
+    '{'       reduce using rule 120 (OperandName)
+    '{'       [reduce using rule 200 (TypeName)]
+    $default  reduce using rule 120 (OperandName)
 
 
 State 119
 
-  102 Literal: CompositeLit .
+  111 Literal: CompositeLit •
 
-    $default  reduce using rule 102 (Literal)
+    $default  reduce using rule 111 (Literal)
 
 
 State 120
 
-  113 CompositeLit: LiteralType . LiteralValue
+  122 CompositeLit: LiteralType • LiteralValue
 
-    '{'  shift, and go to state 180
+    '{'  shift, and go to state 179
 
-    LiteralValue  go to state 181
+    LiteralValue  go to state 180
 
 
 State 121
 
-  103 Literal: FunctionLit .
+  112 Literal: FunctionLit •
 
-    $default  reduce using rule 103 (Literal)
+    $default  reduce using rule 112 (Literal)
 
 
 State 122
 
-  117 LiteralType: TypeName .
+  126 LiteralType: TypeName •
 
-    $default  reduce using rule 117 (LiteralType)
+    $default  reduce using rule 126 (LiteralType)
 
 
 State 123
 
-  115 LiteralType: ArrayType .
+  124 LiteralType: ArrayType •
 
-    $default  reduce using rule 115 (LiteralType)
+    $default  reduce using rule 124 (LiteralType)
 
 
 State 124
 
-  114 LiteralType: StructType .
+  123 LiteralType: StructType •
 
-    $default  reduce using rule 114 (LiteralType)
+    $default  reduce using rule 123 (LiteralType)
 
 
 State 125
 
-  210 FunctionType: FUNC Signature .
+  214 FunctionType: FUNC Signature •
 
-    $default  reduce using rule 210 (FunctionType)
+    $default  reduce using rule 214 (FunctionType)
 
 
 State 126
 
-  204 StructType: STRUCT '{' . STAR_FieldDecl_SC '}'
+  208 StructType: STRUCT '{' • STAR_FieldDecl_SC '}'
 
     $default  reduce using rule 33 (STAR_FieldDecl_SC)
 
-    STAR_FieldDecl_SC  go to state 182
+    STAR_FieldDecl_SC  go to state 181
 
 
 State 127
 
-  209 BaseType: Type .
-
-    $default  reduce using rule 209 (BaseType)
-
-
-State 128
-
-  208 PointerType: '*' BaseType .
-
-    $default  reduce using rule 208 (PointerType)
-
-
-State 129
-
-  194 Type: '(' Type . ')'
-
-    ')'  shift, and go to state 183
-
-
-State 130
-
-   45 AliasDecl: ID '=' Type .
+   45 AliasDecl: ID '=' Type •
 
     $default  reduce using rule 45 (AliasDecl)
 
 
+State 128
+
+  213 BaseType: Type •
+
+    $default  reduce using rule 213 (BaseType)
+
+
+State 129
+
+  212 PointerType: '*' BaseType •
+
+    $default  reduce using rule 212 (PointerType)
+
+
+State 130
+
+  198 Type: '(' Type • ')'
+
+    ')'  shift, and go to state 182
+
+
 State 131
 
-   52 Expression: Expression . binary_op Expression
-  202 ArrayLength: Expression .
+   52 Expression: Expression • binary_op Expression
+  206 ArrayLength: Expression •
 
-    '+'   shift, and go to state 150
-    '-'   shift, and go to state 151
-    '*'   shift, and go to state 152
-    '/'   shift, and go to state 153
-    "||"  shift, and go to state 154
-    "&&"  shift, and go to state 155
-    "=="  shift, and go to state 156
-    "!="  shift, and go to state 157
-    '<'   shift, and go to state 158
+    "||"  shift, and go to state 149
+    "&&"  shift, and go to state 150
+    '|'   shift, and go to state 151
+    '^'   shift, and go to state 152
+    '&'   shift, and go to state 153
+    "=="  shift, and go to state 154
+    "!="  shift, and go to state 155
+    '>'   shift, and go to state 156
+    '<'   shift, and go to state 157
+    ">="  shift, and go to state 158
     "<="  shift, and go to state 159
-    '>'   shift, and go to state 160
-    ">="  shift, and go to state 161
-    '|'   shift, and go to state 162
-    '^'   shift, and go to state 163
-    '%'   shift, and go to state 164
-    "<<"  shift, and go to state 165
-    ">>"  shift, and go to state 166
-    '&'   shift, and go to state 167
+    ">>"  shift, and go to state 160
+    "<<"  shift, and go to state 161
+    '+'   shift, and go to state 162
+    '-'   shift, and go to state 163
+    '*'   shift, and go to state 164
+    '/'   shift, and go to state 165
+    '%'   shift, and go to state 166
 
-    $default  reduce using rule 202 (ArrayLength)
+    $default  reduce using rule 206 (ArrayLength)
 
-    binary_op  go to state 169
-    rel_op     go to state 170
-    add_op     go to state 171
-    mul_op     go to state 172
+    binary_op  go to state 168
+    rel_op     go to state 169
+    add_op     go to state 170
+    mul_op     go to state 171
 
 
 State 132
 
-  201 ArrayType: '[' ArrayLength . ']' ElementType
+  205 ArrayType: '[' ArrayLength • ']' ElementType
 
-    ']'  shift, and go to state 184
+    ']'  shift, and go to state 183
 
 
 State 133
 
-  112 QualifiedIdent: PackageName '.' . ID
+  121 QualifiedIdent: PackageName '.' • ID
 
-    ID  shift, and go to state 185
+    ID  shift, and go to state 184
 
 
 State 134
 
-   26 STAR_TypeSpec_SC: STAR_TypeSpec_SC ';' .
+   26 STAR_TypeSpec_SC: STAR_TypeSpec_SC ';' •
 
     $default  reduce using rule 26 (STAR_TypeSpec_SC)
 
 
 State 135
 
-   42 TypeDecl: TYPE_TOK '(' STAR_TypeSpec_SC ')' .
+   42 TypeDecl: TYPE_TOK '(' STAR_TypeSpec_SC ')' •
 
     $default  reduce using rule 42 (TypeDecl)
 
 
 State 136
 
-  222 ParameterDecl: ELIPSIS Type .
+  227 ParameterDecl: ELIPSIS Type •
 
-    $default  reduce using rule 222 (ParameterDecl)
+    $default  reduce using rule 227 (ParameterDecl)
 
 
 State 137
 
-  221 ParameterDecl: IdentifierList ELIPSIS . Type
+  226 ParameterDecl: IdentifierList ELIPSIS • Type
 
     FUNC    shift, and go to state 56
     STRUCT  shift, and go to state 57
     ID      shift, and go to state 58
-    '*'     shift, and go to state 59
-    '('     shift, and go to state 60
+    '*'     shift, and go to state 60
+    '('     shift, and go to state 61
     '['     shift, and go to state 62
 
     PackageName     go to state 63
     QualifiedIdent  go to state 64
-    Type            go to state 186
+    Type            go to state 185
     TypeName        go to state 66
     TypeLit         go to state 67
     ArrayType       go to state 68
@@ -2310,80 +2272,80 @@ State 137
 
 State 138
 
-  220 ParameterDecl: IdentifierList Type .
+  225 ParameterDecl: IdentifierList Type •
 
-    $default  reduce using rule 220 (ParameterDecl)
+    $default  reduce using rule 225 (ParameterDecl)
 
 
 State 139
 
-  216 Parameters: '(' ParameterList ')' .
+  222 Parameters: '(' ParameterList ',' • ')'
 
-    $default  reduce using rule 216 (Parameters)
+    ')'  shift, and go to state 186
 
 
 State 140
 
-  217 Parameters: '(' ParameterList ',' . ')'
+  221 Parameters: '(' ParameterList ')' •
 
-    ')'  shift, and go to state 187
+    $default  reduce using rule 221 (Parameters)
 
 
 State 141
 
-   30 STAR_CM_ParameterDecl: STAR_CM_ParameterDecl . ',' ParameterDecl
-  218 ParameterList: ParameterDecl STAR_CM_ParameterDecl .
+   30 STAR_CM_ParameterDecl: STAR_CM_ParameterDecl • ',' ParameterDecl
+  223 ParameterList: ParameterDecl STAR_CM_ParameterDecl •
 
-    ','  shift, and go to state 188
+    ','  shift, and go to state 187
 
-    ','       [reduce using rule 218 (ParameterList)]
-    $default  reduce using rule 218 (ParameterList)
+    ','       [reduce using rule 223 (ParameterList)]
+    $default  reduce using rule 223 (ParameterList)
 
 
 State 142
 
-   28 STAR_Statement_SC: STAR_Statement_SC . Statement ';'
-  136 Block: '{' STAR_Statement_SC . '}'
+   28 STAR_Statement_SC: STAR_Statement_SC • Statement ';'
+  144 Block: '{' STAR_Statement_SC • '}'
 
-    BREAK        shift, and go to state 189
+    BREAK        shift, and go to state 188
     FUNC         shift, and go to state 93
     STRUCT       shift, and go to state 57
-    RETURN       shift, and go to state 190
-    GOTO         shift, and go to state 191
+    RETURN       shift, and go to state 189
+    GOTO         shift, and go to state 190
     CONST        shift, and go to state 20
-    IF           shift, and go to state 192
-    CONTINUE     shift, and go to state 193
-    FOR          shift, and go to state 194
-    ID           shift, and go to state 195
+    IF           shift, and go to state 191
+    CONTINUE     shift, and go to state 192
+    FOR          shift, and go to state 193
+    ID           shift, and go to state 194
     VAR          shift, and go to state 21
     STRING_LIT   shift, and go to state 95
     BINARY_LIT   shift, and go to state 96
     HEX_LIT      shift, and go to state 97
     FLOAT_LIT    shift, and go to state 98
     DEC_LIT      shift, and go to state 99
-    GO           shift, and go to state 196
-    FALLTHROUGH  shift, and go to state 197
+    GO           shift, and go to state 195
+    FALLTHROUGH  shift, and go to state 196
     TYPE_TOK     shift, and go to state 22
-    '+'          shift, and go to state 100
-    '-'          shift, and go to state 101
-    '*'          shift, and go to state 102
-    '^'          shift, and go to state 103
-    '&'          shift, and go to state 104
+    '^'          shift, and go to state 100
+    '&'          shift, and go to state 101
+    '+'          shift, and go to state 102
+    '-'          shift, and go to state 103
+    '*'          shift, and go to state 104
     '!'          shift, and go to state 105
     '['          shift, and go to state 106
     "("          shift, and go to state 107
     '{'          shift, and go to state 81
-    '}'          shift, and go to state 198
+    '}'          shift, and go to state 197
 
-    $default  reduce using rule 155 (EmptyStmt)
+    $default  reduce using rule 163 (EmptyStmt)
 
     PackageName      go to state 63
-    Declaration      go to state 199
+    Declaration      go to state 198
     ConstDecl        go to state 25
     TypeDecl         go to state 26
     VarDecl          go to state 27
-    ExpressionList   go to state 200
-    Expression       go to state 201
+    ExpressionList   go to state 199
+    Expression       go to state 200
     UnaryExpr        go to state 110
     unary_op         go to state 111
     PrimaryExpr      go to state 112
@@ -2396,23 +2358,23 @@ State 142
     CompositeLit     go to state 119
     LiteralType      go to state 120
     FunctionLit      go to state 121
-    Block            go to state 202
-    Statement        go to state 203
-    LabeledStmt      go to state 204
-    Label            go to state 205
-    SimpleStmt       go to state 206
-    EmptyStmt        go to state 207
-    ExpressionStmt   go to state 208
-    IncDecStmt       go to state 209
-    Assignment       go to state 210
-    IfStmt           go to state 211
-    ForStmt          go to state 212
-    GoStmt           go to state 213
-    ReturnStmt       go to state 214
-    BreakStmt        go to state 215
-    ContinueStmt     go to state 216
-    GotoStmt         go to state 217
-    FallthroughStmt  go to state 218
+    Block            go to state 201
+    Statement        go to state 202
+    LabeledStmt      go to state 203
+    Label            go to state 204
+    SimpleStmt       go to state 205
+    EmptyStmt        go to state 206
+    ExpressionStmt   go to state 207
+    IncDecStmt       go to state 208
+    Assignment       go to state 209
+    IfStmt           go to state 210
+    ForStmt          go to state 211
+    GoStmt           go to state 212
+    ReturnStmt       go to state 213
+    BreakStmt        go to state 214
+    ContinueStmt     go to state 215
+    GotoStmt         go to state 216
+    FallthroughStmt  go to state 217
     TypeName         go to state 122
     ArrayType        go to state 123
     StructType       go to state 124
@@ -2420,224 +2382,213 @@ State 142
 
 State 143
 
-  194 Type: '(' Type . ')'
-  219 ParameterDecl: Type .
-
-    ')'  shift, and go to state 183
-
-    ')'       [reduce using rule 219 (ParameterDecl)]
-    $default  reduce using rule 219 (ParameterDecl)
-
-
-State 144
-
-   18 STAR_CM_ID: STAR_CM_ID ',' ID .
+   18 STAR_CM_ID: STAR_CM_ID ',' ID •
 
     $default  reduce using rule 18 (STAR_CM_ID)
 
 
-State 145
+State 144
 
-   20 STAR_ConstSpec_SC: STAR_ConstSpec_SC ConstSpec ';' .
+   20 STAR_ConstSpec_SC: STAR_ConstSpec_SC ConstSpec ';' •
 
     $default  reduce using rule 20 (STAR_ConstSpec_SC)
 
 
-State 146
+State 145
 
-   22 STAR_VarSpec_SC: STAR_VarSpec_SC VarSpec ';' .
+   22 STAR_VarSpec_SC: STAR_VarSpec_SC VarSpec ';' •
 
     $default  reduce using rule 22 (STAR_VarSpec_SC)
 
 
-State 147
+State 146
 
-  131 FunctionLit: FUNC Signature . FunctionBody
+  139 FunctionLit: FUNC Signature • FunctionBody
 
     '{'  shift, and go to state 81
 
-    FunctionBody  go to state 219
+    FunctionBody  go to state 218
     Block         go to state 83
+
+
+State 147
+
+  125 LiteralType: '[' ELIPSIS • ']' ElementType
+
+    ']'  shift, and go to state 219
 
 
 State 148
 
-  116 LiteralType: '[' ELIPSIS . ']' ElementType
+   52 Expression: Expression • binary_op Expression
+  109 Operand: "(" Expression • ")"
 
-    ']'  shift, and go to state 220
+    "||"  shift, and go to state 149
+    "&&"  shift, and go to state 150
+    '|'   shift, and go to state 151
+    '^'   shift, and go to state 152
+    '&'   shift, and go to state 153
+    "=="  shift, and go to state 154
+    "!="  shift, and go to state 155
+    '>'   shift, and go to state 156
+    '<'   shift, and go to state 157
+    ">="  shift, and go to state 158
+    "<="  shift, and go to state 159
+    ">>"  shift, and go to state 160
+    "<<"  shift, and go to state 161
+    '+'   shift, and go to state 162
+    '-'   shift, and go to state 163
+    '*'   shift, and go to state 164
+    '/'   shift, and go to state 165
+    '%'   shift, and go to state 166
+    ")"   shift, and go to state 220
+
+    binary_op  go to state 168
+    rel_op     go to state 169
+    add_op     go to state 170
+    mul_op     go to state 171
 
 
 State 149
 
-   52 Expression: Expression . binary_op Expression
-  100 Operand: "(" Expression . ")"
-
-    '+'   shift, and go to state 150
-    '-'   shift, and go to state 151
-    '*'   shift, and go to state 152
-    '/'   shift, and go to state 153
-    "||"  shift, and go to state 154
-    "&&"  shift, and go to state 155
-    "=="  shift, and go to state 156
-    "!="  shift, and go to state 157
-    '<'   shift, and go to state 158
-    "<="  shift, and go to state 159
-    '>'   shift, and go to state 160
-    ">="  shift, and go to state 161
-    '|'   shift, and go to state 162
-    '^'   shift, and go to state 163
-    '%'   shift, and go to state 164
-    "<<"  shift, and go to state 165
-    ">>"  shift, and go to state 166
-    '&'   shift, and go to state 167
-    ")"   shift, and go to state 221
-
-    binary_op  go to state 169
-    rel_op     go to state 170
-    add_op     go to state 171
-    mul_op     go to state 172
-
-
-State 150
-
-   66 add_op: '+' .
-
-    $default  reduce using rule 66 (add_op)
-
-
-State 151
-
-   67 add_op: '-' .
-
-    $default  reduce using rule 67 (add_op)
-
-
-State 152
-
-   70 mul_op: '*' .
-
-    $default  reduce using rule 70 (mul_op)
-
-
-State 153
-
-   71 mul_op: '/' .
-
-    $default  reduce using rule 71 (mul_op)
-
-
-State 154
-
-   55 binary_op: "||" .
+   55 binary_op: "||" •
 
     $default  reduce using rule 55 (binary_op)
 
 
-State 155
+State 150
 
-   56 binary_op: "&&" .
+   56 binary_op: "&&" •
 
     $default  reduce using rule 56 (binary_op)
 
 
-State 156
+State 151
 
-   60 rel_op: "==" .
+   68 add_op: '|' •
+
+    $default  reduce using rule 68 (add_op)
+
+
+State 152
+
+   69 add_op: '^' •
+
+    $default  reduce using rule 69 (add_op)
+
+
+State 153
+
+   85 mul_op: '&' •
+
+    $default  reduce using rule 85 (mul_op)
+
+
+State 154
+
+   60 rel_op: "==" •
 
     $default  reduce using rule 60 (rel_op)
 
 
-State 157
+State 155
 
-   61 rel_op: "!=" .
+   61 rel_op: "!=" •
 
     $default  reduce using rule 61 (rel_op)
 
 
-State 158
+State 156
 
-   62 rel_op: '<' .
+   64 rel_op: '>' •
+
+    $default  reduce using rule 64 (rel_op)
+
+
+State 157
+
+   62 rel_op: '<' •
 
     $default  reduce using rule 62 (rel_op)
 
 
+State 158
+
+   65 rel_op: ">=" •
+
+    $default  reduce using rule 65 (rel_op)
+
+
 State 159
 
-   63 rel_op: "<=" .
+   63 rel_op: "<=" •
 
     $default  reduce using rule 63 (rel_op)
 
 
 State 160
 
-   64 rel_op: '>' .
+   84 mul_op: ">>" •
 
-    $default  reduce using rule 64 (rel_op)
+    $default  reduce using rule 84 (mul_op)
 
 
 State 161
 
-   65 rel_op: ">=" .
+   83 mul_op: "<<" •
 
-    $default  reduce using rule 65 (rel_op)
+    $default  reduce using rule 83 (mul_op)
 
 
 State 162
 
-   68 add_op: '|' .
+   66 add_op: '+' •
 
-    $default  reduce using rule 68 (add_op)
+    $default  reduce using rule 66 (add_op)
 
 
 State 163
 
-   69 add_op: '^' .
+   67 add_op: '-' •
 
-    $default  reduce using rule 69 (add_op)
+    $default  reduce using rule 67 (add_op)
 
 
 State 164
 
-   72 mul_op: '%' .
+   80 mul_op: '*' •
 
-    $default  reduce using rule 72 (mul_op)
+    $default  reduce using rule 80 (mul_op)
 
 
 State 165
 
-   73 mul_op: "<<" .
+   81 mul_op: '/' •
 
-    $default  reduce using rule 73 (mul_op)
+    $default  reduce using rule 81 (mul_op)
 
 
 State 166
 
-   74 mul_op: ">>" .
+   82 mul_op: '%' •
 
-    $default  reduce using rule 74 (mul_op)
+    $default  reduce using rule 82 (mul_op)
 
 
 State 167
 
-   75 mul_op: '&' .
+   24 STAR_CM_EXP: STAR_CM_EXP • ',' Expression
+   50 ExpressionList: Expression STAR_CM_EXP •
 
-    $default  reduce using rule 75 (mul_op)
-
-
-State 168
-
-   24 STAR_CM_EXP: STAR_CM_EXP . ',' Expression
-   50 ExpressionList: Expression STAR_CM_EXP .
-
-    ','  shift, and go to state 222
+    ','  shift, and go to state 221
 
     ','       [reduce using rule 50 (ExpressionList)]
     $default  reduce using rule 50 (ExpressionList)
 
 
-State 169
+State 168
 
-   52 Expression: Expression binary_op . Expression
+   52 Expression: Expression binary_op • Expression
 
     FUNC        shift, and go to state 93
     STRUCT      shift, and go to state 57
@@ -2647,17 +2598,17 @@ State 169
     HEX_LIT     shift, and go to state 97
     FLOAT_LIT   shift, and go to state 98
     DEC_LIT     shift, and go to state 99
-    '+'         shift, and go to state 100
-    '-'         shift, and go to state 101
-    '*'         shift, and go to state 102
-    '^'         shift, and go to state 103
-    '&'         shift, and go to state 104
+    '^'         shift, and go to state 100
+    '&'         shift, and go to state 101
+    '+'         shift, and go to state 102
+    '-'         shift, and go to state 103
+    '*'         shift, and go to state 104
     '!'         shift, and go to state 105
     '['         shift, and go to state 106
     "("         shift, and go to state 107
 
     PackageName     go to state 63
-    Expression      go to state 223
+    Expression      go to state 222
     UnaryExpr       go to state 110
     unary_op        go to state 111
     PrimaryExpr     go to state 112
@@ -2675,281 +2626,257 @@ State 169
     StructType      go to state 124
 
 
-State 170
+State 169
 
-   57 binary_op: rel_op .
+   57 binary_op: rel_op •
 
     $default  reduce using rule 57 (binary_op)
 
 
-State 171
+State 170
 
-   58 binary_op: add_op .
+   58 binary_op: add_op •
 
     $default  reduce using rule 58 (binary_op)
 
 
-State 172
+State 171
 
-   59 binary_op: mul_op .
+   59 binary_op: mul_op •
 
     $default  reduce using rule 59 (binary_op)
 
 
-State 173
+State 172
 
-   54 UnaryExpr: unary_op UnaryExpr .
+   54 UnaryExpr: unary_op UnaryExpr •
 
     $default  reduce using rule 54 (UnaryExpr)
 
 
-State 174
+State 173
 
-   88 Arguments: '(' . ')'
-   89          | '(' . ArgumentInBracket ')'
-
-    FUNC        shift, and go to state 224
-    STRUCT      shift, and go to state 57
-    ID          shift, and go to state 94
-    STRING_LIT  shift, and go to state 95
-    BINARY_LIT  shift, and go to state 96
-    HEX_LIT     shift, and go to state 97
-    FLOAT_LIT   shift, and go to state 98
-    DEC_LIT     shift, and go to state 99
-    '+'         shift, and go to state 100
-    '-'         shift, and go to state 101
-    '*'         shift, and go to state 225
-    '('         shift, and go to state 60
-    ')'         shift, and go to state 226
-    '^'         shift, and go to state 103
-    '&'         shift, and go to state 104
-    '!'         shift, and go to state 105
-    '['         shift, and go to state 106
-    "("         shift, and go to state 107
-
-    PackageName             go to state 63
-    ExpressionList          go to state 227
-    Expression              go to state 109
-    UnaryExpr               go to state 110
-    unary_op                go to state 111
-    PrimaryExpr             go to state 112
-    ArgumentInBracket       go to state 228
-    ArgumentInBracketFirst  go to state 229
-    Operand                 go to state 113
-    Literal                 go to state 114
-    INT_LIT                 go to state 115
-    BasicLit                go to state 116
-    OperandName             go to state 117
-    QualifiedIdent          go to state 118
-    CompositeLit            go to state 119
-    LiteralType             go to state 120
-    FunctionLit             go to state 121
-    Type                    go to state 230
-    TypeName                go to state 231
-    TypeLit                 go to state 67
-    ArrayType               go to state 232
-    StructType              go to state 233
-    PointerType             go to state 70
-    FunctionType            go to state 71
-
-
-State 175
-
-   86 Selector: '.' . ID
-
-    ID  shift, and go to state 234
-
-
-State 176
-
-   87 Index: '[' . Expression ']'
-
-    FUNC        shift, and go to state 93
-    STRUCT      shift, and go to state 57
-    ID          shift, and go to state 94
-    STRING_LIT  shift, and go to state 95
-    BINARY_LIT  shift, and go to state 96
-    HEX_LIT     shift, and go to state 97
-    FLOAT_LIT   shift, and go to state 98
-    DEC_LIT     shift, and go to state 99
-    '+'         shift, and go to state 100
-    '-'         shift, and go to state 101
-    '*'         shift, and go to state 102
-    '^'         shift, and go to state 103
-    '&'         shift, and go to state 104
-    '!'         shift, and go to state 105
-    '['         shift, and go to state 106
-    "("         shift, and go to state 107
-
-    PackageName     go to state 63
-    Expression      go to state 235
-    UnaryExpr       go to state 110
-    unary_op        go to state 111
-    PrimaryExpr     go to state 112
-    Operand         go to state 113
-    Literal         go to state 114
-    INT_LIT         go to state 115
-    BasicLit        go to state 116
-    OperandName     go to state 117
-    QualifiedIdent  go to state 118
-    CompositeLit    go to state 119
-    LiteralType     go to state 120
-    FunctionLit     go to state 121
-    TypeName        go to state 122
-    ArrayType       go to state 123
-    StructType      go to state 124
-
-
-State 177
-
-   84 PrimaryExpr: PrimaryExpr Selector .
-
-    $default  reduce using rule 84 (PrimaryExpr)
-
-
-State 178
-
-   83 PrimaryExpr: PrimaryExpr Index .
-
-    $default  reduce using rule 83 (PrimaryExpr)
-
-
-State 179
-
-   85 PrimaryExpr: PrimaryExpr Arguments .
-
-    $default  reduce using rule 85 (PrimaryExpr)
-
-
-State 180
-
-  118 LiteralValue: '{' . '}'
-  119             | '{' . ElementList '}'
-  120             | '{' . ElementList ',' '}'
-
-    FUNC        shift, and go to state 93
-    STRUCT      shift, and go to state 57
-    ID          shift, and go to state 236
-    STRING_LIT  shift, and go to state 95
-    BINARY_LIT  shift, and go to state 96
-    HEX_LIT     shift, and go to state 97
-    FLOAT_LIT   shift, and go to state 98
-    DEC_LIT     shift, and go to state 99
-    '+'         shift, and go to state 100
-    '-'         shift, and go to state 101
-    '*'         shift, and go to state 102
-    '^'         shift, and go to state 103
-    '&'         shift, and go to state 104
-    '!'         shift, and go to state 105
-    '['         shift, and go to state 106
-    "("         shift, and go to state 107
-    '{'         shift, and go to state 180
-    '}'         shift, and go to state 237
-
-    PackageName     go to state 63
-    Expression      go to state 238
-    UnaryExpr       go to state 110
-    unary_op        go to state 111
-    PrimaryExpr     go to state 112
-    Operand         go to state 113
-    Literal         go to state 114
-    INT_LIT         go to state 115
-    BasicLit        go to state 116
-    OperandName     go to state 117
-    QualifiedIdent  go to state 118
-    CompositeLit    go to state 119
-    LiteralType     go to state 120
-    LiteralValue    go to state 239
-    ElementList     go to state 240
-    KeyedElement    go to state 241
-    Key             go to state 242
-    Element         go to state 243
-    FunctionLit     go to state 121
-    TypeName        go to state 122
-    ArrayType       go to state 123
-    StructType      go to state 124
-
-
-State 181
-
-  113 CompositeLit: LiteralType LiteralValue .
-
-    $default  reduce using rule 113 (CompositeLit)
-
-
-State 182
-
-   32 STAR_FieldDecl_SC: STAR_FieldDecl_SC . FieldDecl ';'
-  204 StructType: STRUCT '{' STAR_FieldDecl_SC . '}'
-
-    ID   shift, and go to state 34
-    '}'  shift, and go to state 244
-
-    IdentifierList  go to state 245
-    FieldDecl       go to state 246
-
-
-State 183
-
-  194 Type: '(' Type ')' .
-
-    $default  reduce using rule 194 (Type)
-
-
-State 184
-
-  201 ArrayType: '[' ArrayLength ']' . ElementType
+   98 Arguments: '(' • ')'
+   99          | '(' • ArgumentInBracket ')'
 
     FUNC    shift, and go to state 56
     STRUCT  shift, and go to state 57
     ID      shift, and go to state 58
-    '*'     shift, and go to state 59
-    '('     shift, and go to state 60
+    '*'     shift, and go to state 60
+    '('     shift, and go to state 61
+    ')'     shift, and go to state 223
+    '['     shift, and go to state 62
+
+    PackageName             go to state 63
+    ArgumentInBracket       go to state 224
+    ArgumentInBracketFirst  go to state 225
+    QualifiedIdent          go to state 64
+    Type                    go to state 226
+    TypeName                go to state 66
+    TypeLit                 go to state 67
+    ArrayType               go to state 68
+    StructType              go to state 69
+    PointerType             go to state 70
+    FunctionType            go to state 71
+
+
+State 174
+
+   96 Selector: '.' • ID
+
+    ID  shift, and go to state 227
+
+
+State 175
+
+   97 Index: '[' • Expression ']'
+
+    FUNC        shift, and go to state 93
+    STRUCT      shift, and go to state 57
+    ID          shift, and go to state 94
+    STRING_LIT  shift, and go to state 95
+    BINARY_LIT  shift, and go to state 96
+    HEX_LIT     shift, and go to state 97
+    FLOAT_LIT   shift, and go to state 98
+    DEC_LIT     shift, and go to state 99
+    '^'         shift, and go to state 100
+    '&'         shift, and go to state 101
+    '+'         shift, and go to state 102
+    '-'         shift, and go to state 103
+    '*'         shift, and go to state 104
+    '!'         shift, and go to state 105
+    '['         shift, and go to state 106
+    "("         shift, and go to state 107
+
+    PackageName     go to state 63
+    Expression      go to state 228
+    UnaryExpr       go to state 110
+    unary_op        go to state 111
+    PrimaryExpr     go to state 112
+    Operand         go to state 113
+    Literal         go to state 114
+    INT_LIT         go to state 115
+    BasicLit        go to state 116
+    OperandName     go to state 117
+    QualifiedIdent  go to state 118
+    CompositeLit    go to state 119
+    LiteralType     go to state 120
+    FunctionLit     go to state 121
+    TypeName        go to state 122
+    ArrayType       go to state 123
+    StructType      go to state 124
+
+
+State 176
+
+   94 PrimaryExpr: PrimaryExpr Selector •
+
+    $default  reduce using rule 94 (PrimaryExpr)
+
+
+State 177
+
+   93 PrimaryExpr: PrimaryExpr Index •
+
+    $default  reduce using rule 93 (PrimaryExpr)
+
+
+State 178
+
+   95 PrimaryExpr: PrimaryExpr Arguments •
+
+    $default  reduce using rule 95 (PrimaryExpr)
+
+
+State 179
+
+  127 LiteralValue: '{' • '}'
+  128             | '{' • ElementList '}'
+  129             | '{' • ElementList ',' '}'
+
+    FUNC        shift, and go to state 93
+    STRUCT      shift, and go to state 57
+    ID          shift, and go to state 94
+    STRING_LIT  shift, and go to state 95
+    BINARY_LIT  shift, and go to state 96
+    HEX_LIT     shift, and go to state 97
+    FLOAT_LIT   shift, and go to state 98
+    DEC_LIT     shift, and go to state 99
+    '^'         shift, and go to state 100
+    '&'         shift, and go to state 101
+    '+'         shift, and go to state 102
+    '-'         shift, and go to state 103
+    '*'         shift, and go to state 104
+    '!'         shift, and go to state 105
+    '['         shift, and go to state 106
+    "("         shift, and go to state 107
+    '{'         shift, and go to state 179
+    '}'         shift, and go to state 229
+
+    PackageName     go to state 63
+    Expression      go to state 230
+    UnaryExpr       go to state 110
+    unary_op        go to state 111
+    PrimaryExpr     go to state 112
+    Operand         go to state 113
+    Literal         go to state 114
+    INT_LIT         go to state 115
+    BasicLit        go to state 116
+    OperandName     go to state 117
+    QualifiedIdent  go to state 118
+    CompositeLit    go to state 119
+    LiteralType     go to state 120
+    LiteralValue    go to state 231
+    ElementList     go to state 232
+    KeyedElement    go to state 233
+    Key             go to state 234
+    Element         go to state 235
+    FunctionLit     go to state 121
+    TypeName        go to state 122
+    ArrayType       go to state 123
+    StructType      go to state 124
+
+
+State 180
+
+  122 CompositeLit: LiteralType LiteralValue •
+
+    $default  reduce using rule 122 (CompositeLit)
+
+
+State 181
+
+   32 STAR_FieldDecl_SC: STAR_FieldDecl_SC • FieldDecl ';'
+  208 StructType: STRUCT '{' STAR_FieldDecl_SC • '}'
+
+    ID   shift, and go to state 34
+    '}'  shift, and go to state 236
+
+    IdentifierList  go to state 237
+    FieldDecl       go to state 238
+
+
+State 182
+
+  198 Type: '(' Type ')' •
+
+    $default  reduce using rule 198 (Type)
+
+
+State 183
+
+  205 ArrayType: '[' ArrayLength ']' • ElementType
+
+    FUNC    shift, and go to state 56
+    STRUCT  shift, and go to state 57
+    ID      shift, and go to state 58
+    '*'     shift, and go to state 60
+    '('     shift, and go to state 61
     '['     shift, and go to state 62
 
     PackageName     go to state 63
     QualifiedIdent  go to state 64
-    Type            go to state 247
+    Type            go to state 239
     TypeName        go to state 66
     TypeLit         go to state 67
     ArrayType       go to state 68
-    ElementType     go to state 248
+    ElementType     go to state 240
     StructType      go to state 69
     PointerType     go to state 70
     FunctionType    go to state 71
 
 
+State 184
+
+  121 QualifiedIdent: PackageName '.' ID •
+
+    $default  reduce using rule 121 (QualifiedIdent)
+
+
 State 185
 
-  112 QualifiedIdent: PackageName '.' ID .
+  226 ParameterDecl: IdentifierList ELIPSIS Type •
 
-    $default  reduce using rule 112 (QualifiedIdent)
+    $default  reduce using rule 226 (ParameterDecl)
 
 
 State 186
 
-  221 ParameterDecl: IdentifierList ELIPSIS Type .
+  222 Parameters: '(' ParameterList ',' ')' •
 
-    $default  reduce using rule 221 (ParameterDecl)
+    $default  reduce using rule 222 (Parameters)
 
 
 State 187
 
-  217 Parameters: '(' ParameterList ',' ')' .
-
-    $default  reduce using rule 217 (Parameters)
-
-
-State 188
-
-   30 STAR_CM_ParameterDecl: STAR_CM_ParameterDecl ',' . ParameterDecl
+   30 STAR_CM_ParameterDecl: STAR_CM_ParameterDecl ',' • ParameterDecl
 
     FUNC     shift, and go to state 56
     STRUCT   shift, and go to state 57
     ID       shift, and go to state 74
     ELIPSIS  shift, and go to state 75
-    '*'      shift, and go to state 59
-    '('      shift, and go to state 60
+    '*'      shift, and go to state 60
+    '('      shift, and go to state 61
     '['      shift, and go to state 62
 
     PackageName     go to state 63
@@ -2962,25 +2889,25 @@ State 188
     StructType      go to state 69
     PointerType     go to state 70
     FunctionType    go to state 71
-    ParameterDecl   go to state 249
+    ParameterDecl   go to state 241
+
+
+State 188
+
+  190 BreakStmt: BREAK • Label
+  191          | BREAK •
+
+    ID  shift, and go to state 242
+
+    $default  reduce using rule 191 (BreakStmt)
+
+    Label  go to state 243
 
 
 State 189
 
-  186 BreakStmt: BREAK . Label
-  187          | BREAK .
-
-    ID  shift, and go to state 250
-
-    $default  reduce using rule 187 (BreakStmt)
-
-    Label  go to state 251
-
-
-State 190
-
-  184 ReturnStmt: RETURN . ExpressionList
-  185           | RETURN .
+  188 ReturnStmt: RETURN • ExpressionList
+  189           | RETURN •
 
     FUNC        shift, and go to state 93
     STRUCT      shift, and go to state 57
@@ -2990,19 +2917,19 @@ State 190
     HEX_LIT     shift, and go to state 97
     FLOAT_LIT   shift, and go to state 98
     DEC_LIT     shift, and go to state 99
-    '+'         shift, and go to state 100
-    '-'         shift, and go to state 101
-    '*'         shift, and go to state 102
-    '^'         shift, and go to state 103
-    '&'         shift, and go to state 104
+    '^'         shift, and go to state 100
+    '&'         shift, and go to state 101
+    '+'         shift, and go to state 102
+    '-'         shift, and go to state 103
+    '*'         shift, and go to state 104
     '!'         shift, and go to state 105
     '['         shift, and go to state 106
     "("         shift, and go to state 107
 
-    $default  reduce using rule 185 (ReturnStmt)
+    $default  reduce using rule 189 (ReturnStmt)
 
     PackageName     go to state 63
-    ExpressionList  go to state 252
+    ExpressionList  go to state 244
     Expression      go to state 109
     UnaryExpr       go to state 110
     unary_op        go to state 111
@@ -3021,21 +2948,21 @@ State 190
     StructType      go to state 124
 
 
+State 190
+
+  194 GotoStmt: GOTO • Label
+
+    ID  shift, and go to state 242
+
+    Label  go to state 245
+
+
 State 191
 
-  190 GotoStmt: GOTO . Label
-
-    ID  shift, and go to state 250
-
-    Label  go to state 253
-
-
-State 192
-
-  162 IfStmt: IF . Expression Block
-  163       | IF . SimpleStmt ';' Expression Block
-  164       | IF . SimpleStmt ';' Expression Block ELSE Block
-  165       | IF . SimpleStmt ';' Expression Block ELSE IfStmt
+  168 IfStmt: IF • Expression Block
+  169       | IF • SimpleStmt ';' Expression Block
+  170       | IF • SimpleStmt ';' Expression Block ELSE Block
+  171       | IF • SimpleStmt ';' Expression Block ELSE IfStmt
 
     FUNC        shift, and go to state 93
     STRUCT      shift, and go to state 57
@@ -3045,20 +2972,20 @@ State 192
     HEX_LIT     shift, and go to state 97
     FLOAT_LIT   shift, and go to state 98
     DEC_LIT     shift, and go to state 99
-    '+'         shift, and go to state 100
-    '-'         shift, and go to state 101
-    '*'         shift, and go to state 102
-    '^'         shift, and go to state 103
-    '&'         shift, and go to state 104
+    '^'         shift, and go to state 100
+    '&'         shift, and go to state 101
+    '+'         shift, and go to state 102
+    '-'         shift, and go to state 103
+    '*'         shift, and go to state 104
     '!'         shift, and go to state 105
     '['         shift, and go to state 106
     "("         shift, and go to state 107
 
-    $default  reduce using rule 155 (EmptyStmt)
+    $default  reduce using rule 163 (EmptyStmt)
 
     PackageName     go to state 63
-    ExpressionList  go to state 200
-    Expression      go to state 254
+    ExpressionList  go to state 199
+    Expression      go to state 246
     UnaryExpr       go to state 110
     unary_op        go to state 111
     PrimaryExpr     go to state 112
@@ -3071,59 +2998,57 @@ State 192
     CompositeLit    go to state 119
     LiteralType     go to state 120
     FunctionLit     go to state 121
-    SimpleStmt      go to state 255
-    EmptyStmt       go to state 207
-    ExpressionStmt  go to state 208
-    IncDecStmt      go to state 209
-    Assignment      go to state 210
+    SimpleStmt      go to state 247
+    EmptyStmt       go to state 206
+    ExpressionStmt  go to state 207
+    IncDecStmt      go to state 208
+    Assignment      go to state 209
     TypeName        go to state 122
     ArrayType       go to state 123
     StructType      go to state 124
 
 
+State 192
+
+  192 ContinueStmt: CONTINUE • Label
+  193             | CONTINUE •
+
+    ID  shift, and go to state 242
+
+    $default  reduce using rule 193 (ContinueStmt)
+
+    Label  go to state 248
+
+
 State 193
 
-  188 ContinueStmt: CONTINUE . Label
-  189             | CONTINUE .
-
-    ID  shift, and go to state 250
-
-    $default  reduce using rule 189 (ContinueStmt)
-
-    Label  go to state 256
-
-
-State 194
-
-  166 ForStmt: FOR . Block
-  167        | FOR . ForStmtAfter Block
+  172 ForStmt: FOR • Block
+  173        | FOR • ForStmtAfter Block
 
     FUNC        shift, and go to state 93
     STRUCT      shift, and go to state 57
-    RANGE       shift, and go to state 257
+    RANGE       shift, and go to state 249
     ID          shift, and go to state 94
     STRING_LIT  shift, and go to state 95
     BINARY_LIT  shift, and go to state 96
     HEX_LIT     shift, and go to state 97
     FLOAT_LIT   shift, and go to state 98
     DEC_LIT     shift, and go to state 99
-    '+'         shift, and go to state 100
-    '-'         shift, and go to state 101
-    '*'         shift, and go to state 102
-    '^'         shift, and go to state 103
-    '&'         shift, and go to state 104
+    '^'         shift, and go to state 100
+    '&'         shift, and go to state 101
+    '+'         shift, and go to state 102
+    '-'         shift, and go to state 103
+    '*'         shift, and go to state 104
     '!'         shift, and go to state 105
     '['         shift, and go to state 106
     "("         shift, and go to state 107
     '{'         shift, and go to state 81
 
-    ';'       reduce using rule 155 (EmptyStmt)
-    ';'       [reduce using rule 174 (OPT_InitStmt)]
-    $default  reduce using rule 155 (EmptyStmt)
+    $default  reduce using rule 163 (EmptyStmt)
 
     PackageName     go to state 63
-    ExpressionList  go to state 258
-    Expression      go to state 259
+    ExpressionList  go to state 250
+    Expression      go to state 251
     UnaryExpr       go to state 110
     unary_op        go to state 111
     PrimaryExpr     go to state 112
@@ -3136,40 +3061,40 @@ State 194
     CompositeLit    go to state 119
     LiteralType     go to state 120
     FunctionLit     go to state 121
-    Block           go to state 260
-    SimpleStmt      go to state 261
-    EmptyStmt       go to state 207
-    ExpressionStmt  go to state 208
-    IncDecStmt      go to state 209
-    Assignment      go to state 210
-    ForStmtAfter    go to state 262
-    Condition       go to state 263
-    ForClause       go to state 264
-    OPT_InitStmt    go to state 265
-    InitStmt        go to state 266
-    RangeClause     go to state 267
+    Block           go to state 252
+    SimpleStmt      go to state 253
+    EmptyStmt       go to state 206
+    ExpressionStmt  go to state 207
+    IncDecStmt      go to state 208
+    Assignment      go to state 209
+    ForStmtAfter    go to state 254
+    Condition       go to state 255
+    ForClause       go to state 256
+    OPT_InitStmt    go to state 257
+    InitStmt        go to state 258
+    RangeClause     go to state 259
     TypeName        go to state 122
     ArrayType       go to state 123
     StructType      go to state 124
 
 
-State 195
+State 194
 
-    3 PackageName: ID .
-  110 OperandName: ID .
-  150 Label: ID .
-  195 TypeName: ID .
+    3 PackageName: ID •
+  119 OperandName: ID •
+  158 Label: ID •
+  199 TypeName: ID •
 
     '.'       reduce using rule 3 (PackageName)
-    '.'       [reduce using rule 110 (OperandName)]
-    '{'       reduce using rule 195 (TypeName)
-    ':'       reduce using rule 150 (Label)
-    $default  reduce using rule 110 (OperandName)
+    '.'       [reduce using rule 119 (OperandName)]
+    '{'       reduce using rule 199 (TypeName)
+    ':'       reduce using rule 158 (Label)
+    $default  reduce using rule 119 (OperandName)
 
 
-State 196
+State 195
 
-  183 GoStmt: GO . Expression
+  187 GoStmt: GO • Expression
 
     FUNC        shift, and go to state 93
     STRUCT      shift, and go to state 57
@@ -3179,17 +3104,17 @@ State 196
     HEX_LIT     shift, and go to state 97
     FLOAT_LIT   shift, and go to state 98
     DEC_LIT     shift, and go to state 99
-    '+'         shift, and go to state 100
-    '-'         shift, and go to state 101
-    '*'         shift, and go to state 102
-    '^'         shift, and go to state 103
-    '&'         shift, and go to state 104
+    '^'         shift, and go to state 100
+    '&'         shift, and go to state 101
+    '+'         shift, and go to state 102
+    '-'         shift, and go to state 103
+    '*'         shift, and go to state 104
     '!'         shift, and go to state 105
     '['         shift, and go to state 106
     "("         shift, and go to state 107
 
     PackageName     go to state 63
-    Expression      go to state 268
+    Expression      go to state 260
     UnaryExpr       go to state 110
     unary_op        go to state 111
     PrimaryExpr     go to state 112
@@ -3207,236 +3132,225 @@ State 196
     StructType      go to state 124
 
 
+State 196
+
+  195 FallthroughStmt: FALLTHROUGH •
+
+    $default  reduce using rule 195 (FallthroughStmt)
+
+
 State 197
 
-  191 FallthroughStmt: FALLTHROUGH .
+  144 Block: '{' STAR_Statement_SC '}' •
 
-    $default  reduce using rule 191 (FallthroughStmt)
+    $default  reduce using rule 144 (Block)
 
 
 State 198
 
-  136 Block: '{' STAR_Statement_SC '}' .
+  145 Statement: Declaration •
 
-    $default  reduce using rule 136 (Block)
+    $default  reduce using rule 145 (Statement)
 
 
 State 199
 
-  137 Statement: Declaration .
+  167 Assignment: ExpressionList • assign_op ExpressionList
 
-    $default  reduce using rule 137 (Statement)
+    "+="   shift, and go to state 261
+    "-="   shift, and go to state 262
+    "|="   shift, and go to state 263
+    "^="   shift, and go to state 264
+    "*="   shift, and go to state 265
+    "/="   shift, and go to state 266
+    "%="   shift, and go to state 267
+    "<<="  shift, and go to state 268
+    ">>="  shift, and go to state 269
+    "&="   shift, and go to state 270
+
+    assign_op  go to state 271
 
 
 State 200
 
-  159 Assignment: ExpressionList . assign_op ExpressionList
+   50 ExpressionList: Expression • STAR_CM_EXP
+   52 Expression: Expression • binary_op Expression
+  164 ExpressionStmt: Expression •
+  165 IncDecStmt: Expression • "++"
+  166           | Expression • "--"
 
-    '+'   shift, and go to state 150
-    '-'   shift, and go to state 151
-    '*'   shift, and go to state 152
-    '/'   shift, and go to state 153
-    '|'   shift, and go to state 162
-    '^'   shift, and go to state 163
-    '%'   shift, and go to state 164
-    "<<"  shift, and go to state 165
-    ">>"  shift, and go to state 166
-    '&'   shift, and go to state 167
+    "||"  shift, and go to state 149
+    "&&"  shift, and go to state 150
+    '|'   shift, and go to state 151
+    '^'   shift, and go to state 152
+    '&'   shift, and go to state 153
+    "=="  shift, and go to state 154
+    "!="  shift, and go to state 155
+    '>'   shift, and go to state 156
+    '<'   shift, and go to state 157
+    ">="  shift, and go to state 158
+    "<="  shift, and go to state 159
+    ">>"  shift, and go to state 160
+    "<<"  shift, and go to state 161
+    '+'   shift, and go to state 162
+    '-'   shift, and go to state 163
+    '*'   shift, and go to state 164
+    '/'   shift, and go to state 165
+    '%'   shift, and go to state 166
+    "++"  shift, and go to state 272
+    "--"  shift, and go to state 273
 
-    add_op     go to state 269
-    mul_op     go to state 270
-    assign_op  go to state 271
+    ';'       reduce using rule 164 (ExpressionStmt)
+    '{'       reduce using rule 164 (ExpressionStmt)
+    $default  reduce using rule 25 (STAR_CM_EXP)
+
+    STAR_CM_EXP  go to state 167
+    binary_op    go to state 168
+    rel_op       go to state 169
+    add_op       go to state 170
+    mul_op       go to state 171
 
 
 State 201
 
-   50 ExpressionList: Expression . STAR_CM_EXP
-   52 Expression: Expression . binary_op Expression
-  156 ExpressionStmt: Expression .
-  157 IncDecStmt: Expression . "++"
-  158           | Expression . "--"
+  154 Statement: Block •
 
-    '+'   shift, and go to state 150
-    '-'   shift, and go to state 151
-    '*'   shift, and go to state 152
-    '/'   shift, and go to state 153
-    "||"  shift, and go to state 154
-    "&&"  shift, and go to state 155
-    "=="  shift, and go to state 156
-    "!="  shift, and go to state 157
-    '<'   shift, and go to state 158
-    "<="  shift, and go to state 159
-    '>'   shift, and go to state 160
-    ">="  shift, and go to state 161
-    '|'   shift, and go to state 162
-    '^'   shift, and go to state 163
-    '%'   shift, and go to state 164
-    "<<"  shift, and go to state 165
-    ">>"  shift, and go to state 166
-    '&'   shift, and go to state 167
-    "++"  shift, and go to state 272
-    "--"  shift, and go to state 273
-
-    '+'       [reduce using rule 25 (STAR_CM_EXP)]
-    '-'       [reduce using rule 25 (STAR_CM_EXP)]
-    '*'       [reduce using rule 25 (STAR_CM_EXP)]
-    '/'       [reduce using rule 25 (STAR_CM_EXP)]
-    ','       reduce using rule 25 (STAR_CM_EXP)
-    '|'       [reduce using rule 25 (STAR_CM_EXP)]
-    '^'       [reduce using rule 25 (STAR_CM_EXP)]
-    '%'       [reduce using rule 25 (STAR_CM_EXP)]
-    "<<"      [reduce using rule 25 (STAR_CM_EXP)]
-    ">>"      [reduce using rule 25 (STAR_CM_EXP)]
-    '&'       [reduce using rule 25 (STAR_CM_EXP)]
-    $default  reduce using rule 156 (ExpressionStmt)
-
-    STAR_CM_EXP  go to state 168
-    binary_op    go to state 169
-    rel_op       go to state 170
-    add_op       go to state 171
-    mul_op       go to state 172
+    $default  reduce using rule 154 (Statement)
 
 
 State 202
 
-  146 Statement: Block .
-
-    $default  reduce using rule 146 (Statement)
-
-
-State 203
-
-   28 STAR_Statement_SC: STAR_Statement_SC Statement . ';'
+   28 STAR_Statement_SC: STAR_Statement_SC Statement • ';'
 
     ';'  shift, and go to state 274
 
 
+State 203
+
+  146 Statement: LabeledStmt •
+
+    $default  reduce using rule 146 (Statement)
+
+
 State 204
 
-  138 Statement: LabeledStmt .
-
-    $default  reduce using rule 138 (Statement)
-
-
-State 205
-
-  149 LabeledStmt: Label . ':' Statement
+  157 LabeledStmt: Label • ':' Statement
 
     ':'  shift, and go to state 275
 
 
-State 206
+State 205
 
-  139 Statement: SimpleStmt .
-
-    $default  reduce using rule 139 (Statement)
-
-
-State 207
-
-  151 SimpleStmt: EmptyStmt .
-
-    $default  reduce using rule 151 (SimpleStmt)
-
-
-State 208
-
-  152 SimpleStmt: ExpressionStmt .
-
-    $default  reduce using rule 152 (SimpleStmt)
-
-
-State 209
-
-  153 SimpleStmt: IncDecStmt .
-
-    $default  reduce using rule 153 (SimpleStmt)
-
-
-State 210
-
-  154 SimpleStmt: Assignment .
-
-    $default  reduce using rule 154 (SimpleStmt)
-
-
-State 211
-
-  147 Statement: IfStmt .
+  147 Statement: SimpleStmt •
 
     $default  reduce using rule 147 (Statement)
 
 
+State 206
+
+  159 SimpleStmt: EmptyStmt •
+
+    $default  reduce using rule 159 (SimpleStmt)
+
+
+State 207
+
+  160 SimpleStmt: ExpressionStmt •
+
+    $default  reduce using rule 160 (SimpleStmt)
+
+
+State 208
+
+  161 SimpleStmt: IncDecStmt •
+
+    $default  reduce using rule 161 (SimpleStmt)
+
+
+State 209
+
+  162 SimpleStmt: Assignment •
+
+    $default  reduce using rule 162 (SimpleStmt)
+
+
+State 210
+
+  155 Statement: IfStmt •
+
+    $default  reduce using rule 155 (Statement)
+
+
+State 211
+
+  156 Statement: ForStmt •
+
+    $default  reduce using rule 156 (Statement)
+
+
 State 212
 
-  148 Statement: ForStmt .
+  148 Statement: GoStmt •
 
     $default  reduce using rule 148 (Statement)
 
 
 State 213
 
-  140 Statement: GoStmt .
+  149 Statement: ReturnStmt •
 
-    $default  reduce using rule 140 (Statement)
+    $default  reduce using rule 149 (Statement)
 
 
 State 214
 
-  141 Statement: ReturnStmt .
+  150 Statement: BreakStmt •
 
-    $default  reduce using rule 141 (Statement)
+    $default  reduce using rule 150 (Statement)
 
 
 State 215
 
-  142 Statement: BreakStmt .
+  151 Statement: ContinueStmt •
 
-    $default  reduce using rule 142 (Statement)
+    $default  reduce using rule 151 (Statement)
 
 
 State 216
 
-  143 Statement: ContinueStmt .
+  152 Statement: GotoStmt •
 
-    $default  reduce using rule 143 (Statement)
+    $default  reduce using rule 152 (Statement)
 
 
 State 217
 
-  144 Statement: GotoStmt .
+  153 Statement: FallthroughStmt •
 
-    $default  reduce using rule 144 (Statement)
+    $default  reduce using rule 153 (Statement)
 
 
 State 218
 
-  145 Statement: FallthroughStmt .
+  139 FunctionLit: FUNC Signature FunctionBody •
 
-    $default  reduce using rule 145 (Statement)
+    $default  reduce using rule 139 (FunctionLit)
 
 
 State 219
 
-  131 FunctionLit: FUNC Signature FunctionBody .
-
-    $default  reduce using rule 131 (FunctionLit)
-
-
-State 220
-
-  116 LiteralType: '[' ELIPSIS ']' . ElementType
+  125 LiteralType: '[' ELIPSIS ']' • ElementType
 
     FUNC    shift, and go to state 56
     STRUCT  shift, and go to state 57
     ID      shift, and go to state 58
-    '*'     shift, and go to state 59
-    '('     shift, and go to state 60
+    '*'     shift, and go to state 60
+    '('     shift, and go to state 61
     '['     shift, and go to state 62
 
     PackageName     go to state 63
     QualifiedIdent  go to state 64
-    Type            go to state 247
+    Type            go to state 239
     TypeName        go to state 66
     TypeLit         go to state 67
     ArrayType       go to state 68
@@ -3446,16 +3360,16 @@ State 220
     FunctionType    go to state 71
 
 
+State 220
+
+  109 Operand: "(" Expression ")" •
+
+    $default  reduce using rule 109 (Operand)
+
+
 State 221
 
-  100 Operand: "(" Expression ")" .
-
-    $default  reduce using rule 100 (Operand)
-
-
-State 222
-
-   24 STAR_CM_EXP: STAR_CM_EXP ',' . Expression
+   24 STAR_CM_EXP: STAR_CM_EXP ',' • Expression
 
     FUNC        shift, and go to state 93
     STRUCT      shift, and go to state 57
@@ -3465,11 +3379,11 @@ State 222
     HEX_LIT     shift, and go to state 97
     FLOAT_LIT   shift, and go to state 98
     DEC_LIT     shift, and go to state 99
-    '+'         shift, and go to state 100
-    '-'         shift, and go to state 101
-    '*'         shift, and go to state 102
-    '^'         shift, and go to state 103
-    '&'         shift, and go to state 104
+    '^'         shift, and go to state 100
+    '&'         shift, and go to state 101
+    '+'         shift, and go to state 102
+    '-'         shift, and go to state 103
+    '*'         shift, and go to state 104
     '!'         shift, and go to state 105
     '['         shift, and go to state 106
     "("         shift, and go to state 107
@@ -3493,324 +3407,198 @@ State 222
     StructType      go to state 124
 
 
-State 223
+State 222
 
-   52 Expression: Expression . binary_op Expression
-   52           | Expression binary_op Expression .
+   52 Expression: Expression • binary_op Expression
+   52           | Expression binary_op Expression •
 
-    '+'   shift, and go to state 150
-    '-'   shift, and go to state 151
-    '*'   shift, and go to state 152
-    '/'   shift, and go to state 153
-    "||"  shift, and go to state 154
-    "&&"  shift, and go to state 155
-    "=="  shift, and go to state 156
-    "!="  shift, and go to state 157
-    '<'   shift, and go to state 158
-    "<="  shift, and go to state 159
-    '>'   shift, and go to state 160
-    ">="  shift, and go to state 161
-    '|'   shift, and go to state 162
-    '^'   shift, and go to state 163
-    '%'   shift, and go to state 164
-    "<<"  shift, and go to state 165
-    ">>"  shift, and go to state 166
-    '&'   shift, and go to state 167
-
-    '+'       [reduce using rule 52 (Expression)]
-    '-'       [reduce using rule 52 (Expression)]
-    '*'       [reduce using rule 52 (Expression)]
-    '/'       [reduce using rule 52 (Expression)]
-    "||"      [reduce using rule 52 (Expression)]
-    "&&"      [reduce using rule 52 (Expression)]
-    "=="      [reduce using rule 52 (Expression)]
-    "!="      [reduce using rule 52 (Expression)]
-    '<'       [reduce using rule 52 (Expression)]
-    "<="      [reduce using rule 52 (Expression)]
-    '>'       [reduce using rule 52 (Expression)]
-    ">="      [reduce using rule 52 (Expression)]
-    '|'       [reduce using rule 52 (Expression)]
-    '^'       [reduce using rule 52 (Expression)]
-    '%'       [reduce using rule 52 (Expression)]
-    "<<"      [reduce using rule 52 (Expression)]
-    ">>"      [reduce using rule 52 (Expression)]
-    '&'       [reduce using rule 52 (Expression)]
     $default  reduce using rule 52 (Expression)
 
-    binary_op  go to state 169
-    rel_op     go to state 170
-    add_op     go to state 171
-    mul_op     go to state 172
+    binary_op  go to state 168
+    rel_op     go to state 169
+    add_op     go to state 170
+    mul_op     go to state 171
+
+
+State 223
+
+   98 Arguments: '(' ')' •
+
+    $default  reduce using rule 98 (Arguments)
 
 
 State 224
 
-  131 FunctionLit: FUNC . Signature FunctionBody
-  210 FunctionType: FUNC . Signature
+   99 Arguments: '(' ArgumentInBracket • ')'
 
-    '('  shift, and go to state 49
-
-    Signature   go to state 278
-    Parameters  go to state 51
+    ')'  shift, and go to state 278
 
 
 State 225
 
-   80 unary_op: '*' .
-  208 PointerType: '*' . BaseType
+  100 ArgumentInBracket: ArgumentInBracketFirst • ArgumentInBracketEnd
 
-    FUNC    shift, and go to state 56
-    STRUCT  shift, and go to state 57
-    ID      shift, and go to state 58
-    '('     shift, and go to state 60
-    '['     shift, and go to state 62
+    ELIPSIS  shift, and go to state 279
+    ','      shift, and go to state 280
 
-    FUNC      [reduce using rule 80 (unary_op)]
-    STRUCT    [reduce using rule 80 (unary_op)]
-    ID        [reduce using rule 80 (unary_op)]
-    '['       [reduce using rule 80 (unary_op)]
-    $default  reduce using rule 80 (unary_op)
+    $default  reduce using rule 106 (ArgumentInBracketEnd)
 
-    PackageName     go to state 63
-    QualifiedIdent  go to state 64
-    Type            go to state 127
-    TypeName        go to state 66
-    TypeLit         go to state 67
-    ArrayType       go to state 68
-    StructType      go to state 69
-    PointerType     go to state 70
-    BaseType        go to state 128
-    FunctionType    go to state 71
+    ArgumentInBracketEnd  go to state 281
 
 
 State 226
 
-   88 Arguments: '(' ')' .
+  101 ArgumentInBracketFirst: Type •
+  102                       | Type • ',' ExpressionList
 
-    $default  reduce using rule 88 (Arguments)
+    ','  shift, and go to state 282
+
+    ','       [reduce using rule 101 (ArgumentInBracketFirst)]
+    $default  reduce using rule 101 (ArgumentInBracketFirst)
 
 
 State 227
 
-   91 ArgumentInBracketFirst: ExpressionList .
+   96 Selector: '.' ID •
 
-    $default  reduce using rule 91 (ArgumentInBracketFirst)
+    $default  reduce using rule 96 (Selector)
 
 
 State 228
 
-   89 Arguments: '(' ArgumentInBracket . ')'
+   52 Expression: Expression • binary_op Expression
+   97 Index: '[' Expression • ']'
 
-    ')'  shift, and go to state 279
+    "||"  shift, and go to state 149
+    "&&"  shift, and go to state 150
+    '|'   shift, and go to state 151
+    '^'   shift, and go to state 152
+    '&'   shift, and go to state 153
+    "=="  shift, and go to state 154
+    "!="  shift, and go to state 155
+    '>'   shift, and go to state 156
+    '<'   shift, and go to state 157
+    ">="  shift, and go to state 158
+    "<="  shift, and go to state 159
+    ">>"  shift, and go to state 160
+    "<<"  shift, and go to state 161
+    '+'   shift, and go to state 162
+    '-'   shift, and go to state 163
+    '*'   shift, and go to state 164
+    '/'   shift, and go to state 165
+    '%'   shift, and go to state 166
+    ']'   shift, and go to state 283
+
+    binary_op  go to state 168
+    rel_op     go to state 169
+    add_op     go to state 170
+    mul_op     go to state 171
 
 
 State 229
 
-   90 ArgumentInBracket: ArgumentInBracketFirst . ArgumentInBracketEnd
+  127 LiteralValue: '{' '}' •
 
-    ELIPSIS  shift, and go to state 280
-    ','      shift, and go to state 281
-
-    $default  reduce using rule 97 (ArgumentInBracketEnd)
-
-    ArgumentInBracketEnd  go to state 282
+    $default  reduce using rule 127 (LiteralValue)
 
 
 State 230
 
-   92 ArgumentInBracketFirst: Type .
-   93                       | Type . ',' ExpressionList
+   52 Expression: Expression • binary_op Expression
+  135 Key: Expression •
+  137 Element: Expression •
 
-    ','  shift, and go to state 283
+    "||"  shift, and go to state 149
+    "&&"  shift, and go to state 150
+    '|'   shift, and go to state 151
+    '^'   shift, and go to state 152
+    '&'   shift, and go to state 153
+    "=="  shift, and go to state 154
+    "!="  shift, and go to state 155
+    '>'   shift, and go to state 156
+    '<'   shift, and go to state 157
+    ">="  shift, and go to state 158
+    "<="  shift, and go to state 159
+    ">>"  shift, and go to state 160
+    "<<"  shift, and go to state 161
+    '+'   shift, and go to state 162
+    '-'   shift, and go to state 163
+    '*'   shift, and go to state 164
+    '/'   shift, and go to state 165
+    '%'   shift, and go to state 166
 
-    ','       [reduce using rule 92 (ArgumentInBracketFirst)]
-    $default  reduce using rule 92 (ArgumentInBracketFirst)
+    ':'       reduce using rule 135 (Key)
+    $default  reduce using rule 137 (Element)
+
+    binary_op  go to state 168
+    rel_op     go to state 169
+    add_op     go to state 170
+    mul_op     go to state 171
 
 
 State 231
 
-  117 LiteralType: TypeName .
-  192 Type: TypeName .
+  136 Key: LiteralValue •
+  138 Element: LiteralValue •
 
-    '{'       reduce using rule 117 (LiteralType)
-    $default  reduce using rule 192 (Type)
+    ':'       reduce using rule 136 (Key)
+    $default  reduce using rule 138 (Element)
 
 
 State 232
 
-  115 LiteralType: ArrayType .
-  197 TypeLit: ArrayType .
+  128 LiteralValue: '{' ElementList • '}'
+  129             | '{' ElementList • ',' '}'
 
-    '{'       reduce using rule 115 (LiteralType)
-    $default  reduce using rule 197 (TypeLit)
+    ','  shift, and go to state 284
+    '}'  shift, and go to state 285
 
 
 State 233
 
-  114 LiteralType: StructType .
-  198 TypeLit: StructType .
+  130 ElementList: KeyedElement • STAR_CM_KeyedElement
 
-    '{'       reduce using rule 114 (LiteralType)
-    $default  reduce using rule 198 (TypeLit)
+    $default  reduce using rule 132 (STAR_CM_KeyedElement)
+
+    STAR_CM_KeyedElement  go to state 286
 
 
 State 234
 
-   86 Selector: '.' ID .
+  133 KeyedElement: Key • ':' Element
 
-    $default  reduce using rule 86 (Selector)
+    ':'  shift, and go to state 287
 
 
 State 235
 
-   52 Expression: Expression . binary_op Expression
-   87 Index: '[' Expression . ']'
+  134 KeyedElement: Element •
 
-    '+'   shift, and go to state 150
-    '-'   shift, and go to state 151
-    '*'   shift, and go to state 152
-    '/'   shift, and go to state 153
-    "||"  shift, and go to state 154
-    "&&"  shift, and go to state 155
-    "=="  shift, and go to state 156
-    "!="  shift, and go to state 157
-    '<'   shift, and go to state 158
-    "<="  shift, and go to state 159
-    '>'   shift, and go to state 160
-    ">="  shift, and go to state 161
-    '|'   shift, and go to state 162
-    '^'   shift, and go to state 163
-    '%'   shift, and go to state 164
-    "<<"  shift, and go to state 165
-    ">>"  shift, and go to state 166
-    '&'   shift, and go to state 167
-    ']'   shift, and go to state 284
-
-    binary_op  go to state 169
-    rel_op     go to state 170
-    add_op     go to state 171
-    mul_op     go to state 172
+    $default  reduce using rule 134 (KeyedElement)
 
 
 State 236
 
-    3 PackageName: ID .
-  110 OperandName: ID .
-  126 Key: ID .
-  195 TypeName: ID .
+  208 StructType: STRUCT '{' STAR_FieldDecl_SC '}' •
 
-    '.'       reduce using rule 3 (PackageName)
-    '.'       [reduce using rule 110 (OperandName)]
-    '{'       reduce using rule 195 (TypeName)
-    ':'       reduce using rule 110 (OperandName)
-    ':'       [reduce using rule 126 (Key)]
-    $default  reduce using rule 110 (OperandName)
+    $default  reduce using rule 208 (StructType)
 
 
 State 237
 
-  118 LiteralValue: '{' '}' .
-
-    $default  reduce using rule 118 (LiteralValue)
-
-
-State 238
-
-   52 Expression: Expression . binary_op Expression
-  127 Key: Expression .
-  129 Element: Expression .
-
-    '+'   shift, and go to state 150
-    '-'   shift, and go to state 151
-    '*'   shift, and go to state 152
-    '/'   shift, and go to state 153
-    "||"  shift, and go to state 154
-    "&&"  shift, and go to state 155
-    "=="  shift, and go to state 156
-    "!="  shift, and go to state 157
-    '<'   shift, and go to state 158
-    "<="  shift, and go to state 159
-    '>'   shift, and go to state 160
-    ">="  shift, and go to state 161
-    '|'   shift, and go to state 162
-    '^'   shift, and go to state 163
-    '%'   shift, and go to state 164
-    "<<"  shift, and go to state 165
-    ">>"  shift, and go to state 166
-    '&'   shift, and go to state 167
-
-    ':'       reduce using rule 127 (Key)
-    $default  reduce using rule 129 (Element)
-
-    binary_op  go to state 169
-    rel_op     go to state 170
-    add_op     go to state 171
-    mul_op     go to state 172
-
-
-State 239
-
-  128 Key: LiteralValue .
-  130 Element: LiteralValue .
-
-    ':'       reduce using rule 128 (Key)
-    $default  reduce using rule 130 (Element)
-
-
-State 240
-
-  119 LiteralValue: '{' ElementList . '}'
-  120             | '{' ElementList . ',' '}'
-
-    ','  shift, and go to state 285
-    '}'  shift, and go to state 286
-
-
-State 241
-
-  121 ElementList: KeyedElement . STAR_CM_KeyedElement
-
-    $default  reduce using rule 123 (STAR_CM_KeyedElement)
-
-    STAR_CM_KeyedElement  go to state 287
-
-
-State 242
-
-  124 KeyedElement: Key . ':' Element
-
-    ':'  shift, and go to state 288
-
-
-State 243
-
-  125 KeyedElement: Element .
-
-    $default  reduce using rule 125 (KeyedElement)
-
-
-State 244
-
-  204 StructType: STRUCT '{' STAR_FieldDecl_SC '}' .
-
-    $default  reduce using rule 204 (StructType)
-
-
-State 245
-
-  205 FieldDecl: IdentifierList . Type Tag
-  206          | IdentifierList . Type
+  209 FieldDecl: IdentifierList • Type Tag
+  210          | IdentifierList • Type
 
     FUNC    shift, and go to state 56
     STRUCT  shift, and go to state 57
     ID      shift, and go to state 58
-    '*'     shift, and go to state 59
-    '('     shift, and go to state 60
+    '*'     shift, and go to state 60
+    '('     shift, and go to state 61
     '['     shift, and go to state 62
 
     PackageName     go to state 63
     QualifiedIdent  go to state 64
-    Type            go to state 289
+    Type            go to state 288
     TypeName        go to state 66
     TypeLit         go to state 67
     ArrayType       go to state 68
@@ -3819,133 +3607,123 @@ State 245
     FunctionType    go to state 71
 
 
-State 246
+State 238
 
-   32 STAR_FieldDecl_SC: STAR_FieldDecl_SC FieldDecl . ';'
+   32 STAR_FieldDecl_SC: STAR_FieldDecl_SC FieldDecl • ';'
 
-    ';'  shift, and go to state 290
-
-
-State 247
-
-  203 ElementType: Type .
-
-    $default  reduce using rule 203 (ElementType)
+    ';'  shift, and go to state 289
 
 
-State 248
+State 239
 
-  201 ArrayType: '[' ArrayLength ']' ElementType .
+  207 ElementType: Type •
 
-    $default  reduce using rule 201 (ArrayType)
+    $default  reduce using rule 207 (ElementType)
 
 
-State 249
+State 240
 
-   30 STAR_CM_ParameterDecl: STAR_CM_ParameterDecl ',' ParameterDecl .
+  205 ArrayType: '[' ArrayLength ']' ElementType •
+
+    $default  reduce using rule 205 (ArrayType)
+
+
+State 241
+
+   30 STAR_CM_ParameterDecl: STAR_CM_ParameterDecl ',' ParameterDecl •
 
     $default  reduce using rule 30 (STAR_CM_ParameterDecl)
 
 
-State 250
+State 242
 
-  150 Label: ID .
+  158 Label: ID •
 
-    $default  reduce using rule 150 (Label)
-
-
-State 251
-
-  186 BreakStmt: BREAK Label .
-
-    $default  reduce using rule 186 (BreakStmt)
+    $default  reduce using rule 158 (Label)
 
 
-State 252
+State 243
 
-  184 ReturnStmt: RETURN ExpressionList .
+  190 BreakStmt: BREAK Label •
 
-    $default  reduce using rule 184 (ReturnStmt)
-
-
-State 253
-
-  190 GotoStmt: GOTO Label .
-
-    $default  reduce using rule 190 (GotoStmt)
+    $default  reduce using rule 190 (BreakStmt)
 
 
-State 254
+State 244
 
-   50 ExpressionList: Expression . STAR_CM_EXP
-   52 Expression: Expression . binary_op Expression
-  156 ExpressionStmt: Expression .
-  157 IncDecStmt: Expression . "++"
-  158           | Expression . "--"
-  162 IfStmt: IF Expression . Block
+  188 ReturnStmt: RETURN ExpressionList •
 
-    '+'   shift, and go to state 150
-    '-'   shift, and go to state 151
-    '*'   shift, and go to state 152
-    '/'   shift, and go to state 153
-    "||"  shift, and go to state 154
-    "&&"  shift, and go to state 155
-    "=="  shift, and go to state 156
-    "!="  shift, and go to state 157
-    '<'   shift, and go to state 158
+    $default  reduce using rule 188 (ReturnStmt)
+
+
+State 245
+
+  194 GotoStmt: GOTO Label •
+
+    $default  reduce using rule 194 (GotoStmt)
+
+
+State 246
+
+   50 ExpressionList: Expression • STAR_CM_EXP
+   52 Expression: Expression • binary_op Expression
+  164 ExpressionStmt: Expression •
+  165 IncDecStmt: Expression • "++"
+  166           | Expression • "--"
+  168 IfStmt: IF Expression • Block
+
+    "||"  shift, and go to state 149
+    "&&"  shift, and go to state 150
+    '|'   shift, and go to state 151
+    '^'   shift, and go to state 152
+    '&'   shift, and go to state 153
+    "=="  shift, and go to state 154
+    "!="  shift, and go to state 155
+    '>'   shift, and go to state 156
+    '<'   shift, and go to state 157
+    ">="  shift, and go to state 158
     "<="  shift, and go to state 159
-    '>'   shift, and go to state 160
-    ">="  shift, and go to state 161
-    '|'   shift, and go to state 162
-    '^'   shift, and go to state 163
-    '%'   shift, and go to state 164
-    "<<"  shift, and go to state 165
-    ">>"  shift, and go to state 166
-    '&'   shift, and go to state 167
+    ">>"  shift, and go to state 160
+    "<<"  shift, and go to state 161
+    '+'   shift, and go to state 162
+    '-'   shift, and go to state 163
+    '*'   shift, and go to state 164
+    '/'   shift, and go to state 165
+    '%'   shift, and go to state 166
     '{'   shift, and go to state 81
     "++"  shift, and go to state 272
     "--"  shift, and go to state 273
 
-    '+'       [reduce using rule 25 (STAR_CM_EXP)]
-    '-'       [reduce using rule 25 (STAR_CM_EXP)]
-    '*'       [reduce using rule 25 (STAR_CM_EXP)]
-    '/'       [reduce using rule 25 (STAR_CM_EXP)]
-    ';'       reduce using rule 156 (ExpressionStmt)
-    '|'       [reduce using rule 25 (STAR_CM_EXP)]
-    '^'       [reduce using rule 25 (STAR_CM_EXP)]
-    '%'       [reduce using rule 25 (STAR_CM_EXP)]
-    "<<"      [reduce using rule 25 (STAR_CM_EXP)]
-    ">>"      [reduce using rule 25 (STAR_CM_EXP)]
-    '&'       [reduce using rule 25 (STAR_CM_EXP)]
+    ';'       reduce using rule 164 (ExpressionStmt)
     $default  reduce using rule 25 (STAR_CM_EXP)
 
-    STAR_CM_EXP  go to state 168
-    binary_op    go to state 169
-    rel_op       go to state 170
-    add_op       go to state 171
-    mul_op       go to state 172
-    Block        go to state 291
+    STAR_CM_EXP  go to state 167
+    binary_op    go to state 168
+    rel_op       go to state 169
+    add_op       go to state 170
+    mul_op       go to state 171
+    Block        go to state 290
 
 
-State 255
+State 247
 
-  163 IfStmt: IF SimpleStmt . ';' Expression Block
-  164       | IF SimpleStmt . ';' Expression Block ELSE Block
-  165       | IF SimpleStmt . ';' Expression Block ELSE IfStmt
+  169 IfStmt: IF SimpleStmt • ';' Expression Block
+  170       | IF SimpleStmt • ';' Expression Block ELSE Block
+  171       | IF SimpleStmt • ';' Expression Block ELSE IfStmt
 
-    ';'  shift, and go to state 292
-
-
-State 256
-
-  188 ContinueStmt: CONTINUE Label .
-
-    $default  reduce using rule 188 (ContinueStmt)
+    ';'  shift, and go to state 291
 
 
-State 257
+State 248
 
-  181 RangeClause: RANGE . Expression
+  192 ContinueStmt: CONTINUE Label •
+
+    $default  reduce using rule 192 (ContinueStmt)
+
+
+State 249
+
+  185 RangeClause: RANGE • Expression
 
     FUNC        shift, and go to state 93
     STRUCT      shift, and go to state 57
@@ -3955,17 +3733,17 @@ State 257
     HEX_LIT     shift, and go to state 97
     FLOAT_LIT   shift, and go to state 98
     DEC_LIT     shift, and go to state 99
-    '+'         shift, and go to state 100
-    '-'         shift, and go to state 101
-    '*'         shift, and go to state 102
-    '^'         shift, and go to state 103
-    '&'         shift, and go to state 104
+    '^'         shift, and go to state 100
+    '&'         shift, and go to state 101
+    '+'         shift, and go to state 102
+    '-'         shift, and go to state 103
+    '*'         shift, and go to state 104
     '!'         shift, and go to state 105
     '['         shift, and go to state 106
     "("         shift, and go to state 107
 
     PackageName     go to state 63
-    Expression      go to state 293
+    Expression      go to state 292
     UnaryExpr       go to state 110
     unary_op        go to state 111
     PrimaryExpr     go to state 112
@@ -3983,186 +3761,230 @@ State 257
     StructType      go to state 124
 
 
+State 250
+
+  167 Assignment: ExpressionList • assign_op ExpressionList
+  186 RangeClause: ExpressionList • '=' RANGE Expression
+
+    '='    shift, and go to state 293
+    "+="   shift, and go to state 261
+    "-="   shift, and go to state 262
+    "|="   shift, and go to state 263
+    "^="   shift, and go to state 264
+    "*="   shift, and go to state 265
+    "/="   shift, and go to state 266
+    "%="   shift, and go to state 267
+    "<<="  shift, and go to state 268
+    ">>="  shift, and go to state 269
+    "&="   shift, and go to state 270
+
+    assign_op  go to state 271
+
+
+State 251
+
+   50 ExpressionList: Expression • STAR_CM_EXP
+   52 Expression: Expression • binary_op Expression
+  164 ExpressionStmt: Expression •
+  165 IncDecStmt: Expression • "++"
+  166           | Expression • "--"
+  177 Condition: Expression •
+
+    "||"  shift, and go to state 149
+    "&&"  shift, and go to state 150
+    '|'   shift, and go to state 151
+    '^'   shift, and go to state 152
+    '&'   shift, and go to state 153
+    "=="  shift, and go to state 154
+    "!="  shift, and go to state 155
+    '>'   shift, and go to state 156
+    '<'   shift, and go to state 157
+    ">="  shift, and go to state 158
+    "<="  shift, and go to state 159
+    ">>"  shift, and go to state 160
+    "<<"  shift, and go to state 161
+    '+'   shift, and go to state 162
+    '-'   shift, and go to state 163
+    '*'   shift, and go to state 164
+    '/'   shift, and go to state 165
+    '%'   shift, and go to state 166
+    "++"  shift, and go to state 272
+    "--"  shift, and go to state 273
+
+    ';'       reduce using rule 164 (ExpressionStmt)
+    '{'       reduce using rule 177 (Condition)
+    $default  reduce using rule 25 (STAR_CM_EXP)
+
+    STAR_CM_EXP  go to state 167
+    binary_op    go to state 168
+    rel_op       go to state 169
+    add_op       go to state 170
+    mul_op       go to state 171
+
+
+State 252
+
+  172 ForStmt: FOR Block •
+
+    $default  reduce using rule 172 (ForStmt)
+
+
+State 253
+
+  183 InitStmt: SimpleStmt •
+
+    $default  reduce using rule 183 (InitStmt)
+
+
+State 254
+
+  173 ForStmt: FOR ForStmtAfter • Block
+
+    '{'  shift, and go to state 81
+
+    Block  go to state 294
+
+
+State 255
+
+  174 ForStmtAfter: Condition •
+
+    $default  reduce using rule 174 (ForStmtAfter)
+
+
+State 256
+
+  175 ForStmtAfter: ForClause •
+
+    $default  reduce using rule 175 (ForStmtAfter)
+
+
+State 257
+
+  178 ForClause: OPT_InitStmt • ';' OPT_Condition ';' OPT_PostStmt
+
+    ';'  shift, and go to state 295
+
+
 State 258
 
-  159 Assignment: ExpressionList . assign_op ExpressionList
-  182 RangeClause: ExpressionList . '=' RANGE Expression
+  179 OPT_InitStmt: InitStmt •
 
-    '+'   shift, and go to state 150
-    '-'   shift, and go to state 151
-    '*'   shift, and go to state 152
-    '/'   shift, and go to state 153
-    '='   shift, and go to state 294
-    '|'   shift, and go to state 162
-    '^'   shift, and go to state 163
-    '%'   shift, and go to state 164
-    "<<"  shift, and go to state 165
-    ">>"  shift, and go to state 166
-    '&'   shift, and go to state 167
-
-    add_op     go to state 269
-    mul_op     go to state 270
-    assign_op  go to state 271
+    $default  reduce using rule 179 (OPT_InitStmt)
 
 
 State 259
 
-   50 ExpressionList: Expression . STAR_CM_EXP
-   52 Expression: Expression . binary_op Expression
-  156 ExpressionStmt: Expression .
-  157 IncDecStmt: Expression . "++"
-  158           | Expression . "--"
-  171 Condition: Expression .
+  176 ForStmtAfter: RangeClause •
 
-    '+'   shift, and go to state 150
-    '-'   shift, and go to state 151
-    '*'   shift, and go to state 152
-    '/'   shift, and go to state 153
-    "||"  shift, and go to state 154
-    "&&"  shift, and go to state 155
-    "=="  shift, and go to state 156
-    "!="  shift, and go to state 157
-    '<'   shift, and go to state 158
-    "<="  shift, and go to state 159
-    '>'   shift, and go to state 160
-    ">="  shift, and go to state 161
-    '|'   shift, and go to state 162
-    '^'   shift, and go to state 163
-    '%'   shift, and go to state 164
-    "<<"  shift, and go to state 165
-    ">>"  shift, and go to state 166
-    '&'   shift, and go to state 167
-    "++"  shift, and go to state 272
-    "--"  shift, and go to state 273
-
-    '+'       [reduce using rule 25 (STAR_CM_EXP)]
-    '-'       [reduce using rule 25 (STAR_CM_EXP)]
-    '*'       [reduce using rule 25 (STAR_CM_EXP)]
-    '/'       [reduce using rule 25 (STAR_CM_EXP)]
-    ';'       reduce using rule 156 (ExpressionStmt)
-    '|'       [reduce using rule 25 (STAR_CM_EXP)]
-    '^'       [reduce using rule 25 (STAR_CM_EXP)]
-    '%'       [reduce using rule 25 (STAR_CM_EXP)]
-    "<<"      [reduce using rule 25 (STAR_CM_EXP)]
-    ">>"      [reduce using rule 25 (STAR_CM_EXP)]
-    '&'       [reduce using rule 25 (STAR_CM_EXP)]
-    '{'       reduce using rule 171 (Condition)
-    $default  reduce using rule 25 (STAR_CM_EXP)
-
-    STAR_CM_EXP  go to state 168
-    binary_op    go to state 169
-    rel_op       go to state 170
-    add_op       go to state 171
-    mul_op       go to state 172
+    $default  reduce using rule 176 (ForStmtAfter)
 
 
 State 260
 
-  166 ForStmt: FOR Block .
+   52 Expression: Expression • binary_op Expression
+  187 GoStmt: GO Expression •
 
-    $default  reduce using rule 166 (ForStmt)
+    "||"  shift, and go to state 149
+    "&&"  shift, and go to state 150
+    '|'   shift, and go to state 151
+    '^'   shift, and go to state 152
+    '&'   shift, and go to state 153
+    "=="  shift, and go to state 154
+    "!="  shift, and go to state 155
+    '>'   shift, and go to state 156
+    '<'   shift, and go to state 157
+    ">="  shift, and go to state 158
+    "<="  shift, and go to state 159
+    ">>"  shift, and go to state 160
+    "<<"  shift, and go to state 161
+    '+'   shift, and go to state 162
+    '-'   shift, and go to state 163
+    '*'   shift, and go to state 164
+    '/'   shift, and go to state 165
+    '%'   shift, and go to state 166
+
+    $default  reduce using rule 187 (GoStmt)
+
+    binary_op  go to state 168
+    rel_op     go to state 169
+    add_op     go to state 170
+    mul_op     go to state 171
 
 
 State 261
 
-  179 InitStmt: SimpleStmt .
+   70 assign_op: "+=" •
 
-    $default  reduce using rule 179 (InitStmt)
+    $default  reduce using rule 70 (assign_op)
 
 
 State 262
 
-  167 ForStmt: FOR ForStmtAfter . Block
+   71 assign_op: "-=" •
 
-    '{'  shift, and go to state 81
-
-    Block  go to state 295
+    $default  reduce using rule 71 (assign_op)
 
 
 State 263
 
-  168 ForStmtAfter: Condition .
+   72 assign_op: "|=" •
 
-    $default  reduce using rule 168 (ForStmtAfter)
+    $default  reduce using rule 72 (assign_op)
 
 
 State 264
 
-  169 ForStmtAfter: ForClause .
+   73 assign_op: "^=" •
 
-    $default  reduce using rule 169 (ForStmtAfter)
+    $default  reduce using rule 73 (assign_op)
 
 
 State 265
 
-  172 ForClause: OPT_InitStmt . ';' OPT_Condition ';' OPT_PostStmt
+   74 assign_op: "*=" •
 
-    ';'  shift, and go to state 296
+    $default  reduce using rule 74 (assign_op)
 
 
 State 266
 
-  173 OPT_InitStmt: InitStmt .
+   75 assign_op: "/=" •
 
-    $default  reduce using rule 173 (OPT_InitStmt)
+    $default  reduce using rule 75 (assign_op)
 
 
 State 267
 
-  170 ForStmtAfter: RangeClause .
+   76 assign_op: "%=" •
 
-    $default  reduce using rule 170 (ForStmtAfter)
+    $default  reduce using rule 76 (assign_op)
 
 
 State 268
 
-   52 Expression: Expression . binary_op Expression
-  183 GoStmt: GO Expression .
+   77 assign_op: "<<=" •
 
-    '+'   shift, and go to state 150
-    '-'   shift, and go to state 151
-    '*'   shift, and go to state 152
-    '/'   shift, and go to state 153
-    "||"  shift, and go to state 154
-    "&&"  shift, and go to state 155
-    "=="  shift, and go to state 156
-    "!="  shift, and go to state 157
-    '<'   shift, and go to state 158
-    "<="  shift, and go to state 159
-    '>'   shift, and go to state 160
-    ">="  shift, and go to state 161
-    '|'   shift, and go to state 162
-    '^'   shift, and go to state 163
-    '%'   shift, and go to state 164
-    "<<"  shift, and go to state 165
-    ">>"  shift, and go to state 166
-    '&'   shift, and go to state 167
-
-    $default  reduce using rule 183 (GoStmt)
-
-    binary_op  go to state 169
-    rel_op     go to state 170
-    add_op     go to state 171
-    mul_op     go to state 172
+    $default  reduce using rule 77 (assign_op)
 
 
 State 269
 
-  160 assign_op: add_op . '='
+   78 assign_op: ">>=" •
 
-    '='  shift, and go to state 297
+    $default  reduce using rule 78 (assign_op)
 
 
 State 270
 
-  161 assign_op: mul_op . '='
+   79 assign_op: "&=" •
 
-    '='  shift, and go to state 298
+    $default  reduce using rule 79 (assign_op)
 
 
 State 271
 
-  159 Assignment: ExpressionList assign_op . ExpressionList
+  167 Assignment: ExpressionList assign_op • ExpressionList
 
     FUNC        shift, and go to state 93
     STRUCT      shift, and go to state 57
@@ -4172,11 +3994,219 @@ State 271
     HEX_LIT     shift, and go to state 97
     FLOAT_LIT   shift, and go to state 98
     DEC_LIT     shift, and go to state 99
-    '+'         shift, and go to state 100
-    '-'         shift, and go to state 101
-    '*'         shift, and go to state 102
-    '^'         shift, and go to state 103
-    '&'         shift, and go to state 104
+    '^'         shift, and go to state 100
+    '&'         shift, and go to state 101
+    '+'         shift, and go to state 102
+    '-'         shift, and go to state 103
+    '*'         shift, and go to state 104
+    '!'         shift, and go to state 105
+    '['         shift, and go to state 106
+    "("         shift, and go to state 107
+
+    PackageName     go to state 63
+    ExpressionList  go to state 296
+    Expression      go to state 109
+    UnaryExpr       go to state 110
+    unary_op        go to state 111
+    PrimaryExpr     go to state 112
+    Operand         go to state 113
+    Literal         go to state 114
+    INT_LIT         go to state 115
+    BasicLit        go to state 116
+    OperandName     go to state 117
+    QualifiedIdent  go to state 118
+    CompositeLit    go to state 119
+    LiteralType     go to state 120
+    FunctionLit     go to state 121
+    TypeName        go to state 122
+    ArrayType       go to state 123
+    StructType      go to state 124
+
+
+State 272
+
+  165 IncDecStmt: Expression "++" •
+
+    $default  reduce using rule 165 (IncDecStmt)
+
+
+State 273
+
+  166 IncDecStmt: Expression "--" •
+
+    $default  reduce using rule 166 (IncDecStmt)
+
+
+State 274
+
+   28 STAR_Statement_SC: STAR_Statement_SC Statement ';' •
+
+    $default  reduce using rule 28 (STAR_Statement_SC)
+
+
+State 275
+
+  157 LabeledStmt: Label ':' • Statement
+
+    BREAK        shift, and go to state 188
+    FUNC         shift, and go to state 93
+    STRUCT       shift, and go to state 57
+    RETURN       shift, and go to state 189
+    GOTO         shift, and go to state 190
+    CONST        shift, and go to state 20
+    IF           shift, and go to state 191
+    CONTINUE     shift, and go to state 192
+    FOR          shift, and go to state 193
+    ID           shift, and go to state 194
+    VAR          shift, and go to state 21
+    STRING_LIT   shift, and go to state 95
+    BINARY_LIT   shift, and go to state 96
+    HEX_LIT      shift, and go to state 97
+    FLOAT_LIT    shift, and go to state 98
+    DEC_LIT      shift, and go to state 99
+    GO           shift, and go to state 195
+    FALLTHROUGH  shift, and go to state 196
+    TYPE_TOK     shift, and go to state 22
+    '^'          shift, and go to state 100
+    '&'          shift, and go to state 101
+    '+'          shift, and go to state 102
+    '-'          shift, and go to state 103
+    '*'          shift, and go to state 104
+    '!'          shift, and go to state 105
+    '['          shift, and go to state 106
+    "("          shift, and go to state 107
+    '{'          shift, and go to state 81
+
+    $default  reduce using rule 163 (EmptyStmt)
+
+    PackageName      go to state 63
+    Declaration      go to state 198
+    ConstDecl        go to state 25
+    TypeDecl         go to state 26
+    VarDecl          go to state 27
+    ExpressionList   go to state 199
+    Expression       go to state 200
+    UnaryExpr        go to state 110
+    unary_op         go to state 111
+    PrimaryExpr      go to state 112
+    Operand          go to state 113
+    Literal          go to state 114
+    INT_LIT          go to state 115
+    BasicLit         go to state 116
+    OperandName      go to state 117
+    QualifiedIdent   go to state 118
+    CompositeLit     go to state 119
+    LiteralType      go to state 120
+    FunctionLit      go to state 121
+    Block            go to state 201
+    Statement        go to state 297
+    LabeledStmt      go to state 203
+    Label            go to state 204
+    SimpleStmt       go to state 205
+    EmptyStmt        go to state 206
+    ExpressionStmt   go to state 207
+    IncDecStmt       go to state 208
+    Assignment       go to state 209
+    IfStmt           go to state 210
+    ForStmt          go to state 211
+    GoStmt           go to state 212
+    ReturnStmt       go to state 213
+    BreakStmt        go to state 214
+    ContinueStmt     go to state 215
+    GotoStmt         go to state 216
+    FallthroughStmt  go to state 217
+    TypeName         go to state 122
+    ArrayType        go to state 123
+    StructType       go to state 124
+
+
+State 276
+
+  125 LiteralType: '[' ELIPSIS ']' ElementType •
+
+    $default  reduce using rule 125 (LiteralType)
+
+
+State 277
+
+   24 STAR_CM_EXP: STAR_CM_EXP ',' Expression •
+   52 Expression: Expression • binary_op Expression
+
+    "||"  shift, and go to state 149
+    "&&"  shift, and go to state 150
+    '|'   shift, and go to state 151
+    '^'   shift, and go to state 152
+    '&'   shift, and go to state 153
+    "=="  shift, and go to state 154
+    "!="  shift, and go to state 155
+    '>'   shift, and go to state 156
+    '<'   shift, and go to state 157
+    ">="  shift, and go to state 158
+    "<="  shift, and go to state 159
+    ">>"  shift, and go to state 160
+    "<<"  shift, and go to state 161
+    '+'   shift, and go to state 162
+    '-'   shift, and go to state 163
+    '*'   shift, and go to state 164
+    '/'   shift, and go to state 165
+    '%'   shift, and go to state 166
+
+    $default  reduce using rule 24 (STAR_CM_EXP)
+
+    binary_op  go to state 168
+    rel_op     go to state 169
+    add_op     go to state 170
+    mul_op     go to state 171
+
+
+State 278
+
+   99 Arguments: '(' ArgumentInBracket ')' •
+
+    $default  reduce using rule 99 (Arguments)
+
+
+State 279
+
+  103 ArgumentInBracketEnd: ELIPSIS • ','
+  104                     | ELIPSIS •
+
+    ','  shift, and go to state 298
+
+    $default  reduce using rule 104 (ArgumentInBracketEnd)
+
+
+State 280
+
+  105 ArgumentInBracketEnd: ',' •
+
+    $default  reduce using rule 105 (ArgumentInBracketEnd)
+
+
+State 281
+
+  100 ArgumentInBracket: ArgumentInBracketFirst ArgumentInBracketEnd •
+
+    $default  reduce using rule 100 (ArgumentInBracket)
+
+
+State 282
+
+  102 ArgumentInBracketFirst: Type ',' • ExpressionList
+
+    FUNC        shift, and go to state 93
+    STRUCT      shift, and go to state 57
+    ID          shift, and go to state 94
+    STRING_LIT  shift, and go to state 95
+    BINARY_LIT  shift, and go to state 96
+    HEX_LIT     shift, and go to state 97
+    FLOAT_LIT   shift, and go to state 98
+    DEC_LIT     shift, and go to state 99
+    '^'         shift, and go to state 100
+    '&'         shift, and go to state 101
+    '+'         shift, and go to state 102
+    '-'         shift, and go to state 103
+    '*'         shift, and go to state 104
     '!'         shift, and go to state 105
     '['         shift, and go to state 106
     "("         shift, and go to state 107
@@ -4201,797 +4231,552 @@ State 271
     StructType      go to state 124
 
 
-State 272
-
-  157 IncDecStmt: Expression "++" .
-
-    $default  reduce using rule 157 (IncDecStmt)
-
-
-State 273
-
-  158 IncDecStmt: Expression "--" .
-
-    $default  reduce using rule 158 (IncDecStmt)
-
-
-State 274
-
-   28 STAR_Statement_SC: STAR_Statement_SC Statement ';' .
-
-    $default  reduce using rule 28 (STAR_Statement_SC)
-
-
-State 275
-
-  149 LabeledStmt: Label ':' . Statement
-
-    BREAK        shift, and go to state 189
-    FUNC         shift, and go to state 93
-    STRUCT       shift, and go to state 57
-    RETURN       shift, and go to state 190
-    GOTO         shift, and go to state 191
-    CONST        shift, and go to state 20
-    IF           shift, and go to state 192
-    CONTINUE     shift, and go to state 193
-    FOR          shift, and go to state 194
-    ID           shift, and go to state 195
-    VAR          shift, and go to state 21
-    STRING_LIT   shift, and go to state 95
-    BINARY_LIT   shift, and go to state 96
-    HEX_LIT      shift, and go to state 97
-    FLOAT_LIT    shift, and go to state 98
-    DEC_LIT      shift, and go to state 99
-    GO           shift, and go to state 196
-    FALLTHROUGH  shift, and go to state 197
-    TYPE_TOK     shift, and go to state 22
-    '+'          shift, and go to state 100
-    '-'          shift, and go to state 101
-    '*'          shift, and go to state 102
-    '^'          shift, and go to state 103
-    '&'          shift, and go to state 104
-    '!'          shift, and go to state 105
-    '['          shift, and go to state 106
-    "("          shift, and go to state 107
-    '{'          shift, and go to state 81
-
-    $default  reduce using rule 155 (EmptyStmt)
-
-    PackageName      go to state 63
-    Declaration      go to state 199
-    ConstDecl        go to state 25
-    TypeDecl         go to state 26
-    VarDecl          go to state 27
-    ExpressionList   go to state 200
-    Expression       go to state 201
-    UnaryExpr        go to state 110
-    unary_op         go to state 111
-    PrimaryExpr      go to state 112
-    Operand          go to state 113
-    Literal          go to state 114
-    INT_LIT          go to state 115
-    BasicLit         go to state 116
-    OperandName      go to state 117
-    QualifiedIdent   go to state 118
-    CompositeLit     go to state 119
-    LiteralType      go to state 120
-    FunctionLit      go to state 121
-    Block            go to state 202
-    Statement        go to state 300
-    LabeledStmt      go to state 204
-    Label            go to state 205
-    SimpleStmt       go to state 206
-    EmptyStmt        go to state 207
-    ExpressionStmt   go to state 208
-    IncDecStmt       go to state 209
-    Assignment       go to state 210
-    IfStmt           go to state 211
-    ForStmt          go to state 212
-    GoStmt           go to state 213
-    ReturnStmt       go to state 214
-    BreakStmt        go to state 215
-    ContinueStmt     go to state 216
-    GotoStmt         go to state 217
-    FallthroughStmt  go to state 218
-    TypeName         go to state 122
-    ArrayType        go to state 123
-    StructType       go to state 124
-
-
-State 276
-
-  116 LiteralType: '[' ELIPSIS ']' ElementType .
-
-    $default  reduce using rule 116 (LiteralType)
-
-
-State 277
-
-   24 STAR_CM_EXP: STAR_CM_EXP ',' Expression .
-   52 Expression: Expression . binary_op Expression
-
-    '+'   shift, and go to state 150
-    '-'   shift, and go to state 151
-    '*'   shift, and go to state 152
-    '/'   shift, and go to state 153
-    "||"  shift, and go to state 154
-    "&&"  shift, and go to state 155
-    "=="  shift, and go to state 156
-    "!="  shift, and go to state 157
-    '<'   shift, and go to state 158
-    "<="  shift, and go to state 159
-    '>'   shift, and go to state 160
-    ">="  shift, and go to state 161
-    '|'   shift, and go to state 162
-    '^'   shift, and go to state 163
-    '%'   shift, and go to state 164
-    "<<"  shift, and go to state 165
-    ">>"  shift, and go to state 166
-    '&'   shift, and go to state 167
-
-    '+'       [reduce using rule 24 (STAR_CM_EXP)]
-    '-'       [reduce using rule 24 (STAR_CM_EXP)]
-    '*'       [reduce using rule 24 (STAR_CM_EXP)]
-    '/'       [reduce using rule 24 (STAR_CM_EXP)]
-    '|'       [reduce using rule 24 (STAR_CM_EXP)]
-    '^'       [reduce using rule 24 (STAR_CM_EXP)]
-    '%'       [reduce using rule 24 (STAR_CM_EXP)]
-    "<<"      [reduce using rule 24 (STAR_CM_EXP)]
-    ">>"      [reduce using rule 24 (STAR_CM_EXP)]
-    '&'       [reduce using rule 24 (STAR_CM_EXP)]
-    $default  reduce using rule 24 (STAR_CM_EXP)
-
-    binary_op  go to state 169
-    rel_op     go to state 170
-    add_op     go to state 171
-    mul_op     go to state 172
-
-
-State 278
-
-  131 FunctionLit: FUNC Signature . FunctionBody
-  210 FunctionType: FUNC Signature .
-
-    '{'  shift, and go to state 81
-
-    $default  reduce using rule 210 (FunctionType)
-
-    FunctionBody  go to state 219
-    Block         go to state 83
-
-
-State 279
-
-   89 Arguments: '(' ArgumentInBracket ')' .
-
-    $default  reduce using rule 89 (Arguments)
-
-
-State 280
-
-   94 ArgumentInBracketEnd: ELIPSIS . ','
-   95                     | ELIPSIS .
-
-    ','  shift, and go to state 301
-
-    $default  reduce using rule 95 (ArgumentInBracketEnd)
-
-
-State 281
-
-   96 ArgumentInBracketEnd: ',' .
-
-    $default  reduce using rule 96 (ArgumentInBracketEnd)
-
-
-State 282
-
-   90 ArgumentInBracket: ArgumentInBracketFirst ArgumentInBracketEnd .
-
-    $default  reduce using rule 90 (ArgumentInBracket)
-
-
 State 283
 
-   93 ArgumentInBracketFirst: Type ',' . ExpressionList
+   97 Index: '[' Expression ']' •
 
-    FUNC        shift, and go to state 93
-    STRUCT      shift, and go to state 57
-    ID          shift, and go to state 94
-    STRING_LIT  shift, and go to state 95
-    BINARY_LIT  shift, and go to state 96
-    HEX_LIT     shift, and go to state 97
-    FLOAT_LIT   shift, and go to state 98
-    DEC_LIT     shift, and go to state 99
-    '+'         shift, and go to state 100
-    '-'         shift, and go to state 101
-    '*'         shift, and go to state 102
-    '^'         shift, and go to state 103
-    '&'         shift, and go to state 104
-    '!'         shift, and go to state 105
-    '['         shift, and go to state 106
-    "("         shift, and go to state 107
-
-    PackageName     go to state 63
-    ExpressionList  go to state 302
-    Expression      go to state 109
-    UnaryExpr       go to state 110
-    unary_op        go to state 111
-    PrimaryExpr     go to state 112
-    Operand         go to state 113
-    Literal         go to state 114
-    INT_LIT         go to state 115
-    BasicLit        go to state 116
-    OperandName     go to state 117
-    QualifiedIdent  go to state 118
-    CompositeLit    go to state 119
-    LiteralType     go to state 120
-    FunctionLit     go to state 121
-    TypeName        go to state 122
-    ArrayType       go to state 123
-    StructType      go to state 124
+    $default  reduce using rule 97 (Index)
 
 
 State 284
 
-   87 Index: '[' Expression ']' .
+  129 LiteralValue: '{' ElementList ',' • '}'
 
-    $default  reduce using rule 87 (Index)
+    '}'  shift, and go to state 300
 
 
 State 285
 
-  120 LiteralValue: '{' ElementList ',' . '}'
+  128 LiteralValue: '{' ElementList '}' •
 
-    '}'  shift, and go to state 303
+    $default  reduce using rule 128 (LiteralValue)
 
 
 State 286
 
-  119 LiteralValue: '{' ElementList '}' .
+  130 ElementList: KeyedElement STAR_CM_KeyedElement •
+  131 STAR_CM_KeyedElement: STAR_CM_KeyedElement • ',' KeyedElement
 
-    $default  reduce using rule 119 (LiteralValue)
+    ','  shift, and go to state 301
+
+    ','       [reduce using rule 130 (ElementList)]
+    $default  reduce using rule 130 (ElementList)
 
 
 State 287
 
-  121 ElementList: KeyedElement STAR_CM_KeyedElement .
-  122 STAR_CM_KeyedElement: STAR_CM_KeyedElement . ',' KeyedElement
+  133 KeyedElement: Key ':' • Element
 
-    ','  shift, and go to state 304
+    FUNC        shift, and go to state 93
+    STRUCT      shift, and go to state 57
+    ID          shift, and go to state 94
+    STRING_LIT  shift, and go to state 95
+    BINARY_LIT  shift, and go to state 96
+    HEX_LIT     shift, and go to state 97
+    FLOAT_LIT   shift, and go to state 98
+    DEC_LIT     shift, and go to state 99
+    '^'         shift, and go to state 100
+    '&'         shift, and go to state 101
+    '+'         shift, and go to state 102
+    '-'         shift, and go to state 103
+    '*'         shift, and go to state 104
+    '!'         shift, and go to state 105
+    '['         shift, and go to state 106
+    "("         shift, and go to state 107
+    '{'         shift, and go to state 179
 
-    ','       [reduce using rule 121 (ElementList)]
-    $default  reduce using rule 121 (ElementList)
+    PackageName     go to state 63
+    Expression      go to state 302
+    UnaryExpr       go to state 110
+    unary_op        go to state 111
+    PrimaryExpr     go to state 112
+    Operand         go to state 113
+    Literal         go to state 114
+    INT_LIT         go to state 115
+    BasicLit        go to state 116
+    OperandName     go to state 117
+    QualifiedIdent  go to state 118
+    CompositeLit    go to state 119
+    LiteralType     go to state 120
+    LiteralValue    go to state 303
+    Element         go to state 304
+    FunctionLit     go to state 121
+    TypeName        go to state 122
+    ArrayType       go to state 123
+    StructType      go to state 124
 
 
 State 288
 
-  124 KeyedElement: Key ':' . Element
+  209 FieldDecl: IdentifierList Type • Tag
+  210          | IdentifierList Type •
 
-    FUNC        shift, and go to state 93
-    STRUCT      shift, and go to state 57
-    ID          shift, and go to state 94
-    STRING_LIT  shift, and go to state 95
-    BINARY_LIT  shift, and go to state 96
-    HEX_LIT     shift, and go to state 97
-    FLOAT_LIT   shift, and go to state 98
-    DEC_LIT     shift, and go to state 99
-    '+'         shift, and go to state 100
-    '-'         shift, and go to state 101
-    '*'         shift, and go to state 102
-    '^'         shift, and go to state 103
-    '&'         shift, and go to state 104
-    '!'         shift, and go to state 105
-    '['         shift, and go to state 106
-    "("         shift, and go to state 107
-    '{'         shift, and go to state 180
+    STRING_LIT  shift, and go to state 305
 
-    PackageName     go to state 63
-    Expression      go to state 305
-    UnaryExpr       go to state 110
-    unary_op        go to state 111
-    PrimaryExpr     go to state 112
-    Operand         go to state 113
-    Literal         go to state 114
-    INT_LIT         go to state 115
-    BasicLit        go to state 116
-    OperandName     go to state 117
-    QualifiedIdent  go to state 118
-    CompositeLit    go to state 119
-    LiteralType     go to state 120
-    LiteralValue    go to state 306
-    Element         go to state 307
-    FunctionLit     go to state 121
-    TypeName        go to state 122
-    ArrayType       go to state 123
-    StructType      go to state 124
+    $default  reduce using rule 210 (FieldDecl)
+
+    Tag  go to state 306
 
 
 State 289
 
-  205 FieldDecl: IdentifierList Type . Tag
-  206          | IdentifierList Type .
-
-    STRING_LIT  shift, and go to state 308
-
-    $default  reduce using rule 206 (FieldDecl)
-
-    Tag  go to state 309
-
-
-State 290
-
-   32 STAR_FieldDecl_SC: STAR_FieldDecl_SC FieldDecl ';' .
+   32 STAR_FieldDecl_SC: STAR_FieldDecl_SC FieldDecl ';' •
 
     $default  reduce using rule 32 (STAR_FieldDecl_SC)
 
 
+State 290
+
+  168 IfStmt: IF Expression Block •
+
+    $default  reduce using rule 168 (IfStmt)
+
+
 State 291
 
-  162 IfStmt: IF Expression Block .
+  169 IfStmt: IF SimpleStmt ';' • Expression Block
+  170       | IF SimpleStmt ';' • Expression Block ELSE Block
+  171       | IF SimpleStmt ';' • Expression Block ELSE IfStmt
 
-    $default  reduce using rule 162 (IfStmt)
+    FUNC        shift, and go to state 93
+    STRUCT      shift, and go to state 57
+    ID          shift, and go to state 94
+    STRING_LIT  shift, and go to state 95
+    BINARY_LIT  shift, and go to state 96
+    HEX_LIT     shift, and go to state 97
+    FLOAT_LIT   shift, and go to state 98
+    DEC_LIT     shift, and go to state 99
+    '^'         shift, and go to state 100
+    '&'         shift, and go to state 101
+    '+'         shift, and go to state 102
+    '-'         shift, and go to state 103
+    '*'         shift, and go to state 104
+    '!'         shift, and go to state 105
+    '['         shift, and go to state 106
+    "("         shift, and go to state 107
+
+    PackageName     go to state 63
+    Expression      go to state 307
+    UnaryExpr       go to state 110
+    unary_op        go to state 111
+    PrimaryExpr     go to state 112
+    Operand         go to state 113
+    Literal         go to state 114
+    INT_LIT         go to state 115
+    BasicLit        go to state 116
+    OperandName     go to state 117
+    QualifiedIdent  go to state 118
+    CompositeLit    go to state 119
+    LiteralType     go to state 120
+    FunctionLit     go to state 121
+    TypeName        go to state 122
+    ArrayType       go to state 123
+    StructType      go to state 124
 
 
 State 292
 
-  163 IfStmt: IF SimpleStmt ';' . Expression Block
-  164       | IF SimpleStmt ';' . Expression Block ELSE Block
-  165       | IF SimpleStmt ';' . Expression Block ELSE IfStmt
+   52 Expression: Expression • binary_op Expression
+  185 RangeClause: RANGE Expression •
 
-    FUNC        shift, and go to state 93
-    STRUCT      shift, and go to state 57
-    ID          shift, and go to state 94
-    STRING_LIT  shift, and go to state 95
-    BINARY_LIT  shift, and go to state 96
-    HEX_LIT     shift, and go to state 97
-    FLOAT_LIT   shift, and go to state 98
-    DEC_LIT     shift, and go to state 99
-    '+'         shift, and go to state 100
-    '-'         shift, and go to state 101
-    '*'         shift, and go to state 102
-    '^'         shift, and go to state 103
-    '&'         shift, and go to state 104
-    '!'         shift, and go to state 105
-    '['         shift, and go to state 106
-    "("         shift, and go to state 107
+    "||"  shift, and go to state 149
+    "&&"  shift, and go to state 150
+    '|'   shift, and go to state 151
+    '^'   shift, and go to state 152
+    '&'   shift, and go to state 153
+    "=="  shift, and go to state 154
+    "!="  shift, and go to state 155
+    '>'   shift, and go to state 156
+    '<'   shift, and go to state 157
+    ">="  shift, and go to state 158
+    "<="  shift, and go to state 159
+    ">>"  shift, and go to state 160
+    "<<"  shift, and go to state 161
+    '+'   shift, and go to state 162
+    '-'   shift, and go to state 163
+    '*'   shift, and go to state 164
+    '/'   shift, and go to state 165
+    '%'   shift, and go to state 166
 
-    PackageName     go to state 63
-    Expression      go to state 310
-    UnaryExpr       go to state 110
-    unary_op        go to state 111
-    PrimaryExpr     go to state 112
-    Operand         go to state 113
-    Literal         go to state 114
-    INT_LIT         go to state 115
-    BasicLit        go to state 116
-    OperandName     go to state 117
-    QualifiedIdent  go to state 118
-    CompositeLit    go to state 119
-    LiteralType     go to state 120
-    FunctionLit     go to state 121
-    TypeName        go to state 122
-    ArrayType       go to state 123
-    StructType      go to state 124
+    $default  reduce using rule 185 (RangeClause)
+
+    binary_op  go to state 168
+    rel_op     go to state 169
+    add_op     go to state 170
+    mul_op     go to state 171
 
 
 State 293
 
-   52 Expression: Expression . binary_op Expression
-  181 RangeClause: RANGE Expression .
+  186 RangeClause: ExpressionList '=' • RANGE Expression
 
-    '+'   shift, and go to state 150
-    '-'   shift, and go to state 151
-    '*'   shift, and go to state 152
-    '/'   shift, and go to state 153
-    "||"  shift, and go to state 154
-    "&&"  shift, and go to state 155
-    "=="  shift, and go to state 156
-    "!="  shift, and go to state 157
-    '<'   shift, and go to state 158
-    "<="  shift, and go to state 159
-    '>'   shift, and go to state 160
-    ">="  shift, and go to state 161
-    '|'   shift, and go to state 162
-    '^'   shift, and go to state 163
-    '%'   shift, and go to state 164
-    "<<"  shift, and go to state 165
-    ">>"  shift, and go to state 166
-    '&'   shift, and go to state 167
-
-    $default  reduce using rule 181 (RangeClause)
-
-    binary_op  go to state 169
-    rel_op     go to state 170
-    add_op     go to state 171
-    mul_op     go to state 172
+    RANGE  shift, and go to state 308
 
 
 State 294
 
-  182 RangeClause: ExpressionList '=' . RANGE Expression
+  173 ForStmt: FOR ForStmtAfter Block •
 
-    RANGE  shift, and go to state 311
+    $default  reduce using rule 173 (ForStmt)
 
 
 State 295
 
-  167 ForStmt: FOR ForStmtAfter Block .
+  178 ForClause: OPT_InitStmt ';' • OPT_Condition ';' OPT_PostStmt
 
-    $default  reduce using rule 167 (ForStmt)
+    FUNC        shift, and go to state 93
+    STRUCT      shift, and go to state 57
+    ID          shift, and go to state 94
+    STRING_LIT  shift, and go to state 95
+    BINARY_LIT  shift, and go to state 96
+    HEX_LIT     shift, and go to state 97
+    FLOAT_LIT   shift, and go to state 98
+    DEC_LIT     shift, and go to state 99
+    '^'         shift, and go to state 100
+    '&'         shift, and go to state 101
+    '+'         shift, and go to state 102
+    '-'         shift, and go to state 103
+    '*'         shift, and go to state 104
+    '!'         shift, and go to state 105
+    '['         shift, and go to state 106
+    "("         shift, and go to state 107
+
+    $default  reduce using rule 181 (OPT_Condition)
+
+    PackageName     go to state 63
+    Expression      go to state 309
+    UnaryExpr       go to state 110
+    unary_op        go to state 111
+    PrimaryExpr     go to state 112
+    Operand         go to state 113
+    Literal         go to state 114
+    INT_LIT         go to state 115
+    BasicLit        go to state 116
+    OperandName     go to state 117
+    QualifiedIdent  go to state 118
+    CompositeLit    go to state 119
+    LiteralType     go to state 120
+    FunctionLit     go to state 121
+    Condition       go to state 310
+    OPT_Condition   go to state 311
+    TypeName        go to state 122
+    ArrayType       go to state 123
+    StructType      go to state 124
 
 
 State 296
 
-  172 ForClause: OPT_InitStmt ';' . OPT_Condition ';' OPT_PostStmt
+  167 Assignment: ExpressionList assign_op ExpressionList •
 
-    FUNC        shift, and go to state 93
-    STRUCT      shift, and go to state 57
-    ID          shift, and go to state 94
-    STRING_LIT  shift, and go to state 95
-    BINARY_LIT  shift, and go to state 96
-    HEX_LIT     shift, and go to state 97
-    FLOAT_LIT   shift, and go to state 98
-    DEC_LIT     shift, and go to state 99
-    '+'         shift, and go to state 100
-    '-'         shift, and go to state 101
-    '*'         shift, and go to state 102
-    '^'         shift, and go to state 103
-    '&'         shift, and go to state 104
-    '!'         shift, and go to state 105
-    '['         shift, and go to state 106
-    "("         shift, and go to state 107
-
-    $default  reduce using rule 176 (OPT_Condition)
-
-    PackageName     go to state 63
-    Expression      go to state 312
-    UnaryExpr       go to state 110
-    unary_op        go to state 111
-    PrimaryExpr     go to state 112
-    Operand         go to state 113
-    Literal         go to state 114
-    INT_LIT         go to state 115
-    BasicLit        go to state 116
-    OperandName     go to state 117
-    QualifiedIdent  go to state 118
-    CompositeLit    go to state 119
-    LiteralType     go to state 120
-    FunctionLit     go to state 121
-    Condition       go to state 313
-    OPT_Condition   go to state 314
-    TypeName        go to state 122
-    ArrayType       go to state 123
-    StructType      go to state 124
+    $default  reduce using rule 167 (Assignment)
 
 
 State 297
 
-  160 assign_op: add_op '=' .
+  157 LabeledStmt: Label ':' Statement •
 
-    $default  reduce using rule 160 (assign_op)
+    $default  reduce using rule 157 (LabeledStmt)
 
 
 State 298
 
-  161 assign_op: mul_op '=' .
+  103 ArgumentInBracketEnd: ELIPSIS ',' •
 
-    $default  reduce using rule 161 (assign_op)
+    $default  reduce using rule 103 (ArgumentInBracketEnd)
 
 
 State 299
 
-  159 Assignment: ExpressionList assign_op ExpressionList .
+  102 ArgumentInBracketFirst: Type ',' ExpressionList •
 
-    $default  reduce using rule 159 (Assignment)
+    $default  reduce using rule 102 (ArgumentInBracketFirst)
 
 
 State 300
 
-  149 LabeledStmt: Label ':' Statement .
+  129 LiteralValue: '{' ElementList ',' '}' •
 
-    $default  reduce using rule 149 (LabeledStmt)
+    $default  reduce using rule 129 (LiteralValue)
 
 
 State 301
 
-   94 ArgumentInBracketEnd: ELIPSIS ',' .
+  131 STAR_CM_KeyedElement: STAR_CM_KeyedElement ',' • KeyedElement
 
-    $default  reduce using rule 94 (ArgumentInBracketEnd)
+    FUNC        shift, and go to state 93
+    STRUCT      shift, and go to state 57
+    ID          shift, and go to state 94
+    STRING_LIT  shift, and go to state 95
+    BINARY_LIT  shift, and go to state 96
+    HEX_LIT     shift, and go to state 97
+    FLOAT_LIT   shift, and go to state 98
+    DEC_LIT     shift, and go to state 99
+    '^'         shift, and go to state 100
+    '&'         shift, and go to state 101
+    '+'         shift, and go to state 102
+    '-'         shift, and go to state 103
+    '*'         shift, and go to state 104
+    '!'         shift, and go to state 105
+    '['         shift, and go to state 106
+    "("         shift, and go to state 107
+    '{'         shift, and go to state 179
+
+    PackageName     go to state 63
+    Expression      go to state 230
+    UnaryExpr       go to state 110
+    unary_op        go to state 111
+    PrimaryExpr     go to state 112
+    Operand         go to state 113
+    Literal         go to state 114
+    INT_LIT         go to state 115
+    BasicLit        go to state 116
+    OperandName     go to state 117
+    QualifiedIdent  go to state 118
+    CompositeLit    go to state 119
+    LiteralType     go to state 120
+    LiteralValue    go to state 231
+    KeyedElement    go to state 312
+    Key             go to state 234
+    Element         go to state 235
+    FunctionLit     go to state 121
+    TypeName        go to state 122
+    ArrayType       go to state 123
+    StructType      go to state 124
 
 
 State 302
 
-   93 ArgumentInBracketFirst: Type ',' ExpressionList .
+   52 Expression: Expression • binary_op Expression
+  137 Element: Expression •
 
-    $default  reduce using rule 93 (ArgumentInBracketFirst)
+    "||"  shift, and go to state 149
+    "&&"  shift, and go to state 150
+    '|'   shift, and go to state 151
+    '^'   shift, and go to state 152
+    '&'   shift, and go to state 153
+    "=="  shift, and go to state 154
+    "!="  shift, and go to state 155
+    '>'   shift, and go to state 156
+    '<'   shift, and go to state 157
+    ">="  shift, and go to state 158
+    "<="  shift, and go to state 159
+    ">>"  shift, and go to state 160
+    "<<"  shift, and go to state 161
+    '+'   shift, and go to state 162
+    '-'   shift, and go to state 163
+    '*'   shift, and go to state 164
+    '/'   shift, and go to state 165
+    '%'   shift, and go to state 166
+
+    $default  reduce using rule 137 (Element)
+
+    binary_op  go to state 168
+    rel_op     go to state 169
+    add_op     go to state 170
+    mul_op     go to state 171
 
 
 State 303
 
-  120 LiteralValue: '{' ElementList ',' '}' .
+  138 Element: LiteralValue •
 
-    $default  reduce using rule 120 (LiteralValue)
+    $default  reduce using rule 138 (Element)
 
 
 State 304
 
-  122 STAR_CM_KeyedElement: STAR_CM_KeyedElement ',' . KeyedElement
+  133 KeyedElement: Key ':' Element •
 
-    FUNC        shift, and go to state 93
-    STRUCT      shift, and go to state 57
-    ID          shift, and go to state 236
-    STRING_LIT  shift, and go to state 95
-    BINARY_LIT  shift, and go to state 96
-    HEX_LIT     shift, and go to state 97
-    FLOAT_LIT   shift, and go to state 98
-    DEC_LIT     shift, and go to state 99
-    '+'         shift, and go to state 100
-    '-'         shift, and go to state 101
-    '*'         shift, and go to state 102
-    '^'         shift, and go to state 103
-    '&'         shift, and go to state 104
-    '!'         shift, and go to state 105
-    '['         shift, and go to state 106
-    "("         shift, and go to state 107
-    '{'         shift, and go to state 180
-
-    PackageName     go to state 63
-    Expression      go to state 238
-    UnaryExpr       go to state 110
-    unary_op        go to state 111
-    PrimaryExpr     go to state 112
-    Operand         go to state 113
-    Literal         go to state 114
-    INT_LIT         go to state 115
-    BasicLit        go to state 116
-    OperandName     go to state 117
-    QualifiedIdent  go to state 118
-    CompositeLit    go to state 119
-    LiteralType     go to state 120
-    LiteralValue    go to state 239
-    KeyedElement    go to state 315
-    Key             go to state 242
-    Element         go to state 243
-    FunctionLit     go to state 121
-    TypeName        go to state 122
-    ArrayType       go to state 123
-    StructType      go to state 124
+    $default  reduce using rule 133 (KeyedElement)
 
 
 State 305
 
-   52 Expression: Expression . binary_op Expression
-  129 Element: Expression .
+  211 Tag: STRING_LIT •
 
-    '+'   shift, and go to state 150
-    '-'   shift, and go to state 151
-    '*'   shift, and go to state 152
-    '/'   shift, and go to state 153
-    "||"  shift, and go to state 154
-    "&&"  shift, and go to state 155
-    "=="  shift, and go to state 156
-    "!="  shift, and go to state 157
-    '<'   shift, and go to state 158
-    "<="  shift, and go to state 159
-    '>'   shift, and go to state 160
-    ">="  shift, and go to state 161
-    '|'   shift, and go to state 162
-    '^'   shift, and go to state 163
-    '%'   shift, and go to state 164
-    "<<"  shift, and go to state 165
-    ">>"  shift, and go to state 166
-    '&'   shift, and go to state 167
-
-    $default  reduce using rule 129 (Element)
-
-    binary_op  go to state 169
-    rel_op     go to state 170
-    add_op     go to state 171
-    mul_op     go to state 172
+    $default  reduce using rule 211 (Tag)
 
 
 State 306
 
-  130 Element: LiteralValue .
+  209 FieldDecl: IdentifierList Type Tag •
 
-    $default  reduce using rule 130 (Element)
+    $default  reduce using rule 209 (FieldDecl)
 
 
 State 307
 
-  124 KeyedElement: Key ':' Element .
+   52 Expression: Expression • binary_op Expression
+  169 IfStmt: IF SimpleStmt ';' Expression • Block
+  170       | IF SimpleStmt ';' Expression • Block ELSE Block
+  171       | IF SimpleStmt ';' Expression • Block ELSE IfStmt
 
-    $default  reduce using rule 124 (KeyedElement)
+    "||"  shift, and go to state 149
+    "&&"  shift, and go to state 150
+    '|'   shift, and go to state 151
+    '^'   shift, and go to state 152
+    '&'   shift, and go to state 153
+    "=="  shift, and go to state 154
+    "!="  shift, and go to state 155
+    '>'   shift, and go to state 156
+    '<'   shift, and go to state 157
+    ">="  shift, and go to state 158
+    "<="  shift, and go to state 159
+    ">>"  shift, and go to state 160
+    "<<"  shift, and go to state 161
+    '+'   shift, and go to state 162
+    '-'   shift, and go to state 163
+    '*'   shift, and go to state 164
+    '/'   shift, and go to state 165
+    '%'   shift, and go to state 166
+    '{'   shift, and go to state 81
+
+    binary_op  go to state 168
+    rel_op     go to state 169
+    add_op     go to state 170
+    mul_op     go to state 171
+    Block      go to state 313
 
 
 State 308
 
-  207 Tag: STRING_LIT .
+  186 RangeClause: ExpressionList '=' RANGE • Expression
 
-    $default  reduce using rule 207 (Tag)
+    FUNC        shift, and go to state 93
+    STRUCT      shift, and go to state 57
+    ID          shift, and go to state 94
+    STRING_LIT  shift, and go to state 95
+    BINARY_LIT  shift, and go to state 96
+    HEX_LIT     shift, and go to state 97
+    FLOAT_LIT   shift, and go to state 98
+    DEC_LIT     shift, and go to state 99
+    '^'         shift, and go to state 100
+    '&'         shift, and go to state 101
+    '+'         shift, and go to state 102
+    '-'         shift, and go to state 103
+    '*'         shift, and go to state 104
+    '!'         shift, and go to state 105
+    '['         shift, and go to state 106
+    "("         shift, and go to state 107
+
+    PackageName     go to state 63
+    Expression      go to state 314
+    UnaryExpr       go to state 110
+    unary_op        go to state 111
+    PrimaryExpr     go to state 112
+    Operand         go to state 113
+    Literal         go to state 114
+    INT_LIT         go to state 115
+    BasicLit        go to state 116
+    OperandName     go to state 117
+    QualifiedIdent  go to state 118
+    CompositeLit    go to state 119
+    LiteralType     go to state 120
+    FunctionLit     go to state 121
+    TypeName        go to state 122
+    ArrayType       go to state 123
+    StructType      go to state 124
 
 
 State 309
 
-  205 FieldDecl: IdentifierList Type Tag .
+   52 Expression: Expression • binary_op Expression
+  177 Condition: Expression •
 
-    $default  reduce using rule 205 (FieldDecl)
+    "||"  shift, and go to state 149
+    "&&"  shift, and go to state 150
+    '|'   shift, and go to state 151
+    '^'   shift, and go to state 152
+    '&'   shift, and go to state 153
+    "=="  shift, and go to state 154
+    "!="  shift, and go to state 155
+    '>'   shift, and go to state 156
+    '<'   shift, and go to state 157
+    ">="  shift, and go to state 158
+    "<="  shift, and go to state 159
+    ">>"  shift, and go to state 160
+    "<<"  shift, and go to state 161
+    '+'   shift, and go to state 162
+    '-'   shift, and go to state 163
+    '*'   shift, and go to state 164
+    '/'   shift, and go to state 165
+    '%'   shift, and go to state 166
+
+    $default  reduce using rule 177 (Condition)
+
+    binary_op  go to state 168
+    rel_op     go to state 169
+    add_op     go to state 170
+    mul_op     go to state 171
 
 
 State 310
 
-   52 Expression: Expression . binary_op Expression
-  163 IfStmt: IF SimpleStmt ';' Expression . Block
-  164       | IF SimpleStmt ';' Expression . Block ELSE Block
-  165       | IF SimpleStmt ';' Expression . Block ELSE IfStmt
+  180 OPT_Condition: Condition •
 
-    '+'   shift, and go to state 150
-    '-'   shift, and go to state 151
-    '*'   shift, and go to state 152
-    '/'   shift, and go to state 153
-    "||"  shift, and go to state 154
-    "&&"  shift, and go to state 155
-    "=="  shift, and go to state 156
-    "!="  shift, and go to state 157
-    '<'   shift, and go to state 158
-    "<="  shift, and go to state 159
-    '>'   shift, and go to state 160
-    ">="  shift, and go to state 161
-    '|'   shift, and go to state 162
-    '^'   shift, and go to state 163
-    '%'   shift, and go to state 164
-    "<<"  shift, and go to state 165
-    ">>"  shift, and go to state 166
-    '&'   shift, and go to state 167
-    '{'   shift, and go to state 81
-
-    binary_op  go to state 169
-    rel_op     go to state 170
-    add_op     go to state 171
-    mul_op     go to state 172
-    Block      go to state 316
+    $default  reduce using rule 180 (OPT_Condition)
 
 
 State 311
 
-  182 RangeClause: ExpressionList '=' RANGE . Expression
+  178 ForClause: OPT_InitStmt ';' OPT_Condition • ';' OPT_PostStmt
 
-    FUNC        shift, and go to state 93
-    STRUCT      shift, and go to state 57
-    ID          shift, and go to state 94
-    STRING_LIT  shift, and go to state 95
-    BINARY_LIT  shift, and go to state 96
-    HEX_LIT     shift, and go to state 97
-    FLOAT_LIT   shift, and go to state 98
-    DEC_LIT     shift, and go to state 99
-    '+'         shift, and go to state 100
-    '-'         shift, and go to state 101
-    '*'         shift, and go to state 102
-    '^'         shift, and go to state 103
-    '&'         shift, and go to state 104
-    '!'         shift, and go to state 105
-    '['         shift, and go to state 106
-    "("         shift, and go to state 107
-
-    PackageName     go to state 63
-    Expression      go to state 317
-    UnaryExpr       go to state 110
-    unary_op        go to state 111
-    PrimaryExpr     go to state 112
-    Operand         go to state 113
-    Literal         go to state 114
-    INT_LIT         go to state 115
-    BasicLit        go to state 116
-    OperandName     go to state 117
-    QualifiedIdent  go to state 118
-    CompositeLit    go to state 119
-    LiteralType     go to state 120
-    FunctionLit     go to state 121
-    TypeName        go to state 122
-    ArrayType       go to state 123
-    StructType      go to state 124
+    ';'  shift, and go to state 315
 
 
 State 312
 
-   52 Expression: Expression . binary_op Expression
-  171 Condition: Expression .
+  131 STAR_CM_KeyedElement: STAR_CM_KeyedElement ',' KeyedElement •
 
-    '+'   shift, and go to state 150
-    '-'   shift, and go to state 151
-    '*'   shift, and go to state 152
-    '/'   shift, and go to state 153
-    "||"  shift, and go to state 154
-    "&&"  shift, and go to state 155
-    "=="  shift, and go to state 156
-    "!="  shift, and go to state 157
-    '<'   shift, and go to state 158
-    "<="  shift, and go to state 159
-    '>'   shift, and go to state 160
-    ">="  shift, and go to state 161
-    '|'   shift, and go to state 162
-    '^'   shift, and go to state 163
-    '%'   shift, and go to state 164
-    "<<"  shift, and go to state 165
-    ">>"  shift, and go to state 166
-    '&'   shift, and go to state 167
-
-    $default  reduce using rule 171 (Condition)
-
-    binary_op  go to state 169
-    rel_op     go to state 170
-    add_op     go to state 171
-    mul_op     go to state 172
+    $default  reduce using rule 131 (STAR_CM_KeyedElement)
 
 
 State 313
 
-  175 OPT_Condition: Condition .
+  169 IfStmt: IF SimpleStmt ';' Expression Block •
+  170       | IF SimpleStmt ';' Expression Block • ELSE Block
+  171       | IF SimpleStmt ';' Expression Block • ELSE IfStmt
 
-    $default  reduce using rule 175 (OPT_Condition)
+    ELSE  shift, and go to state 316
+
+    $default  reduce using rule 169 (IfStmt)
 
 
 State 314
 
-  172 ForClause: OPT_InitStmt ';' OPT_Condition . ';' OPT_PostStmt
+   52 Expression: Expression • binary_op Expression
+  186 RangeClause: ExpressionList '=' RANGE Expression •
 
-    ';'  shift, and go to state 318
+    "||"  shift, and go to state 149
+    "&&"  shift, and go to state 150
+    '|'   shift, and go to state 151
+    '^'   shift, and go to state 152
+    '&'   shift, and go to state 153
+    "=="  shift, and go to state 154
+    "!="  shift, and go to state 155
+    '>'   shift, and go to state 156
+    '<'   shift, and go to state 157
+    ">="  shift, and go to state 158
+    "<="  shift, and go to state 159
+    ">>"  shift, and go to state 160
+    "<<"  shift, and go to state 161
+    '+'   shift, and go to state 162
+    '-'   shift, and go to state 163
+    '*'   shift, and go to state 164
+    '/'   shift, and go to state 165
+    '%'   shift, and go to state 166
+
+    $default  reduce using rule 186 (RangeClause)
+
+    binary_op  go to state 168
+    rel_op     go to state 169
+    add_op     go to state 170
+    mul_op     go to state 171
 
 
 State 315
 
-  122 STAR_CM_KeyedElement: STAR_CM_KeyedElement ',' KeyedElement .
-
-    $default  reduce using rule 122 (STAR_CM_KeyedElement)
-
-
-State 316
-
-  163 IfStmt: IF SimpleStmt ';' Expression Block .
-  164       | IF SimpleStmt ';' Expression Block . ELSE Block
-  165       | IF SimpleStmt ';' Expression Block . ELSE IfStmt
-
-    ELSE  shift, and go to state 319
-
-    $default  reduce using rule 163 (IfStmt)
-
-
-State 317
-
-   52 Expression: Expression . binary_op Expression
-  182 RangeClause: ExpressionList '=' RANGE Expression .
-
-    '+'   shift, and go to state 150
-    '-'   shift, and go to state 151
-    '*'   shift, and go to state 152
-    '/'   shift, and go to state 153
-    "||"  shift, and go to state 154
-    "&&"  shift, and go to state 155
-    "=="  shift, and go to state 156
-    "!="  shift, and go to state 157
-    '<'   shift, and go to state 158
-    "<="  shift, and go to state 159
-    '>'   shift, and go to state 160
-    ">="  shift, and go to state 161
-    '|'   shift, and go to state 162
-    '^'   shift, and go to state 163
-    '%'   shift, and go to state 164
-    "<<"  shift, and go to state 165
-    ">>"  shift, and go to state 166
-    '&'   shift, and go to state 167
-
-    $default  reduce using rule 182 (RangeClause)
-
-    binary_op  go to state 169
-    rel_op     go to state 170
-    add_op     go to state 171
-    mul_op     go to state 172
-
-
-State 318
-
-  172 ForClause: OPT_InitStmt ';' OPT_Condition ';' . OPT_PostStmt
+  178 ForClause: OPT_InitStmt ';' OPT_Condition ';' • OPT_PostStmt
 
     FUNC        shift, and go to state 93
     STRUCT      shift, and go to state 57
@@ -5001,22 +4786,20 @@ State 318
     HEX_LIT     shift, and go to state 97
     FLOAT_LIT   shift, and go to state 98
     DEC_LIT     shift, and go to state 99
-    '+'         shift, and go to state 100
-    '-'         shift, and go to state 101
-    '*'         shift, and go to state 102
-    '^'         shift, and go to state 103
-    '&'         shift, and go to state 104
+    '^'         shift, and go to state 100
+    '&'         shift, and go to state 101
+    '+'         shift, and go to state 102
+    '-'         shift, and go to state 103
+    '*'         shift, and go to state 104
     '!'         shift, and go to state 105
     '['         shift, and go to state 106
     "("         shift, and go to state 107
 
-    '{'       reduce using rule 155 (EmptyStmt)
-    '{'       [reduce using rule 178 (OPT_PostStmt)]
-    $default  reduce using rule 155 (EmptyStmt)
+    $default  reduce using rule 163 (EmptyStmt)
 
     PackageName     go to state 63
-    ExpressionList  go to state 200
-    Expression      go to state 201
+    ExpressionList  go to state 199
+    Expression      go to state 200
     UnaryExpr       go to state 110
     unary_op        go to state 111
     PrimaryExpr     go to state 112
@@ -5029,60 +4812,60 @@ State 318
     CompositeLit    go to state 119
     LiteralType     go to state 120
     FunctionLit     go to state 121
-    SimpleStmt      go to state 320
-    EmptyStmt       go to state 207
-    ExpressionStmt  go to state 208
-    IncDecStmt      go to state 209
-    Assignment      go to state 210
-    OPT_PostStmt    go to state 321
-    PostStmt        go to state 322
+    SimpleStmt      go to state 317
+    EmptyStmt       go to state 206
+    ExpressionStmt  go to state 207
+    IncDecStmt      go to state 208
+    Assignment      go to state 209
+    OPT_PostStmt    go to state 318
+    PostStmt        go to state 319
     TypeName        go to state 122
     ArrayType       go to state 123
     StructType      go to state 124
 
 
-State 319
+State 316
 
-  164 IfStmt: IF SimpleStmt ';' Expression Block ELSE . Block
-  165       | IF SimpleStmt ';' Expression Block ELSE . IfStmt
+  170 IfStmt: IF SimpleStmt ';' Expression Block ELSE • Block
+  171       | IF SimpleStmt ';' Expression Block ELSE • IfStmt
 
-    IF   shift, and go to state 192
+    IF   shift, and go to state 191
     '{'  shift, and go to state 81
 
-    Block   go to state 323
-    IfStmt  go to state 324
+    Block   go to state 320
+    IfStmt  go to state 321
+
+
+State 317
+
+  184 PostStmt: SimpleStmt •
+
+    $default  reduce using rule 184 (PostStmt)
+
+
+State 318
+
+  178 ForClause: OPT_InitStmt ';' OPT_Condition ';' OPT_PostStmt •
+
+    $default  reduce using rule 178 (ForClause)
+
+
+State 319
+
+  182 OPT_PostStmt: PostStmt •
+
+    $default  reduce using rule 182 (OPT_PostStmt)
 
 
 State 320
 
-  180 PostStmt: SimpleStmt .
+  170 IfStmt: IF SimpleStmt ';' Expression Block ELSE Block •
 
-    $default  reduce using rule 180 (PostStmt)
+    $default  reduce using rule 170 (IfStmt)
 
 
 State 321
 
-  172 ForClause: OPT_InitStmt ';' OPT_Condition ';' OPT_PostStmt .
+  171 IfStmt: IF SimpleStmt ';' Expression Block ELSE IfStmt •
 
-    $default  reduce using rule 172 (ForClause)
-
-
-State 322
-
-  177 OPT_PostStmt: PostStmt .
-
-    $default  reduce using rule 177 (OPT_PostStmt)
-
-
-State 323
-
-  164 IfStmt: IF SimpleStmt ';' Expression Block ELSE Block .
-
-    $default  reduce using rule 164 (IfStmt)
-
-
-State 324
-
-  165 IfStmt: IF SimpleStmt ';' Expression Block ELSE IfStmt .
-
-    $default  reduce using rule 165 (IfStmt)
+    $default  reduce using rule 171 (IfStmt)

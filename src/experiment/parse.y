@@ -7,8 +7,22 @@ int yydebug = 1;
 %define parse.trace
 %token CASE BREAK FUNC VARCASE STRUCT RETURN ELSE GOTO PACKAGE CONST IF RANGE CONTINUE FOR SPACE TAB ID VAR INT8 INT16 INT32 INT64 UINT8 UINT16 UINT32 UINT64 FLOAT32 FLOAT64 BYTE TRUE FALSE STRING_LIT BINARY_LIT HEX_LIT FLOAT_LIT DEC_LIT IMPORT STRING ELIPSIS SELECT GO FALLTHROUGH DEFAULT TYPE_TOK
 
+%left ','
+%right '=' "+=" "-=" "|=" "^=" "*=" "/=" "%=" "<<=" ">>=" "&="
+%left "||"
+%left "&&"
+%left '|'
+%left '^'
+%left '&'
+%left "==" "!="
+%left '>' '<' ">=" "<="
+%left ">>" "<<"
 %left '+' '-'
-%left '*' '/'
+%left '*' '/' '%'
+%right '!'
+
+%left EXPR
+%right UNARY
 
 %%
 /* First non-terminal symbol defined is taken as the start symbol, so ours is SourceFile*/
@@ -101,50 +115,80 @@ VarSpec          : IdentifierList "=" ExpressionList ;
 
 ExpressionList : Expression STAR_CM_EXP ;
 
-Expression : UnaryExpr
-|            Expression binary_op Expression ;
+Expression : UnaryExpr %prec UNARY
+|            Expression binary_op Expression %prec EXPR ;
 
 UnaryExpr  : PrimaryExpr
 |            unary_op UnaryExpr ;
 
 /* TODO: Remove extra operators that we do not support */
 /* TODO: Replace <= to LE and ;... */
-binary_op  : "||" ;
-| 	     "&&" ;
-| 	     rel_op ;
-|            add_op ;
+binary_op  : "||"  
+| 	     "&&" 
+| 	     rel_op 
+|            add_op 
 | 	     mul_op ;
 
-rel_op     : "==" ;
-|     	     "!=" ;
-|            '<' ;
-|            "<=" ;
-|            '>' ;
-|            ">=" ;
-
-add_op     : '+' ;
-|            '-' ;
-|            '|' ;
+rel_op     : "==" 
+|     	     "!=" 
+|            '<' 
+|            "<=" 
+|            '>' 
+|            ">=" 
+;
+add_op     : '+'
+|            '-' 
+|            '|' 
 |            '^' ;
 
-mul_op     : '*' ;
-|            '/' ;
-|            '%' ;
-|            "<<" ;
-|            ">>" ;
+assign_op  : "+=" 
+|           "-="
+|"|="
+|"^=" 
+|"*="
+|"/="
+|"%="
+|"<<="
+|">>="
+|"&="
+;
+mul_op     : '*' 
+|            '/' 
+|            '%' 
+|            "<<" 
+|            ">>" 
 |            '&' ;
 
-unary_op   : '+' ;
-|            '-' ;
-|            '!' ;
-|            '^' ;
-|            '*' ;
-|            '&' ;
+unary_op   : '+'
+|            '-'
+|            '!'
+|            '^'
+|            '*'
+|            '&'
+
+/*
+parse.y: warning: reduce/reduce conflict on token '.' [-Wcounterexamples]
+  Example: ID • '.' ID
+  First reduce derivation
+    PrimaryExpr
+    ↳ 82: Operand
+          ↳ 98: OperandName
+                ↳ 110: QualifiedIdent
+                       ↳ 111: PackageName '.' ID
+                              ↳ 3: ID •
+  Second reduce derivation
+    PrimaryExpr
+    ↳ 84: PrimaryExpr             Selector
+          ↳ 82: Operand           ↳ 86: '.' ID
+                ↳ 98: OperandName
+                      ↳ 109: ID •
+
+*/
 
 PrimaryExpr : Operand ;
 |             PrimaryExpr Index;
-|             PrimaryExpr Selector ;
-|             PrimaryExpr Arguments ;
+|             PrimaryExpr Selector 
+|             PrimaryExpr Arguments;
 
 Selector       : '.' ID ;
 Index          : '[' Expression ']' ;
@@ -153,10 +197,34 @@ Arguments      : '(' ')'
 |                '(' ArgumentInBracket ')'
 ;
 
+/*
+parse.y: warning: shift/reduce conflict on token ID [-Wcounterexamples]
+  Example: '*' • ID
+  Shift derivation
+    ArgumentInBracketFirst
+    ↳ 92: Type
+          ↳ 192: TypeLit
+                 ↳ 198: PointerType
+                        ↳ 207: '*' BaseType
+                                   ↳ 208: Type
+                                          ↳ 191: TypeName
+                                                 ↳ 194: • ID
+  Reduce derivation
+    ArgumentInBracketFirst
+    ↳ 91: ExpressionList
+          ↳ 50: Expression                                            STAR_CM_EXP
+                ↳ 51: UnaryExpr                                       ↳ 50: ε
+                      ↳ 54: unary_op    UnaryExpr
+                            ↳ 80: '*' • ↳ 53: PrimaryExpr
+                                              ↳ 82: Operand
+                                                    ↳ 99: OperandName
+                                                          ↳ 110: ID
+
+*/
+
 ArgumentInBracket : ArgumentInBracketFirst ArgumentInBracketEnd ;
 
-ArgumentInBracketFirst :  ExpressionList
-|                         Type
+ArgumentInBracketFirst : Type
 |                         Type ',' ExpressionList
 ;
 
@@ -186,7 +254,7 @@ INT_LIT : DEC_LIT
 |         HEX_LIT
 ;
 
-BasicLit    : INT_LIT;
+BasicLit    : INT_LIT
 |             FLOAT_LIT
 |             STRING_LIT
 ;
@@ -220,8 +288,7 @@ KeyedElement  : Key ':' Element
 |               Element
 ;
 
-Key           : ID
-|               Expression
+Key           : Expression
 |               LiteralValue
 ;
 
@@ -275,9 +342,8 @@ ExpressionStmt	:	Expression ;
 IncDecStmt		:	Expression "++"
 |					Expression "--" ;
 
-Assignment		:	ExpressionList assign_op ExpressionList ;
-assign_op		:	add_op '='
-|					mul_op '=' ;
+Assignment		:	ExpressionList assign_op ExpressionList;
+
 
 IfStmt			:	IF Expression Block
 |					IF SimpleStmt ';' Expression Block
@@ -300,15 +366,27 @@ Condition : Expression ;
 ForClause : OPT_InitStmt ';' OPT_Condition ';' OPT_PostStmt;
 
 OPT_InitStmt : InitStmt
-|              %empty
 ;
 
 OPT_Condition : Condition
 |              %empty
 ;
 
+/*
+                                                                                                                                                                                                ↳ 120: KeyedElement STAR_CM_KeyedElement •
+parse.y: warning: reduce/reduce conflict on token '{' [-Wcounterexamples]
+  Example: •
+  First reduce derivation
+    OPT_PostStmt
+    ↳ 175: PostStmt
+           ↳ 178: SimpleStmt
+                  ↳ 149: EmptyStmt
+                         ↳ 153: ε •
+  Second reduce derivation
+    OPT_PostStmt
+    ↳ 176: ε •
+*/
 OPT_PostStmt : PostStmt
-|              %empty
 ;
 
 InitStmt : SimpleStmt ;
@@ -396,8 +474,9 @@ func(a, b int, z float32) (bool)
 FunctionType   : FUNC Signature ;
 Signature		: 	Parameters
 |					Parameters Result ;
-Result			: 	Parameters
-|					Type ;
+Result			: 	Parameters  
+|                   TypeName
+|                   TypeLit ;
 
 Parameters		: 	'(' ')'
 |					'(' ParameterList  ')'
