@@ -32,133 +32,126 @@ int yydebug = 1;
 /* Name in order : {IMPORT ';'} -> STAR_Import_SC */
 /* { ',' ID} -> STAR_CM_ID */
 
-SourceFile: PackageClause ';' STAR_ImportDecl_SC STAR_TopLevelDecl_SC;
+SourceFile: PackageClause STAR_ImportDecl STAR_TopLevelDecl;
 
-PackageClause  : PACKAGE PackageName ; /* package math */
+PackageClause  : PACKAGE PackageName ';'; /* package math */
 PackageName    : ID ; /* math */
 
-
-/* CHANGE: Use comma in place of Semi colon */
-ImportDecl       : IMPORT ImportSpec /* import "fmt" */
-|                  IMPORT '(' STAR_ImportSpec_SC')' ; /* import ( "fmt", "mth",) ; */
-
+/* Simplest import declaration : import "fmt"; */
+ImportDecl       : IMPORT ImportSpec ';';
 ImportSpec       : ImportPath /* "llvm/dir" */
-|                  '.' ImportPath /* . "llvm/dir" */
-|                  PackageName ImportPath ; /* math "llvm/dir" ;  cmd "llvm/cmd" ; "llvm" "dir" */
-
 ImportPath       : STRING_LIT ; /* "fmt" */
 
 TopLevelDecl     : Declaration
-|                  FunctionDecl;
+|                  FunctionDecl
+;
 
-/******************* FUCK YOU BISON ********************/
+STAR_TopLevelDecl : STAR_TopLevelDecl TopLevelDecl
+|                   %empty
+;
 
-STAR_TopLevelDecl_SC : STAR_TopLevelDecl_SC TopLevelDecl ';'
-|                   %empty ;
-
-STAR_ImportDecl_SC : STAR_ImportDecl_SC ImportDecl ';'
-|                 %empty ;
-
-STAR_ImportSpec_SC : STAR_ImportSpec_SC ImportSpec ';'
-|                 %empty ;
+STAR_ImportDecl : STAR_ImportDecl ImportDecl
+|                 %empty
+;
 
 STAR_CM_ID: STAR_CM_ID ',' ID
-|                 %empty ;
+|                 %empty
+;
 
-STAR_ConstSpec_SC : STAR_ConstSpec_SC ConstSpec ';'
-|                 %empty ;
-STAR_VarSpec_SC   : STAR_VarSpec_SC VarSpec ';'
-|                 %empty ;
 STAR_CM_EXP: STAR_CM_EXP ',' Expression
-|                 %empty ;
-STAR_TypeSpec_SC   : STAR_TypeSpec_SC ';'
-|                 %empty ;
+|                 %empty
+;
 
 /* this same as if StatementList */
-STAR_Statement_SC	: STAR_Statement_SC Statement ';'
-|					%empty;
+STAR_Statement : STAR_Statement Statement
+|					%empty
+;
 
 
 STAR_CM_ParameterDecl	: STAR_CM_ParameterDecl ',' ParameterDecl
-|					%empty;
+|					%empty
+;
 
 STAR_FieldDecl_SC : STAR_FieldDecl_SC FieldDecl ';'
-|                 %empty ;
+|                 %empty
+;
 /************************** Declarations **************************/
 
+/* NOTE: No type declarations allowed for now */
 Declaration      : ConstDecl
-|                  TypeDecl
-|                  VarDecl ; /* const ... */
+|                  VarDecl
+;
+
 
 /************** Constant Declaration ******************/
 
-ConstDecl        : CONST ConstSpec /* const a, b, c, d ; */
-|                  CONST '(' STAR_ConstSpec_SC ')' ; /* const  ( a, b, c , d ; e, f, g, h); */
+ConstDecl        : CONST ConstSpec ';' ;/* const a, b, c, d ; */
 ConstSpec        : IdentifierList ;
 IdentifierList   : ID STAR_CM_ID  ; /* a, b, c */
 
-/************** Type Declaration ******************/
-TypeDecl         : TYPE_TOK TypeSpec
-|                  TYPE_TOK '(' STAR_TypeSpec_SC ')';
-TypeSpec         : AliasDecl
-|                  TypeDef ;
-AliasDecl        : ID '=' Type ;
-TypeDef          : ID Type ;
-
 /************* Variable Declaration ******************/
 
-VarDecl          : VAR VarSpec
-|                  VAR '(' STAR_VarSpec_SC ')' ;
-VarSpec          : IdentifierList "=" ExpressionList ;
+/* making comma and type compulsory */
+VarDecl          : VAR VarSpec ';' ; /* var i int; var U, V, W float32; var k int = 0 ; */
+VarSpec          : IdentifierList Type ;/* Only declaration */
+|                  IdentifierList Type "=" ExpressionList  /* Declaration with initialization; those not initialized should be set to their zero values */
+;
 
 /************* Expressions ******************/
 
 ExpressionList : Expression STAR_CM_EXP ;
 
 Expression : UnaryExpr %prec UNARY
-|            Expression binary_op Expression %prec EXPR ;
+|            Expression binary_op Expression %prec EXPR
+;
 
 UnaryExpr  : PrimaryExpr
-|            unary_op UnaryExpr ;
+|            unary_op UnaryExpr
+;
 
 /* TODO: Remove extra operators that we do not support */
 /* TODO: Replace <= to LE and ;... */
 binary_op  : "||"
 | 	     "&&"
 | 	     rel_op
-|            add_op
-| 	     mul_op ;
+|          add_op
+| 	     mul_op
+;
 
 rel_op     : "=="
-|     	     "!="
+|     	 "!="
 |            '<'
 |            "<="
 |            '>'
 |            ">="
 ;
+
 add_op     : '+'
 |            '-'
 |            '|'
-|            '^' ;
+|            '^'
+;
 
 assign_op  : PLUS_EQ
-|           MINUS_EQ
-|OR_EQ
-|XOR_EQ
-|MUL_EQ
-|DIV_EQ
-|MOD_EQ
-|LS_EQ
-|RS_EQ
-|AND_EQ
-|'='
+|            MINUS_EQ
+|            OR_EQ
+|            XOR_EQ
+|            MUL_EQ
+|            DIV_EQ
+|            MOD_EQ
+|            LS_EQ
+|            RS_EQ
+|            AND_EQ
+|            '='
 ;
+
 mul_op     : '*'
 |            '/'
 |            '%'
 |            "<<"
 |            ">>"
-|            '&' ;
+|            '&'
+;
 
 unary_op   : '+'
 |            '-'
@@ -166,6 +159,7 @@ unary_op   : '+'
 |            '^'
 |            '*'
 |            '&'
+;
 
 /*
 parse.y: warning: reduce/reduce conflict on token '.' [-Wcounterexamples]
@@ -186,16 +180,20 @@ parse.y: warning: reduce/reduce conflict on token '.' [-Wcounterexamples]
 
 */
 
-PrimaryExpr : Operand ;
-|             PrimaryExpr Index;
+PrimaryExpr : Operand
+|             PrimaryExpr Index
 |             PrimaryExpr Selector
-|             PrimaryExpr Arguments;
+|             PrimaryExpr Arguments
+;
 
 Selector       : '.' ID ;
 Index          : '[' Expression ']' ;
 
-Arguments      : '(' ')'
-|                '(' ArgumentInBracket ')'
+/* No optional ELIPSIS and comma at the end */
+Arguments      : '(' ')' /* () */
+|                '(' ExpressionList ')' /* (a, b, c + d) */
+|                '(' Type ')' /* ( int )*/
+|                '(' Type ',' ExpressionList ')' /* ( int, a, b, c + d) */
 ;
 
 /*
@@ -226,28 +224,25 @@ parse.y: warning: shift/reduce conflict on token ID [-Wcounterexamples]
 ArgumentInBracket : ArgumentInBracketFirst ArgumentInBracketEnd ;
 
 ArgumentInBracketFirst : Type
-|                         Type ',' ExpressionList
-;
+|                         Type ',' ExpressionList ;
 
 ArgumentInBracketEnd : ELIPSIS ','
 |                      ELIPSIS
 |                      %empty
 ;
+
 /*Arugument removed CM*/
 /* TODO: Literal -> token name */
-Operand     : Literal ;
-|             OperandName ;
-|             "(" Expression ")" ;
+Operand     : Literal
+|             OperandName
+|             "(" Expression ")"
+;
 
 /************************** Literals **************************/
 
-/* TODO: Remove composite literal and what they do even mean? */
-Literal     : BasicLit
-|             CompositeLit
-|             FunctionLit
-;
+/* Removed Function literals and composite literals for now */
+Literal     : BasicLit ;
 
-/* TODO: Replace by token names  */
 /* TODO: get integer value using strtol() function by giving appropriate base in lexer */
 INT_LIT : DEC_LIT
 |         BINARY_LIT
@@ -262,16 +257,9 @@ BasicLit    : INT_LIT
 OperandName : ID
 |             QualifiedIdent
 ;
-/* TODO: How are we going to use qualified IDs */
+
 QualifiedIdent : PackageName '.' ID ;
 
-
-CompositeLit  : LiteralType LiteralValue ;
-LiteralType   : StructType
-|               ArrayType
-|               '[' ELIPSIS ']' ElementType
-|               TypeName
-;
 
 LiteralValue  : '{' '}'
 |               '{' ElementList '}'
@@ -282,7 +270,6 @@ STAR_CM_KeyedElement : STAR_CM_KeyedElement ',' KeyedElement
 |                      %empty
 ;
 
-/* add colon as token */
 KeyedElement  : Key ':' Element
 |               Element
 ;
@@ -295,22 +282,21 @@ Element       : Expression
 |               LiteralValue
 ;
 
-/* TODO: If we don't use function literals remove the corresponding rules */
-FunctionLit : FUNC Signature FunctionBody ;
-
 /************************** Function Declaration **************************/
 FunctionDecl	:	FUNC FunctionName Signature  FunctionBody
 |					FUNC FunctionName Signature	;
 
 FunctionName 	:	ID;
 FunctionBody	:	Block ;
-Block			:	'{' STAR_Statement_SC '}' ;
+/* Use semicolon at the lowest level to avoid confusion */
+Block			:	'{' STAR_Statement '}'
 /* no ... operator */
 
 
 
 /************** Statement ***************/
 
+/* Statement should end with a semicolon : ensure this per case*/
 Statement 		: 	Declaration
 |           		LabeledStmt
 |           		SimpleStmt
@@ -322,18 +308,19 @@ Statement 		: 	Declaration
 |           		FallthroughStmt
 |           		Block
 |           		IfStmt
-|           		ForStmt ;
+|           		ForStmt
+;
 
-/* removed switchstmt, SelectStmt */
 
+/* Error: log.Panic("error encountered") */
 LabeledStmt		: 	Label ':' Statement ;
 Label			:	ID ;
 
 SimpleStmt		:	EmptyStmt
-|					ExpressionStmt
-|					IncDecStmt
-|					Assignment ;
-/*|					ShortVarDecl ;	*/
+|				ExpressionStmt
+|				IncDecStmt
+|				Assignment
+;
 
 /* Create new tokens for ++ and -- */
 /*
@@ -356,12 +343,13 @@ Productions leading up to the conflict state found.  Still finding a possible un
                                                   ↳ 125: TypeName                ↳ 126: '{' '}'
 
 */
-EmptyStmt		: 	%empty ;
+EmptyStmt		: 	%empty ; /* ; */
 ExpressionStmt	:	Expression ;
 IncDecStmt		:	Expression INCMNT
-|					Expression DECMNT ;
+|				Expression DECMNT
+;
 
-Assignment		:	ExpressionList assign_op ExpressionList;
+Assignment		:	ExpressionList assign_op ExpressionList ;
 
 
 IfStmt			:	IF Expression Block
@@ -377,7 +365,6 @@ ForStmt : FOR Block
 /* statement that comes after a for statement */
 ForStmtAfter : Condition
 |              ForClause
-|              RangeClause
 ;
 
 Condition : Expression ;
@@ -385,6 +372,7 @@ Condition : Expression ;
 ForClause : OPT_InitStmt ';' OPT_Condition ';' OPT_PostStmt;
 
 OPT_InitStmt : InitStmt
+|              %empty
 ;
 
 OPT_Condition : Condition
@@ -406,17 +394,13 @@ parse.y: warning: reduce/reduce conflict on token '{' [-Wcounterexamples]
     ↳ 176: ε •
 */
 OPT_PostStmt : PostStmt
+|              %empty
 ;
 
 InitStmt : SimpleStmt ;
 PostStmt : SimpleStmt ;
 
 
-/* TODO: Remove range clause related rules if we don't support them */
-/* NOTE: Removed short variable declaration */
-RangeClause : RANGE Expression
-|             ExpressionList '=' RANGE Expression
-;
 
 /* TOKEN: GO */
 GoStmt : GO Expression ;
@@ -425,19 +409,19 @@ ReturnStmt : RETURN ExpressionList
 |            RETURN
 ;
 
-BreakStmt : BREAK Label
-|           BREAK
+BreakStmt : BREAK Label ';'
+|           BREAK ';'
 ;
 
-ContinueStmt : CONTINUE Label
-|              CONTINUE
+ContinueStmt : CONTINUE Label ';'
+|              CONTINUE ';'
 ;
 
 /* TODO: goto is bad, remove if we don't support */
-GotoStmt : GOTO Label ;
+GotoStmt : GOTO Label ';';
 
 /* TODO: remove fallthrough if don't need it */
-FallthroughStmt : FALLTHROUGH;
+FallthroughStmt : FALLTHROUGH ';';
 
 /************************Types******************************/
 
@@ -512,8 +496,6 @@ void yyerror(char* s){
 }
 
 int main(){
-    while(1){
-        yyparse();
-    }
+    yyparse();
     return 0;
 }
