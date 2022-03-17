@@ -1,11 +1,11 @@
 import re
 
 try :
-    file1 = open('parse.gv', 'r')
+    file1 = open('parser.gv', 'r')
 except FileNotFoundError:
-    file1 = open('parse.dot', 'r')
+    file1 = open('parser.dot', 'r')
 
-file2 = open('new_parse.gv', 'x')
+file2 = open('new_parser.gv', 'x')
 
 lines = file1.readlines()
 
