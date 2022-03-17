@@ -1,6 +1,10 @@
 import re
 
-file1 = open('parse.gv', 'r')
+try :
+    file1 = open('parse.gv', 'r')
+except FileNotFoundError:
+    file1 = open('parse.dot', 'r')
+
 file2 = open('new_parse.gv', 'x')
 
 lines = file1.readlines()
