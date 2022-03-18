@@ -1,21 +1,31 @@
-SOURCE_DIR="./src"
-TEST_DIR="./test"
+all:
+	bison -d src/parser.y
+	bison --graph src/parser.y
+	flex src/lex.l
+	mkdir -p bin
+	g++ lex.yy.c parser.tab.c -o bin/parser
+	chmod +x bin/parser
 
-all: build
+generate_graph:
+	python3 src/label.py
+	sfdp -x -Goverlap=scale -Tpng new_parser.gv > automata.png
 
-build: src/lex.l 
-	flex -+ -o src/lex.yy.cc src/lex.l
-	g++ src/lex.yy.cc -lfl -o src/lex.o
+test_go:
+	./bin/parser < ./test/parser_test_file/test1.go
+	./bin/parser < ./test/parser_test_file/test2.go
+	./bin/parser < ./test/parser_test_file/test3.go
+	./bin/parser < ./test/parser_test_file/test4.go
+	./bin/parser < ./test/parser_test_file/test5.go
 
+clean_graph:
+	rm automata.png
+
+# for running all the commands ignoring the errors use `make clean -i`
 clean:
-	rm -f $(SOURCE_DIR)/*.o
-	rm -rf $(TEST_DIR)/lex/output
-
-# TODOs: 
-# 1. Automate testing: write input, output and compare automatically
-#                       ( ? Use github actions )
-# 2. Format files: Avoids unnecessary changes. Use:
-#                  a) TERMINAL: clang-format -i FILE_TO_FORMAT
-#                  b) VSCODE: Install clang-format extension
-#                             Configure default formatter as clang-format
-#                             Ctrl + Shift + I
+	rm lex.yy.c
+	rm parser.tab.c
+	rm parser.tab.h
+	rm bin/parser
+	rm new_parser.gv
+	rm parser.gv
+	rm automata.png
