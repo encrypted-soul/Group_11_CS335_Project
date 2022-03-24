@@ -20,12 +20,12 @@ test_go:
 clean_graph:
 	rm automata.png
 
-# for running all the commands ignoring the errors use `make clean -i`
 clean:
-	rm lex.yy.c
-	rm parser.tab.c
-	rm parser.tab.h
-	rm bin/parser
-	rm new_parser.gv
-	rm parser.gv
-	rm automata.png
+	rm -f lex.yy.c
+	rm -f parser.tab.c
+	rm -f parser.tab.h
+	rm -f bin/parser
+	rm -f new_parser.gv
+	rm -f parser.gv
+	rm -f parser.dot
+	rm -f automata.png

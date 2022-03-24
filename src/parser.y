@@ -1,38 +1,53 @@
 %{
 #include <bits/stdc++.h>
 #include "parser.tab.h"
+#include "src/ast.hpp"
 using namespace std;
+using namespace AST;
 
 int yylex(void);
 void yyerror (const char *s) {fprintf (stderr, "%s\n", s);}
 
 extern int yylineno;
+extern char* yytext;
+extern astnode *theprogram;
 
 %}
 
 // error-verbose
 %define parse.error verbose
 
+%union {
+	int intconst;
+	float floatconst;
+	string stringconst;
+	astnode *node;
+}
+
 %token    PACKAGE IMPORT FUNC BREAK CASE CONST CONTINUE DEFAULT
 %token    ELSE FOR GO IF RANGE RETURN STRUCT SWITCH TYPE VAR VAR_TYPE
-%token    BOOL_CONST NIL_VAL IDENTIFIER BYTE STRING ELLIPSIS
+%token    BOOL_CONST NIL_VAL
+%token <stringconst> IDENTIFIER
+%token    BYTE STRING
+%token    ELLIPSIS
 %token    SHL SHR INC DEC
-%token    INTEGER
-%token     FLOAT
-%left    ADD SUB MUL QUO REM
+%token <intconst> INTEGER
+%token <floatconst> FLOAT
+%left     ADD SUB MUL QUO REM
 %right    ASSIGN AND NOT DEFINE AND_NOT
-%left    OR XOR ARROW
+%left     OR XOR ARROW
 %right    ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN QUO_ASSIGN REM_ASSIGN
 %right    AND_ASSIGN OR_ASSIGN XOR_ASSIGN
 %right    SHL_ASSIGN SHR_ASSIGN AND_NOT_ASSIGN COLON
-%left    LAND LOR EQL NEQ LEQ GEQ SEMICOLON
-%left    GTR LSS LPAREN RPAREN LBRACE RBRACE LBRACK RBRACK COMMA PERIOD
+%left     LAND LOR EQL NEQ LEQ GEQ SEMICOLON
+%left     GTR LSS LPAREN RPAREN LBRACE RBRACE LBRACK RBRACK COMMA PERIOD
 
+%type <node> StartFile PackageClause ImportDeclStar TopLevelDeclStar
 %%
 
 /* START OF FILE */
 StartFile:
-    PackageClause SEMICOLON ImportDeclStar TopLevelDeclStar
+    PackageClause SEMICOLON ImportDeclStar TopLevelDeclStar { theprogram = create_astnode("None","StartFile",vector<astnode*>{$1,$3,$4});}
     ;
 
 Block:

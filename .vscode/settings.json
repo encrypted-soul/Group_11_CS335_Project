@@ -1,0 +1,6 @@
+{
+	"files.associations": {
+		"ast.hpp": "c",
+		"string": "cpp"
+	}
+}

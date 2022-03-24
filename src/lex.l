@@ -1,6 +1,7 @@
 %{
-	#include<stdio.h>
+	#include<bits/stdc++.h>
 	#include "parser.tab.h"
+        #include "src/ast.hpp"
 
 %}
 %option yylineno
