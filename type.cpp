@@ -8,10 +8,18 @@ string DefinedType::getType() {
   return basename;  // int, float , ...
 }
 
+Type *DefinedType::copy() {
+  return (new DefinedType(*this));
+}
+
 string ArrayType::getType() {
   // "[" ArrayLength "]" ElementType
   // e.g. [10]int, [10][11]int
   return "[" + to_string(arrayLength) + "]" + elementType->getType();
+}
+
+Type *ArrayType::clone() {
+  return (new ArrayType(*this));
 }
 
 string StructType::getType() {
@@ -30,6 +38,10 @@ string StructType::getType() {
   return structTypeName;
 }
 
+Type* StructType::copy() {
+  return (new StructType(*this));
+}
+
 string FunctionType::getType() {
   // returnType( argType1, argType2, ....)
   string funcTypeName;
@@ -43,6 +55,10 @@ string FunctionType::getType() {
   funcTypeName += ")";
 
   return funcTypeName;
+}
+
+Type* FunctionType::copy() {
+  return (new FunctionType(*this));
 }
 
 string PointerType::getType(){

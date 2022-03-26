@@ -20,7 +20,7 @@ class Type{
 		virtual string getType();
 		virtual Type *copy();
 		Type *next = NULL; // type linked list
-		TypeClass typeClass;
+		TypeClass typeClass = NULL_TYPE;
 };
 
 class DefinedType : Type{
@@ -65,3 +65,5 @@ class PointerType: Type{
 	PointerType(Type*);
 	Type* copy();
 };
+
+#endif
