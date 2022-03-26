@@ -1,26 +1,32 @@
 %{
 #include <bits/stdc++.h>
-#include "parser.tab.h"
-#include "src/ast.hpp"
+#include "parser.tab.hpp"
+
 using namespace std;
-using namespace AST;
 
 int yylex(void);
 void yyerror (const char *s) {fprintf (stderr, "%s\n", s);}
 
 extern int yylineno;
 extern char* yytext;
-extern astnode *theprogram;
+astnode *theprogram;
 
 %}
 
 // error-verbose
 %define parse.error verbose
 
+// These must go into paser.tab.h
+%code requires{
+        #include <bits/stdc++.h>
+	#include "src/ast.h"
+	using namespace std;
+}
+
 %union {
 	int intconst;
 	float floatconst;
-	string stringconst;
+	char* stringconst;
 	astnode *node;
 }
 
@@ -43,11 +49,12 @@ extern astnode *theprogram;
 %left     GTR LSS LPAREN RPAREN LBRACE RBRACE LBRACK RBRACK COMMA PERIOD
 
 %type <node> StartFile PackageClause ImportDeclStar TopLevelDeclStar
+
 %%
 
 /* START OF FILE */
 StartFile:
-    PackageClause SEMICOLON ImportDeclStar TopLevelDeclStar { theprogram = create_astnode("None","StartFile",vector<astnode*>{$1,$3,$4});}
+    PackageClause SEMICOLON ImportDeclStar TopLevelDeclStar { theprogram = create_astnode("StartFile", "int",{$1,$3,$4});}
     ;
 
 Block:
@@ -508,5 +515,4 @@ AlternatePackageName:
 int main (int argc, char **argv) {
 
 	yyparse ( );
-
 }

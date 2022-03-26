@@ -35,8 +35,8 @@
    especially those whose name start with YY_ or yy_.  They are
    private implementation details that can be changed or removed.  */
 
-#ifndef YY_YY_PARSER_TAB_H_INCLUDED
-# define YY_YY_PARSER_TAB_H_INCLUDED
+#ifndef YY_YY_PARSER_TAB_HPP_INCLUDED
+# define YY_YY_PARSER_TAB_HPP_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -44,6 +44,14 @@
 #if YYDEBUG
 extern int yydebug;
 #endif
+/* "%code requires" blocks.  */
+#line 20 "src/parser.ypp"
+
+        #include <bits/stdc++.h>
+	#include "src/ast.h"
+	using namespace std;
+
+#line 55 "parser.tab.hpp"
 
 /* Token kinds.  */
 #ifndef YYTOKENTYPE
@@ -135,14 +143,14 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 20 "src/parser.y"
+#line 26 "src/parser.ypp"
 
 	int intconst;
 	float floatconst;
-	string stringconst;
+	char* stringconst;
 	astnode *node;
 
-#line 146 "parser.tab.h"
+#line 154 "parser.tab.hpp"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -155,4 +163,4 @@ extern YYSTYPE yylval;
 
 int yyparse (void);
 
-#endif /* !YY_YY_PARSER_TAB_H_INCLUDED  */
+#endif /* !YY_YY_PARSER_TAB_HPP_INCLUDED  */

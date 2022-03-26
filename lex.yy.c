@@ -603,11 +603,9 @@ char *yytext;
 #line 1 "src/lex.l"
 #line 2 "src/lex.l"
 	#include<bits/stdc++.h>
-	#include "parser.tab.h"
-        #include "src/ast.hpp"
-
-#line 610 "lex.yy.c"
-#line 611 "lex.yy.c"
+	#include "parser.tab.hpp"
+#line 608 "lex.yy.c"
+#line 609 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -824,10 +822,10 @@ YY_DECL
 		}
 
 	{
-#line 16 "src/lex.l"
+#line 14 "src/lex.l"
 
 
-#line 831 "lex.yy.c"
+#line 829 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -896,402 +894,402 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 18 "src/lex.l"
+#line 16 "src/lex.l"
 {return ASSIGN;}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 19 "src/lex.l"
+#line 17 "src/lex.l"
 {return ADD;}
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 20 "src/lex.l"
+#line 18 "src/lex.l"
 {return SUB;}
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 21 "src/lex.l"
+#line 19 "src/lex.l"
 {return MUL;}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 22 "src/lex.l"
+#line 20 "src/lex.l"
 {return QUO;}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 23 "src/lex.l"
+#line 21 "src/lex.l"
 {return REM;}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 25 "src/lex.l"
+#line 23 "src/lex.l"
 {return AND;}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 26 "src/lex.l"
+#line 24 "src/lex.l"
 {return OR;}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 27 "src/lex.l"
+#line 25 "src/lex.l"
 {return XOR;}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 28 "src/lex.l"
+#line 26 "src/lex.l"
 {return SHL;}
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 29 "src/lex.l"
+#line 27 "src/lex.l"
 {return SHR;}
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 30 "src/lex.l"
+#line 28 "src/lex.l"
 {return AND_NOT;}
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 32 "src/lex.l"
+#line 30 "src/lex.l"
 {return ADD_ASSIGN;}
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 33 "src/lex.l"
+#line 31 "src/lex.l"
 {return SUB_ASSIGN;}
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 34 "src/lex.l"
+#line 32 "src/lex.l"
 {return MUL_ASSIGN;}
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 35 "src/lex.l"
+#line 33 "src/lex.l"
 {return QUO_ASSIGN;}
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 36 "src/lex.l"
+#line 34 "src/lex.l"
 {return REM_ASSIGN;}
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 38 "src/lex.l"
+#line 36 "src/lex.l"
 {return AND_ASSIGN;}
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 39 "src/lex.l"
+#line 37 "src/lex.l"
 {return OR_ASSIGN;}
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 40 "src/lex.l"
+#line 38 "src/lex.l"
 {return XOR_ASSIGN;}
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 41 "src/lex.l"
+#line 39 "src/lex.l"
 {return SHL_ASSIGN;}
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 42 "src/lex.l"
+#line 40 "src/lex.l"
 {return SHR_ASSIGN;}
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 43 "src/lex.l"
+#line 41 "src/lex.l"
 {return AND_NOT_ASSIGN;}
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 45 "src/lex.l"
+#line 43 "src/lex.l"
 {return LAND;}
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 46 "src/lex.l"
+#line 44 "src/lex.l"
 {return LOR;}
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 47 "src/lex.l"
+#line 45 "src/lex.l"
 {return ARROW;}
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 48 "src/lex.l"
+#line 46 "src/lex.l"
 {return INC;}
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 49 "src/lex.l"
+#line 47 "src/lex.l"
 {return DEC;}
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 51 "src/lex.l"
+#line 49 "src/lex.l"
 {return EQL;}
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 52 "src/lex.l"
+#line 50 "src/lex.l"
 {return GTR;}
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 53 "src/lex.l"
+#line 51 "src/lex.l"
 {return LSS;}
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 54 "src/lex.l"
+#line 52 "src/lex.l"
 {return NOT;}
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 56 "src/lex.l"
+#line 54 "src/lex.l"
 {return NEQ;}
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 57 "src/lex.l"
+#line 55 "src/lex.l"
 {return LEQ;}
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 58 "src/lex.l"
+#line 56 "src/lex.l"
 {return GEQ;}
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 59 "src/lex.l"
+#line 57 "src/lex.l"
 {return DEFINE;}
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 60 "src/lex.l"
+#line 58 "src/lex.l"
 {return ELLIPSIS;}
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 62 "src/lex.l"
+#line 60 "src/lex.l"
 {return LPAREN;}
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 63 "src/lex.l"
+#line 61 "src/lex.l"
 {return RPAREN;}
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 64 "src/lex.l"
+#line 62 "src/lex.l"
 {return LBRACE;}
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 65 "src/lex.l"
+#line 63 "src/lex.l"
 {return RBRACE;}
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 66 "src/lex.l"
+#line 64 "src/lex.l"
 {return LBRACK;}
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 67 "src/lex.l"
+#line 65 "src/lex.l"
 {return RBRACK;}
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 68 "src/lex.l"
+#line 66 "src/lex.l"
 {return COMMA;}
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 69 "src/lex.l"
+#line 67 "src/lex.l"
 {return SEMICOLON;}
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 70 "src/lex.l"
+#line 68 "src/lex.l"
 {return COLON;}
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 71 "src/lex.l"
+#line 69 "src/lex.l"
 {return PERIOD;}
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 73 "src/lex.l"
+#line 71 "src/lex.l"
 {return PACKAGE;}
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 74 "src/lex.l"
+#line 72 "src/lex.l"
 {return IMPORT;}
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 75 "src/lex.l"
+#line 73 "src/lex.l"
 {return FUNC;}
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 76 "src/lex.l"
+#line 74 "src/lex.l"
 {return BREAK;}
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 77 "src/lex.l"
+#line 75 "src/lex.l"
 {return CASE;}
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 78 "src/lex.l"
+#line 76 "src/lex.l"
 {return CONST;}
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 79 "src/lex.l"
+#line 77 "src/lex.l"
 {return CONTINUE;}
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 80 "src/lex.l"
+#line 78 "src/lex.l"
 {return DEFAULT;}
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 81 "src/lex.l"
+#line 79 "src/lex.l"
 {return ELSE;}
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
-#line 82 "src/lex.l"
+#line 80 "src/lex.l"
 {return FOR;}
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 83 "src/lex.l"
+#line 81 "src/lex.l"
 {return GO;}
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 84 "src/lex.l"
+#line 82 "src/lex.l"
 {return IF;}
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 85 "src/lex.l"
+#line 83 "src/lex.l"
 {return RANGE;}
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
-#line 86 "src/lex.l"
+#line 84 "src/lex.l"
 {return RETURN;}
 	YY_BREAK
 case 62:
 YY_RULE_SETUP
-#line 87 "src/lex.l"
+#line 85 "src/lex.l"
 {return STRUCT;}
 	YY_BREAK
 case 63:
 YY_RULE_SETUP
-#line 88 "src/lex.l"
+#line 86 "src/lex.l"
 {return SWITCH;}
 	YY_BREAK
 case 64:
 YY_RULE_SETUP
-#line 89 "src/lex.l"
+#line 87 "src/lex.l"
 {return TYPE;}
 	YY_BREAK
 case 65:
 YY_RULE_SETUP
-#line 90 "src/lex.l"
+#line 88 "src/lex.l"
 {return VAR;}
 	YY_BREAK
 case 66:
 YY_RULE_SETUP
-#line 91 "src/lex.l"
+#line 89 "src/lex.l"
 {return VAR_TYPE;}
 	YY_BREAK
 case 67:
 YY_RULE_SETUP
-#line 92 "src/lex.l"
+#line 90 "src/lex.l"
 {return BOOL_CONST;}
 	YY_BREAK
 case 68:
 YY_RULE_SETUP
-#line 93 "src/lex.l"
+#line 91 "src/lex.l"
 {return NIL_VAL;}
 	YY_BREAK
 case 69:
 YY_RULE_SETUP
-#line 95 "src/lex.l"
+#line 93 "src/lex.l"
 {return IDENTIFIER;}
 	YY_BREAK
 case 70:
 YY_RULE_SETUP
-#line 96 "src/lex.l"
+#line 94 "src/lex.l"
 {return INTEGER;}
 	YY_BREAK
 case 71:
 YY_RULE_SETUP
-#line 97 "src/lex.l"
+#line 95 "src/lex.l"
 {return FLOAT;}
 	YY_BREAK
 case 72:
 YY_RULE_SETUP
-#line 98 "src/lex.l"
+#line 96 "src/lex.l"
 {return BYTE;}
 	YY_BREAK
 case 73:
 YY_RULE_SETUP
-#line 101 "src/lex.l"
+#line 99 "src/lex.l"
 {return STRING;}
 	YY_BREAK
 case 74:
 /* rule 74 can match eol */
 YY_RULE_SETUP
-#line 102 "src/lex.l"
+#line 100 "src/lex.l"
 ;
 	YY_BREAK
 case 75:
 /* rule 75 can match eol */
 YY_RULE_SETUP
-#line 103 "src/lex.l"
+#line 101 "src/lex.l"
 ;
 	YY_BREAK
 case 76:
 YY_RULE_SETUP
-#line 104 "src/lex.l"
+#line 102 "src/lex.l"
 ;
 	YY_BREAK
 case 77:
 YY_RULE_SETUP
-#line 105 "src/lex.l"
+#line 103 "src/lex.l"
 ;
 	YY_BREAK
 case 78:
 YY_RULE_SETUP
-#line 106 "src/lex.l"
+#line 104 "src/lex.l"
 printf("ERROR : unexpected character in line %d\n",yylineno);
 	YY_BREAK
 case 79:
 YY_RULE_SETUP
-#line 108 "src/lex.l"
+#line 106 "src/lex.l"
 ECHO;
 	YY_BREAK
-#line 1295 "lex.yy.c"
+#line 1293 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2308,7 +2306,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 108 "src/lex.l"
+#line 106 "src/lex.l"
 
 int yywrap(void)
 {

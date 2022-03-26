@@ -1,8 +1,6 @@
 %{
 	#include<bits/stdc++.h>
-	#include "parser.tab.h"
-        #include "src/ast.hpp"
-
+	#include "parser.tab.hpp"
 %}
 %option yylineno
 UNICODE_LETTER			[a-zA-Z]

@@ -2,7 +2,7 @@
 // Report bugs to <bug-bison@gnu.org>.
 // Home page: <https://www.gnu.org/software/bison/>.
 
-digraph "src/parser.y"
+digraph "src/parser.ypp"
 {
   node [fontname = courier, shape = box, colorscheme = paired6]
   edge [fontname = courier]

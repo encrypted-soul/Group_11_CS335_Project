@@ -1,9 +1,9 @@
 all:
-	bison -d src/parser.y
-	bison --graph src/parser.y
+	bison -d src/parser.ypp
+	bison --graph src/parser.ypp
 	flex src/lex.l
 	mkdir -p bin
-	g++ lex.yy.c parser.tab.c -o bin/parser
+	g++ src/ast.cpp lex.yy.c parser.tab.cpp -o bin/parser
 	chmod +x bin/parser
 
 generate_graph:

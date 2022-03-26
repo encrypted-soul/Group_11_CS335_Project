@@ -67,23 +67,22 @@
 
 
 /* First part of user prologue.  */
-#line 1 "src/parser.y"
+#line 1 "src/parser.ypp"
 
 #include <bits/stdc++.h>
-#include "parser.tab.h"
-#include "src/ast.hpp"
+#include "parser.tab.hpp"
+
 using namespace std;
-using namespace AST;
 
 int yylex(void);
 void yyerror (const char *s) {fprintf (stderr, "%s\n", s);}
 
 extern int yylineno;
 extern char* yytext;
-extern astnode *theprogram;
+astnode *theprogram;
 
 
-#line 87 "parser.tab.c"
+#line 86 "parser.tab.cpp"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -114,6 +113,14 @@ extern astnode *theprogram;
 #if YYDEBUG
 extern int yydebug;
 #endif
+/* "%code requires" blocks.  */
+#line 20 "src/parser.ypp"
+
+        #include <bits/stdc++.h>
+	#include "src/ast.h"
+	using namespace std;
+
+#line 124 "parser.tab.cpp"
 
 /* Token kinds.  */
 #ifndef YYTOKENTYPE
@@ -205,14 +212,14 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 20 "src/parser.y"
+#line 26 "src/parser.ypp"
 
 	int intconst;
 	float floatconst;
-	string stringconst;
+	char* stringconst;
 	astnode *node;
 
-#line 216 "parser.tab.c"
+#line 223 "parser.tab.cpp"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -793,27 +800,27 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,    50,    50,    54,    57,    61,    66,    67,    71,    72,
-      73,    74,    75,    76,    77,    78,    79,    80,    81,    84,
-      85,    86,    89,    94,    96,    99,   100,   103,   107,   110,
-     111,   115,   116,   117,   120,   121,   123,   125,   127,   130,
-     131,   134,   138,   139,   140,   143,   144,   148,   149,   152,
-     153,   156,   157,   158,   161,   162,   166,   167,   168,   172,
-     173,   177,   178,   181,   182,   186,   187,   191,   194,   195,
-     199,   200,   201,   205,   206,   207,   208,   212,   213,   217,
-     218,   219,   222,   226,   227,   230,   231,   234,   235,   239,
-     240,   241,   242,   243,   244,   248,   249,   252,   255,   258,
-     260,   263,   266,   270,   271,   275,   279,   283,   284,   288,
-     289,   293,   294,   298,   302,   305,   309,   313,   317,   318,
-     322,   323,   327,   328,   331,   332,   335,   336,   339,   343,
-     347,   348,   352,   356,   360,   361,   362,   363,   367,   370,
-     371,   372,   373,   374,   378,   381,   383,   384,   388,   390,
-     394,   400,   404,   405,   409,   410,   414,   415,   419,   420,
-     424,   425,   429,   430,   435,   436,   437,   438,   439,   440,
-     442,   443,   444,   445,   447,   448,   449,   450,   451,   452,
-     453,   456,   457,   458,   459,   460,   461,   465,   466,   467,
-     468,   469,   470,   474,   477,   481,   482,   483,   487,   488,
-     492,   493,   496,   497,   498,   500,   503
+       0,    57,    57,    61,    64,    68,    73,    74,    78,    79,
+      80,    81,    82,    83,    84,    85,    86,    87,    88,    91,
+      92,    93,    96,   101,   103,   106,   107,   110,   114,   117,
+     118,   122,   123,   124,   127,   128,   130,   132,   134,   137,
+     138,   141,   145,   146,   147,   150,   151,   155,   156,   159,
+     160,   163,   164,   165,   168,   169,   173,   174,   175,   179,
+     180,   184,   185,   188,   189,   193,   194,   198,   201,   202,
+     206,   207,   208,   212,   213,   214,   215,   219,   220,   224,
+     225,   226,   229,   233,   234,   237,   238,   241,   242,   246,
+     247,   248,   249,   250,   251,   255,   256,   259,   262,   265,
+     267,   270,   273,   277,   278,   282,   286,   290,   291,   295,
+     296,   300,   301,   305,   309,   312,   316,   320,   324,   325,
+     329,   330,   334,   335,   338,   339,   342,   343,   346,   350,
+     354,   355,   359,   363,   367,   368,   369,   370,   374,   377,
+     378,   379,   380,   381,   385,   388,   390,   391,   395,   397,
+     401,   407,   411,   412,   416,   417,   421,   422,   426,   427,
+     431,   432,   436,   437,   442,   443,   444,   445,   446,   447,
+     449,   450,   451,   452,   454,   455,   456,   457,   458,   459,
+     460,   463,   464,   465,   466,   467,   468,   472,   473,   474,
+     475,   476,   477,   481,   484,   488,   489,   490,   494,   495,
+     499,   500,   503,   504,   505,   507,   510
 };
 #endif
 
@@ -1909,13 +1916,13 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* StartFile: PackageClause SEMICOLON ImportDeclStar TopLevelDeclStar  */
-#line 50 "src/parser.y"
-                                                            { theprogram = create_astnode("None","StartFile",vector<astnode*>{(yyvsp[-3].node),(yyvsp[-1].node),(yyvsp[0].node)});}
-#line 1915 "parser.tab.c"
+#line 57 "src/parser.ypp"
+                                                            { theprogram = create_astnode("StartFile", "int",{(yyvsp[-3].node),(yyvsp[-1].node),(yyvsp[0].node)});}
+#line 1922 "parser.tab.cpp"
     break;
 
 
-#line 1919 "parser.tab.c"
+#line 1926 "parser.tab.cpp"
 
       default: break;
     }
@@ -2140,11 +2147,12 @@ yyreturn:
   return yyresult;
 }
 
-#line 506 "src/parser.y"
+#line 513 "src/parser.ypp"
 
 
 int main (int argc, char **argv) {
 
 	yyparse ( );
+	cout<< theprogram->type << endl;
 
 }
