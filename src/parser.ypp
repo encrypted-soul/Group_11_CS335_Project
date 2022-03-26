@@ -1,7 +1,7 @@
 %{
 #include <bits/stdc++.h>
 #include "parser.tab.hpp"
-
+#include "src/ast.h"
 using namespace std;
 
 int yylex(void);

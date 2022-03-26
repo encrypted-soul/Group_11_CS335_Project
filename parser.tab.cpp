@@ -71,7 +71,7 @@
 
 #include <bits/stdc++.h>
 #include "parser.tab.hpp"
-
+#include "src/ast.h"
 using namespace std;
 
 int yylex(void);
@@ -2153,6 +2153,4 @@ yyreturn:
 int main (int argc, char **argv) {
 
 	yyparse ( );
-	cout<< theprogram->type << endl;
-
 }
