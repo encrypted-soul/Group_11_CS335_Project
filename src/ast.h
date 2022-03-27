@@ -1,18 +1,22 @@
 #ifndef AST_H
 #define AST_H
-#include <bits/stdc++.h>
+#include "type.h"
 
 class astnode {
   // for terminal : lexeme, value(id), data type
   // for non-terminal : grammar symbol, data type, children
  public:
-  std::string type;
-  std::string value;
+  Type* type;
+  std::string id;
+  bool isTerminal;
   std::vector<astnode*> children;
-  astnode(std::string type, std::string value);
-  astnode(std::string type, std::string value, std::vector<astnode*> children);
+  astnode(Type* type, std::string id, bool isTerminal);
+  astnode(Type* type, std::string id, bool isTerminal,
+          std::vector<astnode*> children);
+
+  astnode& operator<<(const astnode& right);
 };
 
-astnode* create_astnode(std::string type, std::string value,
+astnode* create_astnode(Type* type, std::string id, bool isTerminal,
                         std::vector<astnode*> children);
 #endif

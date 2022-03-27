@@ -1,5 +1,4 @@
 %{
-	#include<bits/stdc++.h>
 	#include "parser.tab.hpp"
 %}
 %option yylineno

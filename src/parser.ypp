@@ -1,7 +1,5 @@
 %{
-#include <bits/stdc++.h>
 #include "parser.tab.hpp"
-#include "src/ast.h"
 using namespace std;
 
 int yylex(void);
@@ -24,8 +22,6 @@ astnode *theprogram;
 }
 
 %union {
-	int intconst;
-	float floatconst;
 	char* stringconst;
 	astnode *node;
 }
@@ -54,7 +50,9 @@ astnode *theprogram;
 
 /* START OF FILE */
 StartFile:
-    PackageClause SEMICOLON ImportDeclStar TopLevelDeclStar { theprogram = create_astnode("StartFile", "int",{$1,$3,$4});}
+    PackageClause SEMICOLON ImportDeclStar TopLevelDeclStar {
+	    DefinedType currType("helloworld");
+	    theprogram = create_astnode(&currType, "StartFile",false, {$1,$3,$4}); cout << theprogram->id << endl;}
     ;
 
 Block:
