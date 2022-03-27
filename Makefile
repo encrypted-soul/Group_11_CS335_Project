@@ -22,8 +22,8 @@ clean_graph:
 
 clean:
 	rm -f lex.yy.c
-	rm -f parser.tab.c
-	rm -f parser.tab.h
+	rm -f parser.tab.cpp
+	rm -f parser.tab.hpp
 	rm -f bin/parser
 	rm -f new_parser.gv
 	rm -f parser.gv

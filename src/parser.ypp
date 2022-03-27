@@ -26,25 +26,40 @@ astnode *theprogram;
 	astnode *node;
 }
 
-%token    PACKAGE IMPORT FUNC BREAK CASE CONST CONTINUE DEFAULT
-%token    ELSE FOR GO IF RANGE RETURN STRUCT SWITCH TYPE VAR VAR_TYPE
-%token    BOOL_CONST NIL_VAL
+%token <stringconst> PACKAGE IMPORT FUNC BREAK CASE CONST CONTINUE DEFAULT
+%token <stringconst> ELSE FOR GO IF RANGE RETURN STRUCT SWITCH TYPE VAR VAR_TYPE
+%token <stringconst> BOOL_CONST NIL_VAL
 %token <stringconst> IDENTIFIER
-%token    BYTE STRING
-%token    ELLIPSIS
-%token    SHL SHR INC DEC
-%token <intconst> INTEGER
-%token <floatconst> FLOAT
-%left     ADD SUB MUL QUO REM
-%right    ASSIGN AND NOT DEFINE AND_NOT
-%left     OR XOR ARROW
-%right    ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN QUO_ASSIGN REM_ASSIGN
-%right    AND_ASSIGN OR_ASSIGN XOR_ASSIGN
-%right    SHL_ASSIGN SHR_ASSIGN AND_NOT_ASSIGN COLON
-%left     LAND LOR EQL NEQ LEQ GEQ SEMICOLON
-%left     GTR LSS LPAREN RPAREN LBRACE RBRACE LBRACK RBRACK COMMA PERIOD
+%token <stringconst> BYTE STRING
+%token <stringconst> ELLIPSIS
+%token <stringconst> SHL SHR INC DEC
+%token <stringconst> INTEGER
+%token <stringconst> FLOAT
+%left  <stringconst> ADD SUB MUL QUO REM
+%right <stringconst> ASSIGN AND NOT DEFINE AND_NOT
+%left  <stringconst> OR XOR ARROW
+%right <stringconst> ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN QUO_ASSIGN REM_ASSIGN
+%right <stringconst> AND_ASSIGN OR_ASSIGN XOR_ASSIGN
+%right <stringconst> SHL_ASSIGN SHR_ASSIGN AND_NOT_ASSIGN COLON
+%left  <stringconst> LAND LOR EQL NEQ LEQ GEQ SEMICOLON
+%left  <stringconst> GTR LSS LPAREN RPAREN LBRACE RBRACE LBRACK RBRACK COMMA PERIOD
 
-%type <node> StartFile PackageClause ImportDeclStar TopLevelDeclStar
+%type <node> StartFile Expression Expression1 Expression2 Expression3 Expression4 Expression5
+%type <node> Block StatementList Statement SimpleStmt int_lit
+%type <node> EmptyStmt IncDecStmt OPENB CLOSEB
+%type <node> Assignment Declaration ConstDecl VarSpec string_lit Signature Result Parameters ParameterDecl
+%type <node> ConstSpec MethodDecl Receiver TopLevelDecl TopLevelDeclStar LabeledStmt
+%type <node> ReturnStmt BreakStmt ContinueStmt StructType
+%type <node> FunctionDecl FunctionName TypeList Function FunctionBody FunctionCall FunctionStmt FunctionType
+%type <node> ForStmt ForClause InitStmt ArgumentList Arguments
+%type <node> PostStmt Condition UnaryExpr PrimaryExpr AliasDecl TypeDef FunctionLit
+%type <node> Selector Index TypeDecl TypeSpecList TypeSpec VarDecl
+%type <node> TypeAssertion ExpressionList ArrayType
+%type <node> assign_op rel_op add_op mul_op unary_op Tag byte_lit float_lit
+%type <node> Operand Literal BasicLit OperandName ImportSpec IfStmt
+%type <node> ImportPath PackageClause PackageName ImportDecl ImportDeclStar ImportSpecStar
+%type <node> FieldDeclStar FieldDecl Type TypeLit ArrayLength TypeName
+%type <node> PointerType IdentifierList BaseType AlternatePackageName
 
 %%
 
@@ -76,18 +91,18 @@ Statement:
 	Declaration
 	| LabeledStmt
 	| SimpleStmt
-	|ReturnStmt
+	| ReturnStmt
 	| BreakStmt
 	| ContinueStmt
-	|Block
+	| Block
 	| IfStmt
-	|  ForStmt
+	| ForStmt
 	| FunctionCall
 	| FunctionStmt ;
 
 SimpleStmt:
 	EmptyStmt
-	|  IncDecStmt
+	| IncDecStmt
 	| Assignment
 ;
 
@@ -96,13 +111,11 @@ EmptyStmt:
 	;
 
 LabeledStmt:
-	Label COLON Statement ;
-Label:
-	IDENTIFIER ;
+	IDENTIFIER COLON Statement ;
 
 IncDecStmt:
 	Expression INC
-	|Expression DEC ;
+	| Expression DEC ;
 
 Assignment:
 	ExpressionList assign_op ExpressionList
@@ -123,7 +136,7 @@ Declaration:
 
 FunctionDecl:
 		FUNC FunctionName OPENB Function CLOSEB
-		|FUNC FunctionName OPENB Signature CLOSEB ;
+		| FUNC FunctionName OPENB Signature CLOSEB ;
 FunctionName:
 		IDENTIFIER ;
 Function:
@@ -151,7 +164,7 @@ Arguments:	PrimaryExpr
 
 Signature:
 	Parameters
-	|Parameters Result ;
+	| Parameters Result ;
 
 Result:
 	LPAREN TypeList RPAREN
@@ -160,17 +173,17 @@ Result:
 Parameters:
 	LPAREN RPAREN
 	| LPAREN ParameterDeclStar RPAREN
-	|LPAREN ParameterDeclStar COMMA RPAREN
+	| LPAREN ParameterDeclStar COMMA RPAREN
 	;
 ParameterDeclStar:
 	ParameterDecl
-	|ParameterDeclStar COMMA ParameterDecl
+	| ParameterDeclStar COMMA ParameterDecl
 	;
 
 ParameterDecl:
 	IdentifierList Type
 	| IdentifierList ELLIPSIS  Type
-	|ELLIPSIS Type
+	| ELLIPSIS Type
 	;
 
 TypeList:
@@ -229,15 +242,15 @@ OperandName:
 
 ReturnStmt:
 	RETURN Expression
-	|RETURN ;
+	| RETURN ;
 
 BreakStmt:
-	BREAK Label
+	BREAK IDENTIFIER
 	| BREAK ;
 
 ContinueStmt:
-	CONTINUE Label
-	|CONTINUE
+	CONTINUE IDENTIFIER
+	| CONTINUE
 	;
 
 IfStmt:
