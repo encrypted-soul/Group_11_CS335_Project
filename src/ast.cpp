@@ -1,18 +1,34 @@
 #include "ast.h"
 
-astnode::astnode(Type* type, std::string id, bool isTerminal) {
-  this->type = type;
-  this->id = id;
-  this->isTerminal = isTerminal;
-}
+astnode::astnode(int tokenId) : id(to_string(tokenId)) {}
 
-astnode::astnode(Type* type, std::string id, bool isTerminal,
-                 std::vector<astnode*> children) {
-  this->type = type;
-  this->id = id;
-  this->isTerminal = isTerminal;
-  this->children = children;
-}
+astnode::astnode(Type* type, int tokenId)
+    : type(type), id(to_string(tokenId)) {}
+
+astnode::astnode(string id, bool isTerminal, vector<astnode*> children)
+    : type(type), isTerminal(isTerminal), children(children) {}
+
+astnode::astnode(Type* type, string id, bool isTerminal,
+                 vector<astnode*> children)
+    : type(type), id(id), isTerminal(isTerminal), children(children) {}
+
+astnode::astnode(int tokenId, Data* data)
+    : id(to_string(tokenId)), data(data) {}
+
+astnode::astnode(Type* type, int tokenId, Data* data)
+    : type(type), id(to_string(tokenId)), data(data) {}
+
+astnode::astnode(string id, bool isTerminal, vector<astnode*> children,
+                 Data* data)
+    : type(type), isTerminal(isTerminal), children(children), data(data) {}
+
+astnode::astnode(Type* type, string id, bool isTerminal,
+                 vector<astnode*> children, Data* data)
+    : type(type),
+      id(id),
+      isTerminal(isTerminal),
+      children(children),
+      data(data) {}
 
 // astnode& astnode::operator<<(const astnode& right) {
 //   for (auto& child : right.children) {
@@ -21,7 +37,35 @@ astnode::astnode(Type* type, std::string id, bool isTerminal,
 //   return *this;
 // }
 
-astnode* create_astnode(Type* type, std::string id, bool isTerminal,
-                        std::vector<astnode*> children) {
-  return new astnode(type, id, isTerminal, children);
+astnode* appendId(astnode* node, const char* appendId) {
+  node->id += "+";
+  node->id += string(appendId);
+  return node;
 }
+
+astnode* newId(astnode* node, const char* newId) {
+  node->id = string(newId);
+  return node;
+}
+
+// // Perform type resoulution here
+// binaryOpNode::binaryOpNode(exprNode* left, operatorNode* opNode,
+//                            exprNode* right) {
+//   this->children = {left, opNode, right};
+//   this->id = "binary";
+// }
+
+// binaryOpNode::binaryOpNode(exprNode* left, int opcode, exprNode* right) {
+//   this->children = {left, new operatorNode(opcode), right};
+//   this->id = "binary";
+// }
+
+// unaryOpNode::unaryOpNode(operatorNode* opNode, exprNode* first) {
+//   this->children = {opNode, first};
+//   this->id = "unary";
+// }
+
+// unaryOpNode::unaryOpNode(int opcode, exprNode* first) {
+//   this->children = {new operatorNode(opcode), first};
+//   this->id = "unary";
+// }

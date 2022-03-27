@@ -145,7 +145,7 @@ union YYSTYPE
 {
 #line 24 "src/parser.ypp"
 
-	char* stringconst;
+	Data* data;
 	astnode *node;
 
 #line 152 "parser.tab.hpp"
