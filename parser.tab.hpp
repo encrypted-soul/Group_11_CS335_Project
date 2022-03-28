@@ -45,14 +45,13 @@
 extern int yydebug;
 #endif
 /* "%code requires" blocks.  */
-#line 21 "src/parser.ypp"
+#line 18 "src/parser.ypp"
 
         #include <bits/stdc++.h>
 	#include "src/ast.h"
-	#include "src/symtab.h"
 	using namespace std;
 
-#line 56 "parser.tab.hpp"
+#line 55 "parser.tab.hpp"
 
 /* Token kinds.  */
 #ifndef YYTOKENTYPE
@@ -144,12 +143,12 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 28 "src/parser.ypp"
+#line 24 "src/parser.ypp"
 
 	Data* data;
 	astnode *node;
 
-#line 153 "parser.tab.hpp"
+#line 152 "parser.tab.hpp"
 
 };
 typedef union YYSTYPE YYSTYPE;
