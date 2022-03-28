@@ -6,9 +6,12 @@ all:
 	g++ -std=c++17 src/data.cpp src/type.cpp src/ast.cpp lex.yy.c parser.tab.cpp -o bin/parser
 	chmod +x bin/parser
 
-generate_graph:
+generate_parser:
 	python3 src/label.py
-	sfdp -x -Goverlap=scale -Tpng new_parser.gv > automata.png
+	# sfdp -x -Goverlap=scale -Tpng new_parser.gv > automata.png
+
+generate_ast:
+	dot -Tpng ast.dot -o ast.png
 
 test_go:
 	./bin/parser < ./test/parser_test_file/test1.go
@@ -29,3 +32,6 @@ clean:
 	rm -f parser.gv
 	rm -f parser.dot
 	rm -f automata.png
+	rm -f ast.dot
+	rm -f ast.gv
+	rm -f ast.png

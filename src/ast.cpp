@@ -1,5 +1,7 @@
 #include "ast.h"
 
+astnode::astnode(){};
+
 astnode::astnode(int tokenId) : id(to_string(tokenId)) {}
 
 astnode::astnode(Type* type, int tokenId)
