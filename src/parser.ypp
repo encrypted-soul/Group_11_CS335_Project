@@ -8,7 +8,9 @@ void yyerror (const char *s) {fprintf (stderr, "%s\n", s);}
 extern int yylineno;
 extern char* yytext;
 astnode *theprogram;
-
+umap<string, Type*> symtab;
+int currscope = 0;
+string fullscope = "0";
 %}
 
 // error-verbose
@@ -18,6 +20,7 @@ astnode *theprogram;
 %code requires{
         #include <bits/stdc++.h>
 	#include "src/ast.h"
+	#include "src/symtab.h"
 	using namespace std;
 }
 
@@ -78,11 +81,19 @@ Block:
 	;
 
 OPENB:
-	/*empty*/ { $$ = new astnode(); }
+	/*empty*/ { 
+		$$ = new astnode(); 
+		currscope++;
+		fullscope = fullscope + "/" + to_string(currscope);
+	}
 	;
 
 CLOSEB:
-	/*empty*/ { $$ = new astnode(); }
+	/*empty*/ { 
+		$$ = new astnode();
+		currscope--;
+		fullscope = fullscope.substr(0, fullscope.find_last_of("/") );
+	}
 	;
 
 StatementList:
@@ -138,8 +149,17 @@ Declaration:
 	| VarDecl {$$ = new astnode(new Type(), "Declaration", false, {$1});};
 
 FunctionDecl:
-		FUNC IDENTIFIER OPENB Function CLOSEB {$$ = new astnode(new Type(), "FunctionDecl", false, {$3, $4, $5});}
-		| FUNC IDENTIFIER OPENB Signature CLOSEB {$$ = new astnode(new Type(), "FunctionDecl", false, {$3, $4, $5});};
+		FUNC IDENTIFIER OPENB Function CLOSEB {
+			$$ = new astnode(new Type(), "FunctionDecl", false, {$3, $4, $5});
+			symadd( fullscope + " " + $2->v_str, $4->type);
+			//cout<<($2->v_str)<<endl;
+		}
+		| FUNC IDENTIFIER OPENB Signature CLOSEB {
+			$$ = new astnode(new Type(), "FunctionDecl", false, {$3, $4, $5});
+			symadd( fullscope + " " + $2->v_str, $4->type);
+			//cout<<($2->v_str)<<endl;
+		}
+		;
 Function:
 		Signature FunctionBody {$$ = new astnode(new Type(), "Function", false, {$1, $2});};
 FunctionBody:
@@ -554,5 +574,6 @@ int main (int argc, char **argv) {
 	cout.rdbuf(myfile.rdbuf());
 	cout << "digraph \"src/parser.ypp\" \n { \n node [fontname = courier, shape = box, colorscheme = paired6] \n edge [fontname = courier]" << endl;
 	prettyPrint(theprogram);
+	print_symtab();
 	cout << "}" << endl;
 }
