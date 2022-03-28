@@ -47,10 +47,10 @@ astnode *theprogram;
 %type <node> StartFile Expression Expression1 Expression2 Expression3 Expression4 Expression5
 %type <node> Block StatementList Statement SimpleStmt int_lit
 %type <node> EmptyStmt IncDecStmt OPENB CLOSEB
-%type <node> Assignment Declaration ConstDecl VarSpec string_lit Signature Result Parameters ParameterDecl
+%type <node> Assignment Declaration ConstDecl VarSpec string_lit Signature Result Parameters ParameterDecl ParameterDeclStar
 %type <node> ConstSpec MethodDecl Receiver TopLevelDecl TopLevelDeclStar LabeledStmt
 %type <node> ReturnStmt BreakStmt ContinueStmt StructType
-%type <node> FunctionDecl FunctionName TypeList Function FunctionBody FunctionCall FunctionStmt FunctionType
+%type <node> FunctionDecl TypeList Function FunctionBody FunctionCall FunctionStmt FunctionType
 %type <node> ForStmt ForClause InitStmt ArgumentList Arguments
 %type <node> PostStmt Condition UnaryExpr PrimaryExpr AliasDecl TypeDef FunctionLit
 %type <node> Selector Index TypeDecl TypeSpecList TypeSpec VarDecl
@@ -59,17 +59,21 @@ astnode *theprogram;
 %type <node> Operand Literal BasicLit OperandName ImportSpec IfStmt
 %type <node> ImportPath PackageClause PackageName ImportDecl ImportDeclStar ImportSpecStar
 %type <node> FieldDeclStar FieldDecl Type TypeLit ArrayLength TypeName
-%type <node> PointerType IdentifierList BaseType AlternatePackageName
+%type <node> PointerType IdentifierList IdentifierLIST BaseType AlternatePackageName
 
 %%
 
 /* START OF FILE */
 StartFile:
-    PackageClause SEMICOLON ImportDeclStar TopLevelDeclStar { theprogram = new astnode(new Type(), "StartFile",false, {$1,$3,$4}); }
+    PackageClause SEMICOLON ImportDeclStar TopLevelDeclStar {
+		$$ = new astnode(new Type(), "StartFile",false, {$1,$3,$4});
+	}
     ;
 
 Block:
-	LBRACE OPENB StatementList CLOSEB RBRACE
+	LBRACE OPENB StatementList CLOSEB RBRACE {
+		$$ = new astnode(new Type(), "Block", false, {$2, $3, $4});
+	}
 	;
 
 OPENB:
@@ -81,27 +85,27 @@ CLOSEB:
 	;
 
 StatementList:
-    StatementList Statement SEMICOLON { }
-    | Statement SEMICOLON
+    StatementList Statement SEMICOLON { $$ = new astnode(new Type(), "StatementList", false, {$1, $2});}
+    | Statement SEMICOLON { $$ = new astnode(new Type(), "StatementList", false, {$1}); }
     ;
 
 Statement:
-	Declaration
-	| LabeledStmt
-	| SimpleStmt
-	| ReturnStmt
-	| BreakStmt
-	| ContinueStmt
-	| Block
-	| IfStmt
-	| ForStmt
-	| FunctionCall
-	| FunctionStmt ;
+	Declaration {$$ = new astnode(new Type(), "Declaration", false, {$1});}
+	| LabeledStmt {$$ = new astnode(new Type(), "Declaration", false, {$1});}
+	| SimpleStmt {$$ = new astnode(new Type(), "Declaration", false, {$1});}
+	| ReturnStmt {$$ = new astnode(new Type(), "Declaration", false, {$1});}
+	| BreakStmt {$$ = new astnode(new Type(), "Declaration", false, {$1});}
+	| ContinueStmt {$$ = new astnode(new Type(), "Declaration", false, {$1});}
+	| Block {$$ = new astnode(new Type(), "Declaration", false, {$1});}
+	| IfStmt {$$ = new astnode(new Type(), "Declaration", false, {$1});}
+	| ForStmt {$$ = new astnode(new Type(), "Declaration", false, {$1});}
+	| FunctionCall {$$ = new astnode(new Type(), "Declaration", false, {$1});}
+	| FunctionStmt {$$ = new astnode(new Type(), "Declaration", false, {$1});};
 
 SimpleStmt:
-	EmptyStmt
-	| IncDecStmt
-	| Assignment
+	EmptyStmt {$$ = new astnode(new Type(), "SimpleStmt", false, {$1});}
+	| IncDecStmt {$$ = new astnode(new Type(), "SimpleStmt", false, {$1});}
+	| Assignment {$$ = new astnode(new Type(), "SimpleStmt", false, {$1});}
 ;
 
 EmptyStmt:
@@ -109,124 +113,122 @@ EmptyStmt:
 	;
 
 LabeledStmt:
-	IDENTIFIER COLON Statement ;
+	IDENTIFIER COLON Statement {$$ = new astnode(new Type(), "LabeledStmt", false, {$3});};
 
 IncDecStmt:
-	Expression INC
-	| Expression DEC ;
+	Expression INC {$$ = new astnode(new Type(), "IncDecStmt", false, {$1});}
+	| Expression DEC {$$ = new astnode(new Type(), "IncDecStmt", false, {$1});};
 
 Assignment:
-	ExpressionList assign_op ExpressionList
+	ExpressionList assign_op ExpressionList {$$ = new astnode(new Type(), "Assignment", false, {$1, $3});}
 	;
 
 VarDecl:
-		VAR VarSpec
+		VAR VarSpec {$$ = new astnode(new Type(), "VarDecl", false, {$2});}
 		;
 VarSpec:
-		IdentifierList Type ASSIGN ExpressionList
-		| IdentifierList Type
+		IdentifierList Type ASSIGN ExpressionList {$$ = new astnode(new Type(), "VarSpec", false, {$1, $2, $4});}
+		| IdentifierList Type {$$ = new astnode(new Type(), "VarSpec", false, {$1, $2});}
 		;
 
 Declaration:
-	ConstDecl
-	| TypeDecl
-	| VarDecl ;
+	ConstDecl {$$ = new astnode(new Type(), "Declaration", false, {$1});}
+	| TypeDecl {$$ = new astnode(new Type(), "Declaration", false, {$1});}
+	| VarDecl {$$ = new astnode(new Type(), "Declaration", false, {$1});};
 
 FunctionDecl:
-		FUNC FunctionName OPENB Function CLOSEB
-		| FUNC FunctionName OPENB Signature CLOSEB ;
-FunctionName:
-		IDENTIFIER ;
+		FUNC IDENTIFIER OPENB Function CLOSEB {$$ = new astnode(new Type(), "FunctionDecl", false, {$3, $4, $5});}
+		| FUNC IDENTIFIER OPENB Signature CLOSEB {$$ = new astnode(new Type(), "FunctionDecl", false, {$3, $4, $5});};
 Function:
-		Signature FunctionBody ;
+		Signature FunctionBody {$$ = new astnode(new Type(), "Function", false, {$1, $2});};
 FunctionBody:
-		Block ;
+		Block {$$ = new astnode(new Type(), "FunctionBody", false, {$1});};
 
 FunctionStmt:
-		VarDecl DEFINE FunctionCall
-		| IDENTIFIER DEFINE FunctionCall
+		VarDecl DEFINE FunctionCall {$$ = new astnode(new Type(), "FunctionStmt", false, {$1, $3});}
+		| IDENTIFIER DEFINE FunctionCall {$$ = new astnode(new Type(), "FunctionStmt", false, {$3});};
 		;
 
-FunctionCall:	PrimaryExpr LPAREN ArgumentList RPAREN
+FunctionCall:	PrimaryExpr LPAREN ArgumentList RPAREN {$$ = new astnode(new Type(), "FunctionCall", false, {$1, $3});}
 		;
 
 ArgumentList:
-		ArgumentList COMMA Arguments
-		| Arguments
+		ArgumentList COMMA Arguments {$$ = new astnode(new Type(), "ArgumentList", false, {$1, $3});}
+		| Arguments {$$ = new astnode(new Type(), "ArgumentList", false, {$1});}
 		| /*empty*/
 		;
 
-Arguments:	PrimaryExpr
-		| FunctionCall
+Arguments:	PrimaryExpr {$$ = new astnode(new Type(), "Arguments", false, {$1});}
+		| FunctionCall {$$ = new astnode(new Type(), "Arguments", false, {$1});}
 		;
 
 Signature:
-	Parameters
-	| Parameters Result ;
+	Parameters {$$ = new astnode(new Type(), "Signature", false, {$1});}
+	| Parameters Result {$$ = new astnode(new Type(), "Signature", false, {$1, $2});};
 
 Result:
-	LPAREN TypeList RPAREN
-	| Type  ;
+	LPAREN TypeList RPAREN {$$ = new astnode(new Type(), "Result", false, {$2});}
+	| Type {$$ = new astnode(new Type(), "Result", false, {$1});};
 
 Parameters:
-	LPAREN RPAREN
-	| LPAREN ParameterDeclStar RPAREN
-	| LPAREN ParameterDeclStar COMMA RPAREN
+	LPAREN RPAREN {$$ = new astnode(LPAREN);}
+	| LPAREN ParameterDeclStar RPAREN {$$ = new astnode(new Type(), "Parameters", false, {$2});}
+	| LPAREN ParameterDeclStar COMMA RPAREN {$$ = new astnode(new Type(), "Parameters", false, {$2});};
 	;
 ParameterDeclStar:
-	ParameterDecl
-	| ParameterDeclStar COMMA ParameterDecl
+	ParameterDecl {$$ = new astnode(new Type(), "ParameterDeclStar", false, {$1});}
+	| ParameterDeclStar COMMA ParameterDecl {$$ = new astnode(new Type(), "ParameterDeclStar", false, {$1, $3});};
 	;
 
 ParameterDecl:
-	IdentifierList Type
-	| IdentifierList ELLIPSIS  Type
-	| ELLIPSIS Type
+	IdentifierList Type {$$ = new astnode(new Type(), "ParameterDecl", false, {$1, $2});}
+	| IdentifierList ELLIPSIS  Type {$$ = new astnode(new Type(), "ParameterDecl", false, {$1, $3});};
+	| ELLIPSIS Type {$$ = new astnode(new Type(), "ParameterDecl", false, {$2});};
 	;
 
 TypeList:
-    TypeList COMMA Type
-    | Type
+    TypeList COMMA Type {$$ = new astnode(new Type(), "TypeList", false, {$1, $3});}
+    | Type {$$ = new astnode(new Type(), "TypeList", false, {$1});};
     ;
 
 IdentifierList:
-		IDENTIFIER IdentifierLIST
-		| IDENTIFIER
+		IDENTIFIER IdentifierLIST {$$ = new astnode(new Type(), "IdentifierList", false, {$2});}
+		| IDENTIFIER {$$ = new astnode(IDENTIFIER);};
 		;
 
-IdentifierLIST:	IdentifierLIST COMMA IDENTIFIER
-		| COMMA IDENTIFIER
+IdentifierLIST:	IdentifierLIST COMMA IDENTIFIER {$$ = new astnode(new Type(), "IdentifierLIST", false, {$1});}
+		| COMMA IDENTIFIER {$$ = new astnode(IDENTIFIER);}
 		;
 
 MethodDecl:
-	FUNC Receiver IDENTIFIER Function
-	| FUNC Receiver IDENTIFIER Signature
+	FUNC Receiver IDENTIFIER Function {$$ = new astnode(new Type(), "MethodDecl", false, {$2, $4});};
+	| FUNC Receiver IDENTIFIER Signature {$$ = new astnode(new Type(), "MethodDecl", false, {$2, $4});};
 	;
 
 Receiver:
-	Parameters ;
+	Parameters {$$ = new astnode(new Type(), "Receiver", false, {$1});}
 
 TopLevelDeclStar:
-    TopLevelDeclStar SEMICOLON /*here colon*/ TopLevelDecl
-    | TopLevelDecl
+    TopLevelDeclStar SEMICOLON /*here colon*/ TopLevelDecl {$$ = new astnode(new Type(), "TopLevelDeclStar", false, {$1, $3});}
+    | TopLevelDecl {$$ = new astnode(new Type(), "TopLevelDeclStar", false, {$1});};
     ;
 
 TopLevelDecl:
-	Declaration
-	| FunctionDecl
-	| MethodDecl
+	Declaration {$$ = new astnode(new Type(), "TopLevelDecl", false, {$1});}
+	| FunctionDecl {$$ = new astnode(new Type(), "TopLevelDecl", false, {$1});}
+	| MethodDecl {$$ = new astnode(new Type(), "TopLevelDecl", false, {$1});}
 	;
 
 TypeLit:
-	ArrayType
-	| StructType
-	| PointerType
-	| FunctionType
+	ArrayType {$$ = new astnode(new Type(), "TypeLit", false, {$1});}
+	| StructType {$$ = new astnode(new Type(), "TypeLit", false, {$1});}
+	| PointerType {$$ = new astnode(new Type(), "TypeLit", false, {$1});}
+	| FunctionType {$$ = new astnode(new Type(), "TypeLit", false, {$1});}
 	;
 
 Type:
-	TypeName
-	| TypeLit
+	TypeName {$$ = new astnode(new Type(), "Type", false, {$1});}
+	| TypeLit {$$ = new astnode(new Type(), "Type", false, {$1});}
 	;
 
 Operand:
