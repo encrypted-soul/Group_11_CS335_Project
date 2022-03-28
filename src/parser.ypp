@@ -568,12 +568,12 @@ void prettyPrint(astnode* root){
 
 int main (int argc, char **argv) {
 	yyparse ( );
+	print_symtab();
 	// redirect ostream to file
 	ofstream myfile;
 	myfile.open ("ast.dot");
 	cout.rdbuf(myfile.rdbuf());
 	cout << "digraph \"src/parser.ypp\" \n { \n node [fontname = courier, shape = box, colorscheme = paired6] \n edge [fontname = courier]" << endl;
 	prettyPrint(theprogram);
-	print_symtab();
 	cout << "}" << endl;
 }
