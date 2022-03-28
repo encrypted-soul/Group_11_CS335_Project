@@ -1,0 +1,558 @@
+%{
+#include "parser.tab.hpp"
+using namespace std;
+
+int yylex(void);
+void yyerror (const char *s) {fprintf (stderr, "%s\n", s);}
+
+extern int yylineno;
+extern char* yytext;
+astnode *theprogram;
+
+%}
+
+// error-verbose
+%define parse.error verbose
+
+// These must go into paser.tab.h
+%code requires{
+        #include <bits/stdc++.h>
+	#include "src/ast.h"
+	using namespace std;
+}
+
+%union {
+	Data* data;
+	astnode *node;
+}
+
+%token <data> PACKAGE IMPORT FUNC BREAK CASE CONST CONTINUE DEFAULT
+%token <data> ELSE FOR GO IF RANGE RETURN STRUCT SWITCH TYPE VAR VAR_TYPE
+%token <data> BOOL_CONST NIL_VAL // REVIEW -  Usage of NIL_VAL
+%token <data> IDENTIFIER
+%token <data> BYTE STRING
+%token <data> ELLIPSIS
+%token <data> SHL SHR INC DEC
+%token <data> INTEGER
+%token <data> FLOAT
+%left  <data> ADD SUB MUL QUO REM
+%right <data> ASSIGN AND NOT DEFINE AND_NOT
+%left  <data> OR XOR ARROW
+%right <data> ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN QUO_ASSIGN REM_ASSIGN
+%right <data> AND_ASSIGN OR_ASSIGN XOR_ASSIGN
+%right <data> SHL_ASSIGN SHR_ASSIGN AND_NOT_ASSIGN COLON
+%left  <data> LAND LOR EQL NEQ LEQ GEQ SEMICOLON
+%left  <data> GTR LSS LPAREN RPAREN LBRACE RBRACE LBRACK RBRACK COMMA PERIOD
+
+%type <node> StartFile Expression Expression1 Expression2 Expression3 Expression4 Expression5
+%type <node> Block StatementList Statement SimpleStmt int_lit
+%type <node> EmptyStmt IncDecStmt OPENB CLOSEB
+%type <node> Assignment Declaration ConstDecl VarSpec string_lit Signature Result Parameters ParameterDecl ParameterDeclStar
+%type <node> ConstSpec MethodDecl Receiver TopLevelDecl TopLevelDeclStar LabeledStmt
+%type <node> ReturnStmt BreakStmt ContinueStmt StructType
+%type <node> FunctionDecl TypeList Function FunctionBody FunctionCall FunctionStmt FunctionType
+%type <node> ForStmt ForClause InitStmt ArgumentList Arguments
+%type <node> PostStmt Condition UnaryExpr PrimaryExpr AliasDecl TypeDef FunctionLit
+%type <node> Selector Index TypeDecl TypeSpecList TypeSpec VarDecl
+%type <node> TypeAssertion ExpressionList ArrayType
+%type <node> assign_op rel_op add_op mul_op unary_op Tag byte_lit float_lit
+%type <node> Operand Literal BasicLit OperandName ImportSpec IfStmt
+%type <node> ImportPath PackageClause PackageName ImportDecl ImportDeclStar ImportSpecStar
+%type <node> FieldDeclStar FieldDecl Type TypeLit ArrayLength TypeName
+%type <node> PointerType IdentifierList IdentifierLIST BaseType AlternatePackageName
+%type <node> StructLiteral KeyValList
+
+%%
+
+/* START OF FILE */
+StartFile:
+    PackageClause SEMICOLON ImportDeclStar TopLevelDeclStar {
+		theprogram = new astnode(new Type(), "StartFile",false, {$1,$3,$4});
+	}
+    ;
+
+Block:
+	LBRACE OPENB StatementList CLOSEB RBRACE {
+		$$ = new astnode(new Type(), "Block", false, {$2, $3, $4});
+	}
+	;
+
+OPENB:
+	/*empty*/ { $$ = new astnode(); }
+	;
+
+CLOSEB:
+	/*empty*/ { $$ = new astnode(); }
+	;
+
+StatementList:
+    StatementList Statement SEMICOLON { $$ = new astnode(new Type(), "StatementList", false, {$1, $2});}
+    | Statement SEMICOLON { $$ = new astnode(new Type(), "StatementList", false, {$1}); }
+    ;
+
+Statement:
+	Declaration {$$ = new astnode(new Type(), "Declaration", false, {$1});}
+	| LabeledStmt {$$ = new astnode(new Type(), "Declaration", false, {$1});}
+	| SimpleStmt {$$ = new astnode(new Type(), "Declaration", false, {$1});}
+	| ReturnStmt {$$ = new astnode(new Type(), "Declaration", false, {$1});}
+	| BreakStmt {$$ = new astnode(new Type(), "Declaration", false, {$1});}
+	| ContinueStmt {$$ = new astnode(new Type(), "Declaration", false, {$1});}
+	| Block {$$ = new astnode(new Type(), "Declaration", false, {$1});}
+	| IfStmt {$$ = new astnode(new Type(), "Declaration", false, {$1});}
+	| ForStmt {$$ = new astnode(new Type(), "Declaration", false, {$1});}
+	| FunctionCall {$$ = new astnode(new Type(), "Declaration", false, {$1});}
+	| FunctionStmt {$$ = new astnode(new Type(), "Declaration", false, {$1});};
+
+SimpleStmt:
+	EmptyStmt {$$ = new astnode(new Type(), "SimpleStmt", false, {$1});}
+	| IncDecStmt {$$ = new astnode(new Type(), "SimpleStmt", false, {$1});}
+	| Assignment {$$ = new astnode(new Type(), "SimpleStmt", false, {$1});}
+;
+
+EmptyStmt:
+	/*empty*/ { $$ = new astnode(); }
+	;
+
+LabeledStmt:
+	IDENTIFIER COLON Statement {$$ = new astnode(new Type(), "LabeledStmt", false, {$3});};
+
+IncDecStmt:
+	Expression INC {$$ = new astnode(new Type(), "IncDecStmt", false, {$1});}
+	| Expression DEC {$$ = new astnode(new Type(), "IncDecStmt", false, {$1});};
+
+Assignment:
+	ExpressionList assign_op ExpressionList {$$ = new astnode(new Type(), "Assignment", false, {$1, $3});}
+	;
+
+VarDecl:
+		VAR VarSpec {$$ = new astnode(new Type(), "VarDecl", false, {$2});}
+		;
+VarSpec:
+		IdentifierList Type ASSIGN ExpressionList {$$ = new astnode(new Type(), "VarSpec", false, {$1, $2, $4});}
+		| IdentifierList Type {$$ = new astnode(new Type(), "VarSpec", false, {$1, $2});}
+		;
+
+Declaration:
+	ConstDecl {$$ = new astnode(new Type(), "Declaration", false, {$1});}
+	| TypeDecl {$$ = new astnode(new Type(), "Declaration", false, {$1});}
+	| VarDecl {$$ = new astnode(new Type(), "Declaration", false, {$1});};
+
+FunctionDecl:
+		FUNC IDENTIFIER OPENB Function CLOSEB {$$ = new astnode(new Type(), "FunctionDecl", false, {$3, $4, $5});}
+		| FUNC IDENTIFIER OPENB Signature CLOSEB {$$ = new astnode(new Type(), "FunctionDecl", false, {$3, $4, $5});};
+Function:
+		Signature FunctionBody {$$ = new astnode(new Type(), "Function", false, {$1, $2});};
+FunctionBody:
+		Block {$$ = new astnode(new Type(), "FunctionBody", false, {$1});};
+
+FunctionStmt:
+		VarDecl DEFINE FunctionCall {$$ = new astnode(new Type(), "FunctionStmt", false, {$1, $3});}
+		| IDENTIFIER DEFINE FunctionCall {$$ = new astnode(new Type(), "FunctionStmt", false, {$3});};
+		;
+
+FunctionCall:	PrimaryExpr LPAREN ArgumentList RPAREN {$$ = new astnode(new Type(), "FunctionCall", false, {$1, $3});}
+		;
+
+ArgumentList:
+		ArgumentList COMMA Arguments {$$ = new astnode(new Type(), "ArgumentList", false, {$1, $3});}
+		| Arguments {$$ = new astnode(new Type(), "ArgumentList", false, {$1});}
+		| /*empty*/ { $$ = new astnode();}
+		;
+
+Arguments:	PrimaryExpr {$$ = new astnode(new Type(), "Arguments", false, {$1});}
+		| FunctionCall {$$ = new astnode(new Type(), "Arguments", false, {$1});}
+		;
+
+Signature:
+	Parameters {$$ = new astnode(new Type(), "Signature", false, {$1});}
+	| Parameters Result {$$ = new astnode(new Type(), "Signature", false, {$1, $2});};
+
+Result:
+	LPAREN TypeList RPAREN {$$ = new astnode(new Type(), "Result", false, {$2});}
+	| Type {$$ = new astnode(new Type(), "Result", false, {$1});};
+
+Parameters:
+	LPAREN RPAREN {$$ = new astnode(LPAREN);}
+	| LPAREN ParameterDeclStar RPAREN {$$ = new astnode(new Type(), "Parameters", false, {$2});}
+	| LPAREN ParameterDeclStar COMMA RPAREN {$$ = new astnode(new Type(), "Parameters", false, {$2});};
+	;
+ParameterDeclStar:
+	ParameterDecl {$$ = new astnode(new Type(), "ParameterDeclStar", false, {$1});}
+	| ParameterDeclStar COMMA ParameterDecl {$$ = new astnode(new Type(), "ParameterDeclStar", false, {$1, $3});};
+	;
+
+ParameterDecl:
+	IdentifierList Type {$$ = new astnode(new Type(), "ParameterDecl", false, {$1, $2});}
+	| IdentifierList ELLIPSIS  Type {$$ = new astnode(new Type(), "ParameterDecl", false, {$1, $3});};
+	| ELLIPSIS Type {$$ = new astnode(new Type(), "ParameterDecl", false, {$2});};
+	;
+
+TypeList:
+    TypeList COMMA Type {$$ = new astnode(new Type(), "TypeList", false, {$1, $3});}
+    | Type {$$ = new astnode(new Type(), "TypeList", false, {$1});};
+    ;
+
+IdentifierList:
+		IDENTIFIER IdentifierLIST {$$ = new astnode(new Type(), "IdentifierList", false, {$2});}
+		| IDENTIFIER {$$ = new astnode(IDENTIFIER);};
+		;
+
+IdentifierLIST:	IdentifierLIST COMMA IDENTIFIER {$$ = new astnode(new Type(), "IdentifierLIST", false, {$1});}
+		| COMMA IDENTIFIER {$$ = new astnode(IDENTIFIER);}
+		;
+
+MethodDecl:
+	FUNC Receiver IDENTIFIER Function {$$ = new astnode(new Type(), "MethodDecl", false, {$2, $4});};
+	| FUNC Receiver IDENTIFIER Signature {$$ = new astnode(new Type(), "MethodDecl", false, {$2, $4});};
+	;
+
+Receiver:
+	Parameters {$$ = new astnode(new Type(), "Receiver", false, {$1});}
+
+TopLevelDeclStar:
+    TopLevelDeclStar SEMICOLON /*here colon*/ TopLevelDecl {$$ = new astnode(new Type(), "TopLevelDeclStar", false, {$1, $3});}
+    | TopLevelDecl {$$ = new astnode(new Type(), "TopLevelDeclStar", false, {$1});};
+    ;
+
+TopLevelDecl:
+	Declaration {$$ = new astnode(new Type(), "TopLevelDecl", false, {$1});}
+	| FunctionDecl {$$ = new astnode(new Type(), "TopLevelDecl", false, {$1});}
+	| MethodDecl {$$ = new astnode(new Type(), "TopLevelDecl", false, {$1});}
+	;
+
+TypeLit:
+	ArrayType {$$ = new astnode(new Type(), "TypeLit", false, {$1});}
+	| StructType {$$ = new astnode(new Type(), "TypeLit", false, {$1});}
+	| PointerType {$$ = new astnode(new Type(), "TypeLit", false, {$1});}
+	| FunctionType {$$ = new astnode(new Type(), "TypeLit", false, {$1});}
+	;
+
+Type:
+	TypeName {$$ = new astnode(new Type(), "Type", false, {$1});}
+	| TypeLit {$$ = new astnode(new Type(), "Type", false, {$1});}
+	;
+
+Operand:
+	Literal {$$ = new astnode(new Type(), "Operand", false, {$1});}
+	| OperandName {$$ = new astnode(new Type(), "Operand", false, {$1});}
+	| LPAREN Expression RPAREN {$$ = new astnode(new Type(), "Operand", false, {$2});}
+
+OperandName:
+	IDENTIFIER {$$ = new astnode(IDENTIFIER);}
+;
+
+ReturnStmt:
+	RETURN Expression {$$ = new astnode("ReturnStmt", false, {$2});}
+	| RETURN {$$ = new astnode(RETURN);};
+
+BreakStmt:
+	BREAK IDENTIFIER {$$ = new astnode("BreakStmt", false, {new astnode(BREAK, $1), new astnode(IDENTIFIER, $2)});}
+	| BREAK {$$ = new astnode(BREAK);};
+
+ContinueStmt:
+	CONTINUE IDENTIFIER {$$ = new astnode("ContinueStmt", false, {new astnode(BREAK, $1), new astnode(IDENTIFIER, $2)});}
+	| CONTINUE {$$ = new astnode(CONTINUE);}
+	;
+
+IfStmt:
+	IF OPENB Expression Block CLOSEB {$$ = new astnode("IfStmt", false, {$2, $3, $4, $5});}
+	|IF OPENB SimpleStmt SEMICOLON Expression Block CLOSEB {$$ = new astnode("IfStmt", false, {$2, $3, $5, $6, $7});}
+	|IF OPENB SimpleStmt SEMICOLON Expression Block ELSE IfStmt CLOSEB {$$ = new astnode("IfStmt", false, {$2, $3, $5, $6, $8, $9});}
+	|IF OPENB SimpleStmt SEMICOLON Expression Block ELSE  Block CLOSEB {$$ = new astnode("IfStmt", false, {$2, $3, $5, $6, $8, $9});}
+	|IF OPENB Expression Block ELSE IfStmt CLOSEB {$$ = new astnode("IfStmt", false, {$2, $3, $4, $6, $7});}
+	|IF OPENB Expression Block ELSE  Block CLOSEB {$$ = new astnode("IfStmt", false, {$2, $3, $4, $6, $7});}
+	;
+
+ForStmt:
+	FOR OPENB Condition Block CLOSEB {$$ = new astnode("ForStmt", false, {$2, $3, $4, $5});}
+	|FOR OPENB ForClause Block CLOSEB {$$ = new astnode("ForStmt", false, {$2, $3, $4, $5});}
+	;
+Condition:
+	Expression {$$ = new astnode("Condition", false, {$1});};
+
+ForClause:
+	InitStmt SEMICOLON Condition SEMICOLON PostStmt {$$ = new astnode("ForClause", false, {$1, $3, $5});}
+	;
+InitStmt:
+	SimpleStmt {$$ = new astnode("InitStmt", false, {$1});};
+PostStmt:
+	SimpleStmt {$$ = new astnode("InitStmt", false, {$1});};
+
+int_lit:
+	INTEGER  { $$ = new astnode(INTEGER,$1);}
+	;
+float_lit:
+	  FLOAT { $$ = new astnode(FLOAT,$1);}
+	  ;
+
+TypeName:
+	IDENTIFIER { $$ = new astnode(IDENTIFIER,$1);}
+	| VAR_TYPE { $$ = new astnode(VAR_TYPE,$1);}
+	;
+
+ArrayType:
+	LBRACK ArrayLength RBRACK Type { $$ = new astnode("",false,{$2,$4}); }
+	;
+
+ArrayLength:
+	Expression { $$ = new astnode("ArrayLength",false,{$1}); }
+	;
+
+StructType:
+    STRUCT LBRACE FieldDeclStar RBRACE { $$ = new astnode("StructType",false,{$3}); }
+    | STRUCT LBRACE RBRACE { $$ = new astnode("StructType",false,{}); }
+    ;
+
+FieldDeclStar:
+    FieldDecl SEMICOLON { $$ = new astnode("FieldDeclStar",false,{$1}); }
+    | FieldDeclStar FieldDecl SEMICOLON { $$ = new astnode("FieldDeclStar",false,{$1,$2}); }
+    ;
+
+FieldDecl:
+	IdentifierList Type { $$ = new astnode("FieldDecl",false,{$1,$2}); }
+	| IdentifierList Type Tag { $$ = new astnode("FieldDecl",false,{$1,$2,$3}); }
+	;
+
+Tag:
+	STRING { $$ = new astnode(new DefinedType("string"), STRING, $1);}
+	;
+
+PointerType:
+	MUL BaseType { $$ = new astnode(new PointerType($2->type),"PointerType",false,{$2}); }
+	;
+BaseType:
+	Type { $$ = new astnode($1->type, "BaseType",false,{$1}); }
+	;
+
+// NOTE- Fill type information properly
+FunctionType:
+	FUNC Signature { $$ = new astnode("FunctionType",false,{$2}); }
+	;
+
+ConstDecl:
+		CONST ConstSpec { $$ = new astnode("ConstDecl",false,{$2}); }
+		;
+
+ConstSpec:
+		IDENTIFIER Type ASSIGN Expression { $$ = new astnode("ConstSpec",false,{$2,$4}); }
+		| IDENTIFIER Type { $$ = new astnode("ConstSpec",false,{$2}); }
+		;
+
+ExpressionList:
+		ExpressionList COMMA Expression { $$ = new astnode("ExpressionList",false,{$1,$3}); }
+		| Expression { $$ = new astnode("ExpressionList",false,{$1}); }
+		;
+
+TypeDecl:
+		TYPE  TypeSpec { $$ = new astnode("TypeDecl",false,{new astnode(TYPE,$1),$2}); }
+		| TYPE LPAREN TypeSpecList RPAREN { $$ = new astnode("TypeDecl",false,{new astnode(TYPE,$1), $3}); }
+		;
+
+TypeSpecList:
+		TypeSpecList TypeSpec SEMICOLON { $$ = new astnode("TypeSpecList",false,{$1,$2}); }
+		| TypeSpec SEMICOLON { $$ = new astnode("TypeSpecList",false,{$1}); }
+		;
+TypeSpec:
+		AliasDecl { $$ = new astnode("TypeSpec",false,{$1}); }
+		| TypeDef { $$ = new astnode("TypeSpec",false,{$1}); }
+		;
+
+AliasDecl:
+		IDENTIFIER ASSIGN Type { $$ = new astnode("AliasDecl",false,{new astnode(IDENTIFIER,$1), new astnode(ASSIGN,$2), $3}); }
+		;
+
+TypeDef:
+		IDENTIFIER Type { $$ = new astnode("TypeDef",false,{new astnode(IDENTIFIER,$1), $2}); }
+		;
+
+Literal:
+	BasicLit { $$ = new astnode("Literal",false,{$1}); }
+	| FunctionLit { $$ = new astnode("Literal",false,{$1}); }
+	;
+
+string_lit:
+	STRING { new astnode(new PointerType(new DefinedType("string")) , STRING, $1);}
+	;
+
+byte_lit:
+	BYTE  { $$ = new astnode(new DefinedType("byte") , BYTE, $1);}
+	;
+
+BasicLit:
+	int_lit { $$ = new astnode("BasicLit",false,{$1}); }
+	| float_lit { $$ = new astnode("BasicLit",false,{$1}); }
+	| string_lit { $$ = new astnode("BasicLit",false,{$1}); }
+	| byte_lit { $$ = new astnode("BasicLit",false,{$1}); }
+	;
+
+FunctionLit:
+	FUNC Function { $$ = new astnode("FunctionLit",false,{new astnode(FUNC,$1), $2}); }
+	;
+
+PrimaryExpr:
+	Operand { $$ = new astnode("PrimaryExpr",false,{$1}); }
+	| PrimaryExpr Selector { $$ = new astnode("PrimaryExpr",false,{$1,$2}); }
+	| PrimaryExpr Index { $$ = new astnode("PrimaryExpr",false,{$1,$2}); }
+	| PrimaryExpr TypeAssertion { $$ = new astnode("PrimaryExpr",false,{$1,$2}); }
+	| OperandName StructLiteral { $$ = new astnode("PrimaryExpr",false,{$1,$2}); }
+	;
+
+StructLiteral:
+    LBRACE KeyValList RBRACE { $$ = new astnode("StructLiteral",false,{$2}); }
+    ;
+
+KeyValList:
+    	/* empty */ { $$ = new astnode(); }
+ 	| Expression COLON Expression { $$ = new astnode("",false,{$1,$3}); }
+	| KeyValList COMMA Expression COLON Expression { $$ = new astnode("",false,{$1,$3,$5}); }
+	;
+
+Selector:
+	PERIOD IDENTIFIER { $$ = new astnode("Selector",false,{new astnode(PERIOD,$1), new astnode(IDENTIFIER,$2)}); }
+	;
+Index:
+	LBRACK Expression RBRACK { $$ = new astnode("Index",false,{$2}); }
+	;
+
+
+TypeAssertion:
+	PERIOD LPAREN Type RPAREN { $$ = new astnode("TypeAssertion",false,{new astnode(PERIOD, $1), $3}); }
+	;
+
+// The below expression{number} is written because of the conflict between the
+// expression when the binary operations are used with a single rule
+
+// TODO - Fill Type fields after type resolution
+// TODO - Shorten this expression tree
+Expression:
+    Expression1 { $$ = appendId($1,"1");}
+    ;
+
+Expression1:
+    Expression1 LOR Expression2 { $$ = new astnode("Expression1",false,{$1,new astnode(LOR),$3}); }
+    | Expression2 { $$ = appendId($1,"1"); }
+    ;
+
+Expression2:
+    Expression2 LAND Expression3 { $$ = new astnode("Expression2",false,{$1,new astnode(LAND),$3}); }
+    | Expression3 { $$ = appendId($1,"2"); }
+    ;
+
+Expression3:
+    Expression3 rel_op Expression4 { $$ = new astnode("Expression3",false,{$1,$2,$3}); }
+    | Expression4 { appendId($1,"3"); }
+    ;
+
+Expression4:
+    Expression4 add_op Expression5 { $$ = new astnode("Expression4",false,{$1,$2,$3}); }
+    | Expression5 { appendId($1,"4"); }
+    ;
+
+Expression5:
+    Expression5 mul_op PrimaryExpr { $$ = new astnode("Expression5",false,{$1,$2,$3}); }
+    | UnaryExpr { $$ = new astnode("Expression5",false,{$1}); }
+    ;
+
+UnaryExpr:
+	PrimaryExpr { $$ = new astnode("UnaryExpr",false,{$1}); }
+	| unary_op PrimaryExpr { $$ = new astnode("UnaryExpr",false,{$1,$2}); }
+	//UnaryExpr
+	;
+
+rel_op:
+	EQL   { $$ = new astnode(EQL);}
+	| NEQ { $$ = new astnode(NEQ);}
+	| LSS { $$ = new astnode(LSS);}
+	| LEQ { $$ = new astnode(LEQ);}
+	| GTR { $$ = new astnode(GTR);}
+	| GEQ { $$ = new astnode(GEQ);}
+	;
+add_op:
+	ADD { $$ = new astnode(ADD);}
+	| SUB { $$ = new astnode(SUB);}
+	| OR  { $$ = new astnode(OR);}
+	| XOR { $$ = new astnode(XOR);}
+	;
+mul_op:
+	MUL   { $$ = new astnode(MUL);}
+	| QUO { $$ = new astnode(QUO);}
+	| REM { $$ = new astnode(REM);}
+	| SHL { $$ = new astnode(SHL);}
+	| SHR { $$ = new astnode(SHR);}
+	| AND { $$ = new astnode(AND);}
+	| AND_NOT  { $$ = new astnode(AND_NOT);};
+
+unary_op:
+	ADD  { $$ = new astnode(ADD);}
+	| SUB { $$ = new astnode(SUB);}
+	| NOT { $$ = new astnode(NOT);}
+	| XOR { $$ = new astnode(XOR);}
+	| MUL { $$ = new astnode(MUL);}
+	| AND { $$ = new astnode(AND);}
+	;
+
+assign_op:
+	ASSIGN { $$ = new astnode(ASSIGN);}
+	| ADD_ASSIGN { $$ = new astnode(ADD_ASSIGN);}
+	| SUB_ASSIGN { $$ = new astnode(SUB_ASSIGN);}
+	| MUL_ASSIGN { $$ = new astnode(MUL_ASSIGN);}
+	| QUO_ASSIGN { $$ = new astnode(QUO_ASSIGN);}
+	| REM_ASSIGN { $$ = new astnode(REM_ASSIGN);}
+	;
+
+PackageClause:
+	PACKAGE PackageName { $$ = new astnode("PackageClause", false, {new astnode(PACKAGE), $2});}
+	;
+PackageName:
+	IDENTIFIER { $$ = new astnode(new DefinedType("fillTypeUsingSymbolTable"),IDENTIFIER);}
+	;
+
+ImportDeclStar:
+    ImportDeclStar ImportDecl { $$ = new astnode("ImportDeclStar", false,{$1,$2});}
+    | ImportDecl { $$ = new astnode("", false, {$1}); }
+    | /*empty*/ { $$ = new astnode(); }
+    ;
+
+ImportDecl:
+	IMPORT ImportSpec SEMICOLON { $$ = new astnode("ImportDecl", false, {new astnode(IMPORT),$2}); }
+	| IMPORT LPAREN ImportSpecStar RPAREN { $$ = new astnode("ImportDecl", false, {new astnode(IMPORT), $3}); }
+	;
+
+ImportSpecStar:
+	ImportSpecStar ImportSpec SEMICOLON { $$ = new astnode("ImportSpecStar", false, {$1,$2}); }
+	| ImportSpec SEMICOLON { $$ = new astnode("ImportSpecStar", false, {$1}); }
+	;
+ImportSpec:
+	 PERIOD ImportPath { $$ = new astnode("ImportSpec", false, {$2}); }
+	| AlternatePackageName ImportPath { $$ = new astnode("ImportSpec", false, {$1,$2}); }
+	| AlternatePackageName { $$ = new astnode("ImportSpec", false, {$1}); }
+	;
+ImportPath:
+	string_lit  { $$ = newId($1,"ImportPath");}
+	;
+AlternatePackageName:
+	string_lit { $$ = newId($1, "AlternatePackageName");}
+	;
+
+%%
+
+int nodeId = 0;
+void prettyPrint(astnode* root){
+	cout << nodeId << " [label=\"" << root->id << "\"]" << endl;
+	int parentId = nodeId;
+	for(auto child : root->children){
+		cout << parentId << "->" << ++nodeId << endl;
+		prettyPrint(child);
+	}
+}
+
+int main (int argc, char **argv) {
+	yyparse ( );
+	// redirect ostream to file
+	ofstream myfile;
+	myfile.open ("ast.dot");
+	cout.rdbuf(myfile.rdbuf());
+	cout << "digraph \"src/parser.ypp\" \n { \n node [fontname = courier, shape = box, colorscheme = paired6] \n edge [fontname = courier]" << endl;
+	prettyPrint(theprogram);
+	cout << "}" << endl;
+}

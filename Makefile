@@ -1,14 +1,17 @@
 all:
-	bison -d src/parser.y
-	bison --graph src/parser.y
+	bison -d src/parser.ypp
+	bison --graph src/parser.ypp
 	flex src/lex.l
 	mkdir -p bin
-	g++ lex.yy.c parser.tab.c -o bin/parser
+	g++ -std=c++17 src/data.cpp src/type.cpp src/ast.cpp lex.yy.c parser.tab.cpp -o bin/parser
 	chmod +x bin/parser
 
-generate_graph:
+generate_parser:
 	python3 src/label.py
-	sfdp -x -Goverlap=scale -Tpng new_parser.gv > automata.png
+	# sfdp -x -Goverlap=scale -Tpng new_parser.gv > automata.png
+
+generate_ast:
+	dot -Tpng ast.dot -o ast.png
 
 test_go:
 	./bin/parser < ./test/parser_test_file/test1.go
@@ -20,12 +23,15 @@ test_go:
 clean_graph:
 	rm automata.png
 
-# for running all the commands ignoring the errors use `make clean -i`
 clean:
-	rm lex.yy.c
-	rm parser.tab.c
-	rm parser.tab.h
-	rm bin/parser
-	rm new_parser.gv
-	rm parser.gv
-	rm automata.png
+	rm -f lex.yy.c
+	rm -f parser.tab.cpp
+	rm -f parser.tab.hpp
+	rm -f bin/parser
+	rm -f new_parser.gv
+	rm -f parser.gv
+	rm -f parser.dot
+	rm -f automata.png
+	rm -f ast.dot
+	rm -f ast.gv
+	rm -f ast.png
