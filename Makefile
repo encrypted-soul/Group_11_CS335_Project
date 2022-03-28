@@ -3,7 +3,7 @@ all:
 	bison --graph src/parser.ypp
 	flex src/lex.l
 	mkdir -p bin
-	g++ -std=c++17 src/data.cpp src/type.cpp src/ast.cpp lex.yy.c parser.tab.cpp -o bin/parser
+	g++ -std=c++17 src/data.cpp src/type.cpp src/ast.cpp lex.yy.c parser.tab.cpp src/symtab.h src/symtab.cpp -o bin/parser
 	chmod +x bin/parser
 
 generate_parser:
