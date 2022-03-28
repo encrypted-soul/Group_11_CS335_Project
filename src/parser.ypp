@@ -60,6 +60,7 @@ astnode *theprogram;
 %type <node> ImportPath PackageClause PackageName ImportDecl ImportDeclStar ImportSpecStar
 %type <node> FieldDeclStar FieldDecl Type TypeLit ArrayLength TypeName
 %type <node> PointerType IdentifierList IdentifierLIST BaseType AlternatePackageName
+%type <node> StructLiteral KeyValList
 
 %%
 
@@ -278,92 +279,95 @@ PostStmt:
 	SimpleStmt ;
 
 int_lit:
-	INTEGER
+	INTEGER  { $$ = new astnode(INTEGER,$1);}
 	;
 float_lit:
-	  FLOAT
+	  FLOAT { $$ = new astnode(FLOAT,$1);}
 	  ;
 
 TypeName:
-	IDENTIFIER
-	| VAR_TYPE
+	IDENTIFIER { $$ = new astnode(IDENTIFIER,$1);}
+	| VAR_TYPE { $$ = new astnode(VAR_TYPE,$1);}
 	;
 
 ArrayType:
-	LBRACK ArrayLength RBRACK Type
+	LBRACK ArrayLength RBRACK Type { $$ = new astnode("",false,{$2,$4}); }
 	;
 
 ArrayLength:
-	Expression
+	Expression { $$ = new astnode("ArrayLength",false,{$1}); }
 	;
 
 StructType:
-    STRUCT LBRACE FieldDeclStar RBRACE
-    | STRUCT LBRACE RBRACE
+    STRUCT LBRACE FieldDeclStar RBRACE { $$ = new astnode("StructType",false,{$3}); }
+    | STRUCT LBRACE RBRACE { $$ = new astnode("StructType",false,{}); }
     ;
 
 FieldDeclStar:
-    FieldDecl SEMICOLON
-    | FieldDeclStar FieldDecl SEMICOLON
+    FieldDecl SEMICOLON { $$ = new astnode("FieldDeclStar",false,{$1}); }
+    | FieldDeclStar FieldDecl SEMICOLON { $$ = new astnode("FieldDeclStar",false,{$1,$2}); }
     ;
 
 FieldDecl:
-	IdentifierList Type
-	| IdentifierList Type Tag
+	IdentifierList Type { $$ = new astnode("FieldDecl",false,{$1,$2}); }
+	| IdentifierList Type Tag { $$ = new astnode("FieldDecl",false,{$1,$2,$3}); }
 	;
 
 Tag:
-	STRING
+	STRING { $$ = new astnode(new DefinedType("string"), STRING, $1);}
 	;
 
 PointerType:
-	MUL BaseType
+	MUL BaseType { $$ = new astnode(new PointerType($2->type),"PointerType",false,{$2}); }
 	;
 BaseType:
-	Type
+	Type { $$ = new astnode($1->type, "BaseType",false,{$1}); }
 	;
 
+// NOTE- Fill type information properly
 FunctionType:
-	FUNC Signature
+	FUNC Signature { $$ = new astnode("FunctionType",false,{$2}); }
 	;
 
 ConstDecl:
-		CONST ConstSpec
+		CONST ConstSpec { $$ = new astnode("ConstDecl",false,{$2}); }
 		;
 
 ConstSpec:
-		IDENTIFIER Type ASSIGN Expression
-		| IDENTIFIER Type
+		IDENTIFIER Type ASSIGN Expression { $$ = new astnode("ConstSpec",false,{$2,$4}); }
+		| IDENTIFIER Type { $$ = new astnode("ConstSpec",false,{$2}); }
 		;
 
 ExpressionList:
-		ExpressionList COMMA Expression
-		| Expression
+		ExpressionList COMMA Expression { $$ = new astnode("ExpressionList",false,{$1,$3}); }
+		| Expression { $$ = new astnode("ExpressionList",false,{$1}); }
 		;
 
 TypeDecl:
-		TYPE  TypeSpec
-		| TYPE LPAREN TypeSpecList RPAREN ;
+		TYPE  TypeSpec { $$ = new astnode("TypeDecl",false,{new astnode(TYPE,$1),$2}); }
+		| TYPE LPAREN TypeSpecList RPAREN { $$ = new astnode("TypeDecl",false,{new astnode(TYPE,$1), $3}); }
+		;
 
 TypeSpecList:
-		TypeSpecList TypeSpec SEMICOLON
-		| TypeSpec SEMICOLON
+		TypeSpecList TypeSpec SEMICOLON { $$ = new astnode("TypeSpecList",false,{$1,$2}); }
+		| TypeSpec SEMICOLON { $$ = new astnode("TypeSpecList",false,{$1}); }
 		;
 TypeSpec:
-		AliasDecl
-		| TypeDef ;
+		AliasDecl { $$ = new astnode("TypeSpec",false,{$1}); }
+		| TypeDef { $$ = new astnode("TypeSpec",false,{$1}); }
+		;
 
 AliasDecl:
-		IDENTIFIER ASSIGN Type
+		IDENTIFIER ASSIGN Type { $$ = new astnode("AliasDecl",false,{new astnode(IDENTIFIER,$1), new astnode(ASSIGN,$2), $3}); }
 		;
 
 TypeDef:
-		IDENTIFIER Type
+		IDENTIFIER Type { $$ = new astnode("TypeDef",false,{new astnode(IDENTIFIER,$1), $2}); }
 		;
 
 Literal:
-	BasicLit
-	| FunctionLit
+	BasicLit { $$ = new astnode("Literal",false,{$1}); }
+	| FunctionLit { $$ = new astnode("Literal",false,{$1}); }
 	;
 
 string_lit:
@@ -375,41 +379,44 @@ byte_lit:
 	;
 
 BasicLit:
-	int_lit
-	| float_lit
-	| string_lit
-	| byte_lit
+	int_lit { $$ = new astnode("BasicLit",false,{$1}); }
+	| float_lit { $$ = new astnode("BasicLit",false,{$1}); }
+	| string_lit { $$ = new astnode("BasicLit",false,{$1}); }
+	| byte_lit { $$ = new astnode("BasicLit",false,{$1}); }
 	;
 
 FunctionLit:
-	FUNC Function ;
+	FUNC Function { $$ = new astnode("FunctionLit",false,{new astnode(FUNC,$1), $2}); }
+	;
 
 PrimaryExpr:
-	Operand |
-	PrimaryExpr Selector |
-	PrimaryExpr Index |
-	PrimaryExpr TypeAssertion |
-	OperandName StructLiteral
+	Operand { $$ = new astnode("PrimaryExpr",false,{$1}); }
+	| PrimaryExpr Selector { $$ = new astnode("PrimaryExpr",false,{$1,$2}); }
+	| PrimaryExpr Index { $$ = new astnode("PrimaryExpr",false,{$1,$2}); }
+	| PrimaryExpr TypeAssertion { $$ = new astnode("PrimaryExpr",false,{$1,$2}); }
+	| OperandName StructLiteral { $$ = new astnode("PrimaryExpr",false,{$1,$2}); }
 	;
 
 StructLiteral:
-    LBRACE KeyValList RBRACE
+    LBRACE KeyValList RBRACE { $$ = new astnode("StructLiteral",false,{$2}); }
     ;
 
 KeyValList:
     	/* empty */
- 	| Expression COLON Expression
-	| KeyValList COMMA Expression COLON Expression
+ 	| Expression COLON Expression { $$ = new astnode("",false,{$1,$3}); }
+	| KeyValList COMMA Expression COLON Expression { $$ = new astnode("",false,{$1,$3,$5}); }
 	;
 
 Selector:
-	PERIOD IDENTIFIER ;
+	PERIOD IDENTIFIER { $$ = new astnode("Selector",false,{new astnode(PERIOD,$1), new astnode(IDENTIFIER,$2)}); }
+	;
 Index:
-	LBRACK Expression RBRACK ;
+	LBRACK Expression RBRACK { $$ = new astnode("Index",false,{$2}); }
+	;
 
 
 TypeAssertion:
-	PERIOD LPAREN Type RPAREN
+	PERIOD LPAREN Type RPAREN { $$ = new astnode("TypeAssertion",false,{new astnode(PERIOD, $1), $3}); }
 	;
 
 // The below expression{number} is written because of the conflict between the
