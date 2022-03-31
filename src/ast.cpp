@@ -8,7 +8,7 @@ astnode::astnode(Type* type, int tokenId)
     : type(type), id(to_string(tokenId)) {}
 
 astnode::astnode(string id, bool isTerminal, vector<astnode*> children)
-    : type(type), isTerminal(isTerminal), children(children) {}
+    : id(id), isTerminal(isTerminal), children(children) {}
 
 astnode::astnode(Type* type, string id, bool isTerminal,
                  vector<astnode*> children)
@@ -22,7 +22,7 @@ astnode::astnode(Type* type, int tokenId, Data* data)
 
 astnode::astnode(string id, bool isTerminal, vector<astnode*> children,
                  Data* data)
-    : type(type), isTerminal(isTerminal), children(children), data(data) {}
+    : id(id), isTerminal(isTerminal), children(children), data(data) {}
 
 astnode::astnode(Type* type, string id, bool isTerminal,
                  vector<astnode*> children, Data* data)
