@@ -14,11 +14,11 @@ generate_ast:
 	dot -Tpng ast.dot -o ast.png
 
 test_go:
-	./bin/parser < ./test/parser_test_file/test1.go
-	./bin/parser < ./test/parser_test_file/test2.go
-	./bin/parser < ./test/parser_test_file/test3.go
-	./bin/parser < ./test/parser_test_file/test4.go
-	./bin/parser < ./test/parser_test_file/test5.go
+	./bin/parser 1 < ./test/parser_test_file/test1.go
+	./bin/parser 2 < ./test/parser_test_file/test2.go
+	./bin/parser 3 < ./test/parser_test_file/test3.go
+	./bin/parser 4 < ./test/parser_test_file/test4.go
+	./bin/parser 5 < ./test/parser_test_file/test5.go
 
 clean_graph:
 	rm automata.png
@@ -32,6 +32,7 @@ clean:
 	rm -f parser.gv
 	rm -f parser.dot
 	rm -f automata.png
-	rm -f ast.dot
-	rm -f ast.gv
-	rm -f ast.png
+	rm -f ast*.dot
+	rm -f ast*.gv
+	rm -f ast*.png
+	rm -f symbolTable*.txt

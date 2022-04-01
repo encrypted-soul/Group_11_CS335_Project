@@ -8,6 +8,6 @@ extern umap<string, Type*> symtab; //see parser.ypp
 //extern string fullscope;
 
 int symadd(string symname, Type* symtype);
-void print_symtab();
+void print_symtab(ofstream& symbolTable);
 
 #endif

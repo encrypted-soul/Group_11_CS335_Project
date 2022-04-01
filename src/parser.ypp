@@ -77,18 +77,18 @@ Block:
 	;
 
 OPENB:
-	/*empty*/ { 
-		$$ = new astnode(); 
-		currscope++;
-		fullscope = fullscope + "/" + to_string(currscope);
+	/*empty*/ {
+		$$ = new astnode();
+		 currscope++;
+		 fullscope = fullscope + "/" + to_string(currscope);
 	}
 	;
 
 CLOSEB:
-	/*empty*/ { 
+	/*empty*/ {
 		$$ = new astnode();
-		currscope--;
-		fullscope = fullscope.substr(0, fullscope.find_last_of("/") );
+		 currscope--;
+		 fullscope = fullscope.substr(0, fullscope.find_last_of("/") );
 	}
 	;
 
@@ -145,8 +145,16 @@ Declaration:
 	| VarDecl {$$ = newId($1, "Declaration");};
 
 FunctionDecl:
-		FUNC IDENTIFIER OPENB Function CLOSEB { $$ = new astnode("FunctionDecl", false, {new astnode(IDENTIFIER, $2), $4});symadd( fullscope + " " + $2->v_str, $4->type);}
-		| FUNC IDENTIFIER OPENB Signature CLOSEB { $$ = new astnode("FunctionDecl", false, {new astnode(IDENTIFIER, $2), $4}); symadd( fullscope + " " + $2->v_str, $4->type);}
+		FUNC IDENTIFIER OPENB Function CLOSEB { $$ = new astnode("FunctionDecl", false, {new astnode(IDENTIFIER, $2), $4});
+		// cout << $2->v_str << endl;
+		// cout << $4->type->getType() << endl;
+		symadd( fullscope + " " + $2->v_str, $4->type);
+		}
+		| FUNC IDENTIFIER OPENB Signature CLOSEB { $$ = new astnode("FunctionDecl", false, {new astnode(IDENTIFIER, $2), $4});
+		// cout << $2->v_str << endl;
+		// cout << $4->type->getType() << endl;
+		symadd( fullscope + " " + $2->v_str, $4->type);
+		}
 		;
 Function:
 		Signature FunctionBody {$$ = new astnode("Function", false, {$1, $2});}
@@ -219,7 +227,7 @@ Receiver:
 	Parameters {$$ = newId($1, "Receiver");}
 
 TopLevelDeclStar:
-    TopLevelDeclStar SEMICOLON /*here colon*/ TopLevelDecl {$$ = new astnode("TopLevelDeclStar", false, {$1, $3});}
+    TopLevelDeclStar SEMICOLON/*here colon*/ TopLevelDecl {$$ = new astnode("TopLevelDeclStar", false, {$1, $3});}
     | TopLevelDecl {$$ = newId($1, "TopLevelDeclStar");};
     ;
 
@@ -545,24 +553,32 @@ AlternatePackageName:
 
 %%
 
+
 int nodeId = 0;
-void prettyPrint(astnode* root){
-	cout << nodeId << " [label=\"" << root->id << "\"]" << endl;
+void prettyPrint(ofstream& astFile, astnode* root){
+	astFile << nodeId << " [label=\"" << root->id << "\"]" << endl;
 	int parentId = nodeId;
 	for(auto child : root->children){
-		cout << parentId << "->" << ++nodeId << endl;
-		prettyPrint(child);
+		astFile << parentId << "->" << ++nodeId << endl;
+		prettyPrint(astFile , child);
 	}
 }
 
 int main (int argc, char **argv) {
 	yyparse ( );
-	print_symtab();
-	// redirect ostream to file
-	ofstream myfile;
-	myfile.open ("ast.dot");
-	cout.rdbuf(myfile.rdbuf());
-	cout << "digraph \"src/parser.ypp\" \n { \n node [fontname = courier, shape = box, colorscheme = paired6] \n edge [fontname = courier]" << endl;
-	prettyPrint(theprogram);
-	cout << "}" << endl;
+	ofstream symbolTable;
+	int fileNo = atoi(argv[1]);
+	symbolTable.open("symbolTable" + to_string(fileNo) + ".txt");
+	print_symtab(symbolTable);
+	symbolTable.close();
+	ofstream astFile;
+	astFile.open("ast" + to_string(fileNo) + ".dot" );
+	if(!astFile) {
+		cout << "couldn't open file" << endl;
+		exit(1);
+	}
+	astFile << "digraph \"src/parser.ypp\" \n { \n node [fontname = courier, shape = box, colorscheme = paired6] \n edge [fontname = courier]" << endl;
+	prettyPrint(astFile, theprogram);
+	astFile << "}" << endl;
+	astFile.close();
 }
