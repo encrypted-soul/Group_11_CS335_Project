@@ -142,12 +142,10 @@ VarDecl:
 		
 VarSpec:
 		IdentifierList Type ASSIGN ExpressionList {$$ = new astnode("VarSpec", false, {$1, $2, new astnode(ASSIGN, $3),  $4});
-			//if( !symadd($1->data->v_str, $2->type) ) exit(1); 
-			//cout<<$1->data->v_str<<endl;
+			symadd_list($1, $2->type, IDENTIFIER);
 		}
 		| IdentifierList Type {$$ = new astnode("VarSpec", false, {$1, $2});
-			//if( !symadd($1->data->v_str, $2->type) ) exit(1);
-			//cout<<$1->data->v_str<<endl;
+			symadd_list($1, $2->type, IDENTIFIER);
 		}
 		;
 
@@ -232,7 +230,7 @@ IdentifierList:
 		| IDENTIFIER {$$ = new astnode(IDENTIFIER, $1);}
 		;
 
-IdentifierLIST:	IdentifierLIST COMMA IDENTIFIER {$$ = newId($1, "IdentifierLIST");}
+IdentifierLIST:	IdentifierLIST COMMA IDENTIFIER { $$ = new astnode("IdentifierLIST", false, {$1, new astnode(IDENTIFIER, $3)});}
 		| COMMA IDENTIFIER {$$ = new astnode(IDENTIFIER, $2);}
 		;
 
@@ -382,11 +380,11 @@ ConstDecl:
 ConstSpec:
 		IDENTIFIER Type ASSIGN Expression { $$ = new astnode("ConstSpec",false,{$2,$4}); 
 			if( !symadd($1->v_str, $2->type) ) exit(1);
-			cout<<"SCOPE"<<any_scope("test")<<endl;
+			//cout<<"SCOPE"<<any_scope("test")<<endl;
 		}
 		| IDENTIFIER Type { $$ = newId($2, "ConstSpec"); 
 			if( !symadd($1->v_str, $2->type) ) exit(1);
-			cout<<"SCOPE"<<any_scope("test")<<endl;
+			//cout<<"SCOPE"<<any_scope("test")<<endl;
 		}
 		;
 
