@@ -3,11 +3,18 @@
 
 #include "type.h"
 #include <string>
+#include "ast.h"
+#define FOUND 0
+#define NOTFOUND -1
 
-extern umap<string, Type*> symtab; //see parser.ypp
-//extern string fullscope;
+//see parser.ypp
+extern umap<string, Type*> symtab; 
+extern string fullscope;
 
-int symadd(string symname, Type* symtype);
-void print_symtab(ofstream& symbolTable);
+bool symadd(string symname, Type* symtype);
+void print_symtab(ostream& symbolTable);
+int curr_scope(string symname);
+int any_scope(string symname);
+int symadd_list(astnode* node, Type* symtype, int token_name);
 
 #endif
