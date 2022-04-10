@@ -78,7 +78,7 @@ Block:
 
 OPENB:
 	/*empty*/ {
-		cout<<fullscope<<endl;
+		//cout<<fullscope<<endl;
 		$$ = new astnode();
 		 currscope++;
 		 fullscope = fullscope + "/" + to_string(currscope);
@@ -87,9 +87,8 @@ OPENB:
 
 CLOSEB:
 	/*empty*/ {
-		cout<<fullscope<<endl;
+		//cout<<fullscope<<endl;
 		$$ = new astnode();
-		 //currscope--;
 		 fullscope = fullscope.substr(0, fullscope.find_last_of("/") );
 	}
 	;
@@ -155,20 +154,23 @@ Declaration:
 	| VarDecl {$$ = newId($1, "Declaration");}
 	;
 
+
 FunctionDecl:
 		FUNC IDENTIFIER OPENB Function CLOSEB { $$ = new astnode("FunctionDecl", false, {new astnode(IDENTIFIER, $2), $4});
-			// cout << $2->v_str << endl;
-			// cout << $4->type->getType() << endl;
 			if( !symadd($2->v_str, $4->type) ) exit(-1);
 		}
 		| FUNC IDENTIFIER OPENB Signature CLOSEB { $$ = new astnode("FunctionDecl", false, {new astnode(IDENTIFIER, $2), $4});
-			// cout << $2->v_str << endl;
-			// cout << $4->type->getType() << endl;
 			if( !symadd($2->v_str, $4->type) ) exit(-1);		
 		}
 		;
+		
+/* taking care of that params scope same as fcn block using mid rule + normal end rule actions */
 Function:
-		Signature FunctionBody {$$ = new astnode("Function", false, {$1, $2});}
+		Signature {fullscope=fullscope.substr(0,fullscope.find_last_of("/"));currscope--;} FunctionBody {
+			currscope++; 
+			fullscope = fullscope +"/"+ to_string(currscope); 
+			$$ = new astnode("Function", false, {$1, $3});
+		}
 		;
 		
 FunctionBody:
@@ -194,7 +196,7 @@ Arguments:	PrimaryExpr {$$ = newId($1, "Arguments");}
 		;
 
 Signature:
-	Parameters {$$ = newId($1, "Signature");}
+	Parameters {$$ = newId($1, "Signature"); }
 	| Parameters Result {$$ = new astnode("Signature", false, {$1, $2});}
 	;
 
@@ -206,7 +208,7 @@ Result:
 Parameters:
 	LPAREN RPAREN {$$ = new astnode(LPAREN);}
 	| LPAREN ParameterDeclStar RPAREN {$$ = newId($2, "Parameters");}
-	| LPAREN ParameterDeclStar COMMA RPAREN {$$ = newId($2, "Parameters");}
+	| LPAREN ParameterDeclStar COMMA RPAREN {$$ = newId($2, "Parameters");} /* --COMMA WHY?-- */
 	;
 	
 ParameterDeclStar:
@@ -215,9 +217,12 @@ ParameterDeclStar:
 	;
 
 ParameterDecl:
-	IdentifierList Type {$$ = new astnode("ParameterDecl", false, {$1, $2});}
-	| IdentifierList ELLIPSIS  Type {$$ = new astnode("ParameterDecl", false, {$1, new astnode(ELLIPSIS,$2), $3});};
-	| ELLIPSIS Type {$$ = new astnode("ParameterDecl", false, {new astnode(ELLIPSIS, $1), $2});}
+	IdentifierList Type { 
+		symadd_list($1, $2->type, IDENTIFIER); 
+		$$ = new astnode("ParameterDecl", false, {$1, $2});
+	}
+	| IdentifierList ELLIPSIS  Type {$$ = new astnode("ParameterDecl", false, {$1, new astnode(ELLIPSIS,$2), $3});}; 	/* no support for now ELLIPSIS*/
+	| ELLIPSIS Type {$$ = new astnode("ParameterDecl", false, {new astnode(ELLIPSIS, $1), $2});} 						/* no support for now ELLIPSIS*/
 	;
 
 TypeList:
