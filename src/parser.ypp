@@ -7,6 +7,8 @@ void yyerror (const char *s) {fprintf (stderr, "%s\n", s);}
 
 extern int yylineno;
 extern char* yytext;
+vector <string> prog;
+int lineno = 1;
 astnode *theprogram;
 umap<string, Type*> symtab;
 int currscope = 0;
@@ -53,7 +55,7 @@ string fullscope = "0";
 %type <node> Assignment Declaration ConstDecl VarSpec string_lit Signature Result Parameters ParameterDecl ParameterDeclStar
 %type <node> ConstSpec MethodDecl Receiver TopLevelDecl TopLevelDeclStar LabeledStmt
 %type <node> ReturnStmt BreakStmt ContinueStmt StructType
-%type <node> FunctionDecl TypeList Function FunctionBody FunctionCall FunctionStmt FunctionType
+%type <node> FunctionDecl TypeList Function FunctionBody FunctionCall FunctionStmt FunctionType FunctionName
 %type <node> ForStmt ForClause InitStmt ArgumentList Arguments
 %type <node> PostStmt Condition UnaryExpr PrimaryExpr AliasDecl TypeDef FunctionLit
 %type <node> Selector Index TypeDecl TypeSpecList TypeSpec VarDecl
@@ -127,31 +129,187 @@ LabeledStmt:
 	;
 
 IncDecStmt:
-	Expression INC {$$ = new astnode("IncDecStmt", false, {$1, new astnode(INC, $2)});}
-	| Expression DEC {$$ = new astnode("IncDecStmt", false, {$1, new astnode(INC, $2)});}
+	Expression INC {
+		$$ = new astnode("IncDecStmt", false, {$1, new astnode(INC, $2)});
+			string tac;
+			tac.append(to_string(lineno));
+			tac.append(",");
+			tac.append("+");
+			tac.append(",");
+			tac.append($1->id);
+			tac.append(",");
+			tac.append($1->id);
+			tac.append(",");
+			tac.append("1");
+			tac.append("\n");
+			prog.push_back(tac);
+			lineno++;
+		}
+	| Expression DEC {
+		$$ = new astnode("IncDecStmt", false, {$1, new astnode(INC, $2)});
+		string tac;
+		tac.append(to_string(lineno));
+		tac.append(",");
+		tac.append("-");
+		tac.append(",");
+		tac.append($1->id);
+		tac.append(",");
+		tac.append($1->id);
+		tac.append(",");
+		tac.append("1");
+		tac.append("\n");
+		prog.push_back(tac);
+		lineno++;
+	}
 	;
 
 Assignment:
-	ExpressionList assign_op ExpressionList {$$ = new astnode("Assignment", false, {$1,$2, $3});}
+	ExpressionList assign_op ExpressionList {
+		$$ = new astnode("Assignment", false, {$1,$2, $3});
+
+		string temp1 = $1;
+		string temp2 = $3;
+		vector <string> expr1 = split(temp, ',');
+		vector <string> expr2 = split(temp1, ',');
+
+		// if there are unequal number of elements in either side of the assignment
+		if(expr1.size() != expr2.size()){
+			cout<<"Error: Incompatible assignment"<<endl;
+			// probably shouldn't be putting exit(0) here not sure though
+			exit(0);
+		}
+
+		// if it is a valid assignment
+		else {
+			string operator = $2->value;
+
+			if (operator == "+=") {
+				operator = "+";
+			}
+			else if (operator == "-=") {
+				operator = "-";
+			}
+			else if (operator == "*=") {
+				operator = "*";
+			}
+			else if (operator == "/=") {
+				operator = "/";
+			}
+			else if (operator == "%=") {
+				operator = "%";
+			}
+
+			if (operator == "=") {
+				for (int i = 0; i < expr1.size(); i++) {
+					string tac;
+					tac.append(to_string(lineno));
+					tac.append(",");
+					tac.append("=");
+					tac.append(",");
+					tac.append(expr1[i]);
+					tac.append(",");
+					tac.append(expr2[i]);
+					tac.append(",");
+					tac.append("1");
+					tac.append("\n");
+					prog.push_back(tac);
+					lineno++;
+				}
+			}
+			else {
+				for (int i = 0; i< expr1.size(); i++) {
+					string tac;
+					tac.append(to_string(lineno));
+					tac.append(",");
+					tac.append(operator);
+					tac.append(",");
+					tac.append(expr1[i]);
+					tac.append(",");
+					tac.append(expr2[i]);
+					tac.append(",");
+					tac.append("1");
+					tac.append("\n");
+					prog.push_back(tac);
+					lineno++;
+				}
+			}
+		}
+	}
 	;
 
 VarDecl:
 		VAR VarSpec {$$ = new astnode("VarDecl", false, {new astnode(VAR, $1), $2});}
 		;
-		
+
 VarSpec:
 		IdentifierList Type ASSIGN ExpressionList {$$ = new astnode("VarSpec", false, {$1, $2, new astnode(ASSIGN, $3),  $4});
 			symadd_list($1, $2->type, IDENTIFIER);
+
+			string temp1 = $1->id;
+			string temp2 = $4->id;
+			vector <string> expr1 = temp1.split(temp1, ',');
+			vector <string> expr2 = temp2.split(temp2, ',');
+
+			if (expr1.size() != expr2.size()) {
+				cout<<"Error: Incompatible assignment"<<endl;
+				exit(0);
+			}
+
+			else {
+				for (int i = 0; i < expr1.size(); i++) {
+					string tac;
+					tac.append(to_string(lineno));
+					tac.append(",");
+					tac.append($3->id);
+					tac.append(",");
+					tac.append(expr1[i]);
+					tac.append(",");
+					tac.append(expr2[i]);
+					tac.append("\n");
+					prog.push_back(tac);
+					lineno++;
+				}
+			}
 		}
 		| IdentifierList Type {$$ = new astnode("VarSpec", false, {$1, $2});
 			symadd_list($1, $2->type, IDENTIFIER);
+
+			string temp1 = $1->id;
+			string temp2 = $2->id;
+
+			char temp_char = temp2[0];
+
+			if (temp_char == '[') {
+				int index = 1;
+				while (temp2[index] != ']') {
+					index++;
+				}
+				string length = temp2.substr(1, index-1);
+				string tac = to_string(lineno);
+				tac.append(",array,");
+				tac.append(temp1);
+				tac.append(",");
+				tac.append(length);
+				tac.append("\n");
+				prog.push_back(tac);
+				lineno++;
+			}
 		}
 		;
 
 Declaration:
-	ConstDecl {$$ = newId($1, "Declaration");}
-	| TypeDecl {$$ = newId($1, "Declaration");}
-	| VarDecl {$$ = newId($1, "Declaration");}
+	ConstDecl {
+		$$ = newId($1, "Declaration");
+		// nahi kr rha abhi toh
+	}
+	| TypeDecl {
+		$$ = newId($1, "Declaration");
+		// nahi kr rha abhi toh
+	}
+	| VarDecl {
+		$$ = newId($1, "Declaration");
+		// nahi kr rha abhi toh
+	}
 	;
 
 
@@ -160,19 +318,22 @@ FunctionDecl:
 			if( !symadd($2->v_str, $4->type) ) exit(-1);
 		}
 		| FUNC IDENTIFIER OPENB Signature CLOSEB { $$ = new astnode("FunctionDecl", false, {new astnode(IDENTIFIER, $2), $4});
-			if( !symadd($2->v_str, $4->type) ) exit(-1);		
+			if( !symadd($2->v_str, $4->type) ) exit(-1);
 		}
 		;
-		
+
+FunctionName:
+		IDENTIFIER
+		;
 /* taking care of that params scope same as fcn block using mid rule + normal end rule actions */
 Function:
 		Signature {fullscope=fullscope.substr(0,fullscope.find_last_of("/"));currscope--;} FunctionBody {
-			currscope++; 
-			fullscope = fullscope +"/"+ to_string(currscope); 
+			currscope++;
+			fullscope = fullscope +"/"+ to_string(currscope);
 			$$ = new astnode("Function", false, {$1, $3});
 		}
 		;
-		
+
 FunctionBody:
 		Block {$$ = newId($1, "FunctionBody");}
 		;
@@ -210,15 +371,15 @@ Parameters:
 	| LPAREN ParameterDeclStar RPAREN {$$ = newId($2, "Parameters");}
 	| LPAREN ParameterDeclStar COMMA RPAREN {$$ = newId($2, "Parameters");} /* --COMMA WHY?-- */
 	;
-	
+
 ParameterDeclStar:
 	ParameterDecl {$$ = newId($1, "ParameterDeclStar");}
 	| ParameterDeclStar COMMA ParameterDecl {$$ = new astnode("ParameterDeclStar", false, {$1, $3});}
 	;
 
 ParameterDecl:
-	IdentifierList Type { 
-		symadd_list($1, $2->type, IDENTIFIER); 
+	IdentifierList Type {
+		symadd_list($1, $2->type, IDENTIFIER);
 		$$ = new astnode("ParameterDecl", false, {$1, $2});
 	}
 	| IdentifierList ELLIPSIS  Type {$$ = new astnode("ParameterDecl", false, {$1, new astnode(ELLIPSIS,$2), $3});}; 	/* no support for now ELLIPSIS*/
@@ -309,7 +470,7 @@ ForStmt:
 	FOR OPENB Condition Block CLOSEB {$$ = new astnode("ForStmt", false, {$3, $4});}
 	|FOR OPENB ForClause Block CLOSEB {$$ = new astnode("ForStmt", false, {$3, $4});}
 	;
-	
+
 Condition:
 	Expression {$$ = newId($1, "Condition");}
 	;
@@ -317,11 +478,11 @@ Condition:
 ForClause:
 	InitStmt SEMICOLON Condition SEMICOLON PostStmt {$$ = new astnode("ForClause", false, {$1, $3, $5});}
 	;
-	
+
 InitStmt:
 	SimpleStmt {$$ = newId($1, "InitStmt");}
 	;
-	
+
 PostStmt:
 	SimpleStmt {$$ = newId($1, "InitStmt");}
 	;
@@ -329,7 +490,7 @@ PostStmt:
 int_lit:
 	INTEGER  { $$ = new astnode(INTEGER,$1);}
 	;
-	
+
 float_lit:
 	  FLOAT { $$ = new astnode(FLOAT,$1);}
 	  ;
@@ -383,11 +544,11 @@ ConstDecl:
 		;
 
 ConstSpec:
-		IDENTIFIER Type ASSIGN Expression { $$ = new astnode("ConstSpec",false,{$2,$4}); 
+		IDENTIFIER Type ASSIGN Expression { $$ = new astnode("ConstSpec",false,{$2,$4});
 			if( !symadd($1->v_str, $2->type) ) exit(1);
 			//cout<<"SCOPE"<<any_scope("test")<<endl;
 		}
-		| IDENTIFIER Type { $$ = newId($2, "ConstSpec"); 
+		| IDENTIFIER Type { $$ = newId($2, "ConstSpec");
 			if( !symadd($1->v_str, $2->type) ) exit(1);
 			//cout<<"SCOPE"<<any_scope("test")<<endl;
 		}
@@ -523,14 +684,14 @@ rel_op:
 	| GTR { $$ = new astnode(GTR);}
 	| GEQ { $$ = new astnode(GEQ);}
 	;
-	
+
 add_op:
 	ADD { $$ = new astnode(ADD);}
 	| SUB { $$ = new astnode(SUB);}
 	| OR  { $$ = new astnode(OR);}
 	| XOR { $$ = new astnode(XOR);}
 	;
-	
+
 mul_op:
 	MUL   { $$ = new astnode(MUL);}
 	| QUO { $$ = new astnode(QUO);}
@@ -562,7 +723,7 @@ assign_op:
 PackageClause:
 	PACKAGE PackageName { $$ = new astnode("PackageClause", false, {new astnode(PACKAGE), $2});}
 	;
-	
+
 PackageName:
 	IDENTIFIER { $$ = new astnode(new DefinedType("fillTypeUsingSymbolTable"),IDENTIFIER);}
 	;
@@ -582,17 +743,17 @@ ImportSpecStar:
 	ImportSpecStar ImportSpec SEMICOLON { $$ = new astnode("ImportSpecStar", false, {$1,$2}); }
 	| ImportSpec SEMICOLON { $$ = newId($1, "ImportSpecStar"); }
 	;
-	
+
 ImportSpec:
 	 PERIOD ImportPath { $$ = new astnode("ImportSpec", false, {new astnode(PERIOD), $2}); }
 	| AlternatePackageName ImportPath { $$ = new astnode("ImportSpec", false, {$1,$2}); }
 	| AlternatePackageName { $$ = newId($1,"ImportSpec"); }
 	;
-	
+
 ImportPath:
 	string_lit  { $$ = newId($1,"ImportPath");}
 	;
-	
+
 AlternatePackageName:
 	string_lit { $$ = newId($1, "AlternatePackageName");}
 	;
