@@ -78,18 +78,18 @@ Block:
 
 OPENB:
 	/*empty*/ {
-		//cout<<fullscope<<endl;
 		$$ = new astnode();
 		 currscope++;
 		 fullscope = fullscope + "/" + to_string(currscope);
+		 //cout<<fullscope<<endl;
 	}
 	;
 
 CLOSEB:
 	/*empty*/ {
-		//cout<<fullscope<<endl;
 		$$ = new astnode();
 		 fullscope = fullscope.substr(0, fullscope.find_last_of("/") );
+		 //cout<<fullscope<<endl;
 	}
 	;
 
@@ -167,7 +167,7 @@ FunctionDecl:
 /* taking care of that params scope same as fcn block using mid rule + normal end rule actions */
 Function:
 		Signature {fullscope=fullscope.substr(0,fullscope.find_last_of("/"));currscope--;} FunctionBody {
-			currscope++; 
+			//currscope++; 
 			fullscope = fullscope +"/"+ to_string(currscope); 
 			$$ = new astnode("Function", false, {$1, $3});
 		}

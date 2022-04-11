@@ -1,21 +1,16 @@
 package main;
 
-import "fmt";
+func plus(a int, b int) int {
+
+    return a + b;
+};
+
+func plusPlus(a, b, c int) int {
+    return a + b + c;
+};
 
 func main() {
 
-	var a string = "Initial";
-	fmt.Println(a);
-
-	var b, c int = 1, 2;
-	fmt.Println(b, c);
-
-	// unable to parse the below thing
-
-	// var d = true;
-	// fmt.Println(d);
-
-	var e int;
-	fmt.Println(e);
-
+   var a,b,c,d,e,f int;
+   const pqr string;
 }

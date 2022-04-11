@@ -57,6 +57,10 @@ int symadd_list(astnode* node, Type* symtype, int token_name){
 			if( !symadd( i->data->v_str, symtype) ) return count;
 			count++;
 		}
+		else{
+			astnode *currnode = &(*i);
+			symadd_list(currnode, symtype, token_name);  
+		}
 	}
 	return count;	
 }
