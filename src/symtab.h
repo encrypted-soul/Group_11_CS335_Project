@@ -16,5 +16,6 @@ void print_symtab(ostream& symbolTable);
 int curr_scope(string symname);
 int any_scope(string symname);
 int symadd_list(astnode* node, Type* symtype, int token_name);
+Type* symtype(string symname);
 
 #endif
