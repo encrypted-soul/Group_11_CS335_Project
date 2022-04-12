@@ -4,7 +4,15 @@ using namespace std;
 
 std::ostream* fp = &cout;
 
-
+symtab_t* init_symtab_top(){
+	symtab_t *temp = new symtab_t;
+	(*temp)["true"] =  new Type();
+	symtab_top["u"] = temp;
+	
+	temp = new symtab_t;
+	symtab_top["0"] = temp;
+	return temp;
+}
 
 Type* symtype(string symname){
 	// WIP returns type of symname
@@ -12,9 +20,9 @@ Type* symtype(string symname){
 	string scoped_name = atscope + " " + symname;
 	
 	while( atscope!="" ){
-		auto symitr = symtab.find(scoped_name); 
+		auto symitr = symtab->find(scoped_name); 
 		
-		if( symitr != symtab.end() ) 
+		if( symitr != symtab->end() ) 
 			return symitr->second;
 		else{
 			size_t pos = atscope.find_last_of("/");
@@ -32,7 +40,7 @@ int any_scope(string symname){
 	string tmp = fullscope;
 	tmp = tmp.substr(0, tmp.find_last_of("/") );
 	while (tmp != ""){
-		if( symtab.find(tmp + " " + symname) != symtab.end() )
+		if( symtab->find(tmp + " " + symname) != symtab->end() )
 			return FOUND;	
 		else{
 			size_t pos = tmp.find_last_of("/");
@@ -45,7 +53,7 @@ int any_scope(string symname){
 }
 
 int curr_scope(string symname){
-	if( symtab.find(fullscope + " " + symname) != symtab.end() )
+	if( symtab->find(fullscope + " " + symname) != symtab->end() )
 		return FOUND;		
 	
 	return NOTFOUND;			
@@ -58,7 +66,7 @@ bool symadd(string symname, Type* symtype = NULL){
 		return false;
 	}
 	string scoped_name = fullscope + " " + symname;
-	symtab[scoped_name] = symtype;
+	(*symtab)[scoped_name] = symtype;
 	return true;
 }
 
@@ -75,7 +83,7 @@ int symadd_list(astnode* node, Type* symtype, int token_name){
 	int count=0;
 	for( auto i : node->children ){
 		if( i->id == to_string(token_name)){
-			if( !symadd( i->data->v_str, symtype) ) return -count;
+			if( ! symadd( i->data->v_str, symtype) ) return -count;
 			count++;
 		}
 		else{
@@ -86,11 +94,11 @@ int symadd_list(astnode* node, Type* symtype, int token_name){
 	return count;	
 }
 
-void print_symtab( ostream& symbolTable =  *fp ){
+void print_symtab( ostream& symbolTable /* =  *fp */ ){
 	symbolTable <<"----SYMBOL TABLE----"<<endl;
 	symbolTable <<"Scope_num Sym_name"<<endl;
-	for( auto i : symtab){
-		symbolTable <<i.first<<endl;
+	for( auto i=symtab->begin(); i != symtab->end(); i++ ){
+		symbolTable <<i->first<<endl;
 	}
 	symbolTable <<"----DONE----"<<endl;
 }

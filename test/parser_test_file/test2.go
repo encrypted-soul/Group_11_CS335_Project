@@ -1,5 +1,7 @@
 package main;
 
+var i int;
+
 func plus(a int, b int) int {
 
     return a + b;
