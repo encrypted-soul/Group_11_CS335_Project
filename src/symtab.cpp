@@ -4,6 +4,28 @@ using namespace std;
 
 std::ostream* fp = &cout;
 
+
+
+Type* symtype(string symname){
+	// WIP returns type of symname
+	string atscope = fullscope;
+	string scoped_name = atscope + " " + symname;
+	
+	while( atscope!="" ){
+		auto symitr = symtab.find(scoped_name); 
+		
+		if( symitr != symtab.end() ) 
+			return symitr->second;
+		else{
+			size_t pos = atscope.find_last_of("/");
+			if(pos == string::npos) break;
+			atscope = atscope.substr(0, pos);
+		}
+	}
+	
+	return NULL;
+}
+
 int any_scope(string symname){
 	if( curr_scope(symname) == FOUND ) return FOUND; 
 	
@@ -41,21 +63,24 @@ bool symadd(string symname, Type* symtype = NULL){
 }
 
 int symadd_list(astnode* node, Type* symtype, int token_name){ 
-	//list-like astnode such as identifierlist, *ALL* elements of node of type symtype - no commas or such in b/w. tokentype = IDENITIFER, 
-	//returns num of ele added to symtab
+	//list-like astnode such as identifierlist, token_name = IDENITIFER or ... 
+	//returns num of ele added to symtab, on error returns -(num  of ele added)
 	
-	int count=1;
 	if( node->children.empty() ){
 		if( symadd(node->data->v_str, symtype) )
-			return count;
+			return 1;
 		else
 			return 0;
 	}
-	
+	int count=0;
 	for( auto i : node->children ){
 		if( i->id == to_string(token_name)){
-			if( !symadd( i->data->v_str, symtype) ) return count;
+			if( !symadd( i->data->v_str, symtype) ) return -count;
 			count++;
+		}
+		else{
+			astnode* currnode = &(*i);
+			count += symadd_list(currnode, symtype, token_name);  
 		}
 	}
 	return count;	
