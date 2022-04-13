@@ -19,7 +19,7 @@ Type* symtype(string symname){
 	string atscope = fullscope;
 	string scoped_name = atscope + " " + symname;
 	
-	while( atscope!="" ){
+	while( atscope!="0" ){
 		auto symitr = symtab->find(scoped_name); 
 		
 		if( symitr != symtab->end() ) 
@@ -31,24 +31,48 @@ Type* symtype(string symname){
 		}
 	}
 	
+	auto symitr = symtab_top["0"]->find(scoped_name); 
+	if( symitr != symtab->end() ){
+		return symitr->second;  
+	}
+
+	symitr = symtab_top["u"]->find(scoped_name);
+	if( symitr != symtab->end() ){
+		return symitr->second;  
+	}	
+	
 	return NULL;
 }
 
 int any_scope(string symname){
+
 	if( curr_scope(symname) == FOUND ) return FOUND; 
-	
+			
 	string tmp = fullscope;
+	string scoped_name = tmp + " " + symname;
 	tmp = tmp.substr(0, tmp.find_last_of("/") );
-	while (tmp != ""){
+	while (tmp != "0" ){
 		if( symtab->find(tmp + " " + symname) != symtab->end() )
 			return FOUND;	
 		else{
 			size_t pos = tmp.find_last_of("/");
 			if(pos == string::npos) break;
 			tmp = tmp.substr(0, pos);
-			//cout<<tmp<<endl;	
 		}
 	}
+	
+	scoped_name = "0 " + symname;
+	auto symitr =  (symtab_top["0"]) ->find(scoped_name); 
+	if( symitr != symtab->end() ){
+		return FOUND;  
+	}
+	
+	scoped_name = "u " + symname;
+	symitr = (symtab_top["u"]) ->find(scoped_name);
+	if( symitr != symtab->end() ){
+		return FOUND;  
+	}	
+	
 	return NOTFOUND;
 }
 
@@ -95,7 +119,14 @@ int symadd_list(astnode* node, Type* symtype, int token_name){
 }
 
 void print_symtab( ostream& symbolTable /* =  *fp */ ){
-	symbolTable <<"----SYMBOL TABLE----"<<endl;
+	string curr_fcn_scope = "";
+	for( auto i : symtab_top ){
+		if( symtab == i.second ){
+			curr_fcn_scope = i.first;
+			break;
+		}
+	}
+	symbolTable <<"----Symbtab for scope"<< curr_fcn_scope <<"----"<<endl;
 	symbolTable <<"Scope_num Sym_name"<<endl;
 	for( auto i=symtab->begin(); i != symtab->end(); i++ ){
 		symbolTable <<i->first<<endl;

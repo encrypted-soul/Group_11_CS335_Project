@@ -6,7 +6,16 @@
 #include "ast.h"
 #define FOUND 0
 #define NOTFOUND -1
-typedef umap<string, Type*> symtab_t;
+
+/*
+struct syminfo{
+string symname ="";
+string scope = "";
+Type* symtype =NULL;
+};
+*/
+
+typedef umap< string, Type* > symtab_t;
 
 //see parser.ypp
 extern umap< string, symtab_t* > symtab_top; 
