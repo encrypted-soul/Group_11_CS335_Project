@@ -5,10 +5,29 @@ using namespace std;
 std::ostream* fp = &cout;
 
 symtab_t* init_symtab_top(){
+	string keywords[] = { 
+		"break",        "default",      "func",         "interface",    "select",
+		"case",         "defer",        "go",           "map",          "struct",
+		"chan",         "else",         "goto",         "package",      "switch",
+		"const",        "fallthrough",  "if",           "range",        "type",
+		"continue" ,    "for" ,         "import" ,      "return",       "var"
+	}; 
+	
+	//reserved
 	symtab_t *temp = new symtab_t;
+	for( int i=0; keywords[i] != "var"; i++ ){
+		(*temp)[ keywords[i] ] = NULL;
+		//Type* = NULL for keywords
+	}
+	(*temp)[ "var" ] = NULL;
+	symtab_top["r"] = temp;
+	
+	//universe
+	temp = new symtab_t;
 	(*temp)["true"] =  new Type();
 	symtab_top["u"] = temp;
 	
+	//global = 0
 	temp = new symtab_t;
 	symtab_top["0"] = temp;
 	return temp;
@@ -84,9 +103,15 @@ int curr_scope(string symname){
 }
 
 bool symadd(string symname, Type* symtype = NULL){
+	//check non reserved
+	if( symtab_top["r"]->find(symname) != symtab->end() ){
+		cout<< "ERROR: \""<<symname<<"\" is a resevered keyword"<<endl;
+		return false;
+	}
+	
 	//check new sym
 	if( curr_scope(symname) == FOUND ){
-		cout<< "ERROR: Repeat entry symbol table -"<<symname<<endl;
+		cout<< "ERROR: Repeat entry symbol table \""<<symname<<"\""<<endl;
 		return false;
 	}
 	string scoped_name = fullscope + " " + symname;
@@ -107,7 +132,7 @@ int symadd_list(astnode* node, Type* symtype, int token_name){
 	int count=0;
 	for( auto i : node->children ){
 		if( i->id == to_string(token_name)){
-			if( ! symadd( i->data->v_str, symtype) ) return -count;
+			if( symadd( i->data->v_str, symtype) != true ) return -count;
 			count++;
 		}
 		else{
@@ -129,7 +154,9 @@ void print_symtab( ostream& symbolTable /* =  *fp */ ){
 	symbolTable <<"----Symbtab for scope"<< curr_fcn_scope <<"----"<<endl;
 	symbolTable <<"Scope_num Sym_name"<<endl;
 	for( auto i=symtab->begin(); i != symtab->end(); i++ ){
-		symbolTable <<i->first<<endl;
+		symbolTable <<i->first;
+		if( i->second != NULL ) symbolTable<<" "<< i->second->typeClass;
+		symbolTable<<endl;
 	}
 	symbolTable <<"----DONE----"<<endl;
 }

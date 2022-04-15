@@ -179,10 +179,10 @@ Declaration:
 
 FunctionDecl:
 		FUNC IDENTIFIER SYMTABS Function SYMTABE { $$ = new astnode("FunctionDecl", false, {new astnode(IDENTIFIER, $2), $4});
-			if( !symadd($2->v_str, $4->type) ) exit(-1);
+			symadd($2->v_str, $4->type);
 		}
 		| FUNC IDENTIFIER SYMTABS Signature SYMTABE { $$ = new astnode("FunctionDecl", false, {new astnode(IDENTIFIER, $2), $4});
-			if( !symadd($2->v_str, $4->type) ) exit(-1);		
+			symadd($2->v_str, $4->type);		
 		}
 		;
 		
@@ -405,12 +405,12 @@ ConstDecl:
 
 ConstSpec:
 		IDENTIFIER Type ASSIGN Expression { $$ = new astnode("ConstSpec",false,{$2,$4}); 
-			if( !symadd($1->v_str, $2->type) ) exit(1);
-			cout<<"SCOPE"<<any_scope("test")<<endl;
+			symadd($1->v_str, $2->type);
+			//cout<<"SCOPE"<<any_scope("test")<<endl;
 		}
 		| IDENTIFIER Type { $$ = newId($2, "ConstSpec"); 
-			if( !symadd($1->v_str, $2->type) ) exit(1);
-			cout<<"SCOPE"<<any_scope("test")<<endl;
+			symadd($1->v_str, $2->type);
+			//cout<<"SCOPE"<<any_scope("test")<<endl;
 		}
 		;
 
