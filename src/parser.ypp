@@ -10,7 +10,12 @@ extern char* yytext;
 vector <string> prog;
 int lineno = 1;
 astnode *theprogram;
-umap<string, Type*> symtab;
+
+ofstream symbolTable;					//for symtab_print					
+std::ostream* fp = &cout; 
+		
+umap< string, symtab_t* > symtab_top;
+symtab_t *symtab =  init_symtab_top();	//universal block + symtab "0" aka global
 int currscope = 0;
 string fullscope = "0";
 %}
@@ -20,7 +25,7 @@ string fullscope = "0";
 
 // These must go into paser.tab.h
 %code requires{
-        #include <bits/stdc++.h>
+    #include <bits/stdc++.h>
 	#include "src/ast.h"
 	#include "src/symtab.h"
 	using namespace std;
@@ -51,7 +56,7 @@ string fullscope = "0";
 
 %type <node> StartFile Expression Expression1 Expression2 Expression3 Expression4 Expression5
 %type <node> Block StatementList Statement SimpleStmt int_lit
-%type <node> EmptyStmt IncDecStmt OPENB CLOSEB
+%type <node> EmptyStmt IncDecStmt OPENB CLOSEB SYMTABS SYMTABE 
 %type <node> Assignment Declaration ConstDecl VarSpec string_lit Signature Result Parameters ParameterDecl ParameterDeclStar
 %type <node> ConstSpec MethodDecl Receiver TopLevelDecl TopLevelDeclStar LabeledStmt
 %type <node> ReturnStmt BreakStmt ContinueStmt StructType
@@ -92,6 +97,25 @@ CLOSEB:
 		$$ = new astnode();
 		 fullscope = fullscope.substr(0, fullscope.find_last_of("/") );
 		 //cout<<fullscope<<endl;
+	}
+	;
+
+SYMTABS: 
+	/*empty*/ {
+		currscope++;
+		fullscope = fullscope + "/" + to_string(currscope);
+		symtab = new symtab_t;
+		symtab_top[fullscope] = symtab;
+		//cout<<fullscope<<endl;
+	}
+	;
+	
+SYMTABE:
+	/*empty*/ {
+		print_symtab();
+		delete symtab;
+		symtab = symtab_top["0"];
+		fullscope = "0";
 	}
 	;
 
@@ -314,11 +338,11 @@ Declaration:
 
 
 FunctionDecl:
-		FUNC IDENTIFIER OPENB Function CLOSEB { $$ = new astnode("FunctionDecl", false, {new astnode(IDENTIFIER, $2), $4});
-			if( !symadd($2->v_str, $4->type) ) exit(-1);
+		FUNC IDENTIFIER SYMTABS Function SYMTABE { $$ = new astnode("FunctionDecl", false, {new astnode(IDENTIFIER, $2), $4});
+			symadd($2->v_str, $4->type);
 		}
-		| FUNC IDENTIFIER OPENB Signature CLOSEB { $$ = new astnode("FunctionDecl", false, {new astnode(IDENTIFIER, $2), $4});
-			if( !symadd($2->v_str, $4->type) ) exit(-1);
+		| FUNC IDENTIFIER SYMTABS Signature SYMTABE { $$ = new astnode("FunctionDecl", false, {new astnode(IDENTIFIER, $2), $4});
+			symadd($2->v_str, $4->type);		
 		}
 		;
 
@@ -328,8 +352,7 @@ FunctionName:
 /* taking care of that params scope same as fcn block using mid rule + normal end rule actions */
 Function:
 		Signature {fullscope=fullscope.substr(0,fullscope.find_last_of("/"));currscope--;} FunctionBody {
-			currscope++;
-			fullscope = fullscope +"/"+ to_string(currscope);
+			fullscope = fullscope +"/"+ to_string(currscope); 
 			$$ = new astnode("Function", false, {$1, $3});
 		}
 		;
@@ -544,12 +567,12 @@ ConstDecl:
 		;
 
 ConstSpec:
-		IDENTIFIER Type ASSIGN Expression { $$ = new astnode("ConstSpec",false,{$2,$4});
-			if( !symadd($1->v_str, $2->type) ) exit(1);
+		IDENTIFIER Type ASSIGN Expression { $$ = new astnode("ConstSpec",false,{$2,$4}); 
+			symadd($1->v_str, $2->type);
 			//cout<<"SCOPE"<<any_scope("test")<<endl;
 		}
-		| IDENTIFIER Type { $$ = newId($2, "ConstSpec");
-			if( !symadd($1->v_str, $2->type) ) exit(1);
+		| IDENTIFIER Type { $$ = newId($2, "ConstSpec"); 
+			symadd($1->v_str, $2->type);
 			//cout<<"SCOPE"<<any_scope("test")<<endl;
 		}
 		;
@@ -772,12 +795,15 @@ void prettyPrint(ofstream& astFile, astnode* root){
 }
 
 int main (int argc, char **argv) {
-	yyparse ( );
-	ofstream symbolTable;
 	int fileNo = atoi(argv[1]);
 	symbolTable.open("symbolTable" + to_string(fileNo) + ".txt");
-	print_symtab(symbolTable);
+	fp =  & symbolTable;
+	
+	yyparse ( );
+	
+	print_symtab();
 	symbolTable.close();
+	
 	ofstream astFile;
 	astFile.open("ast" + to_string(fileNo) + ".dot" );
 	if(!astFile) {
