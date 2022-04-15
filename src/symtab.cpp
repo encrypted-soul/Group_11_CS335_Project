@@ -102,13 +102,13 @@ int curr_scope(string symname){
 bool symadd(string symname, Type* symtype = NULL){
 	//check non reserved
 	if( symtab_top["r"]->find(symname) != symtab->end() ){
-		*fp<< "ERROR: \""<<symname<<"\" is a resevered keyword"<<endl;
+		*fp<< "ERROR: On line" << yylineno << " \""<<symname<<"\" is a resevered keyword"<<endl;
 		return false;
 	}
 	
 	//check new sym
 	if( curr_scope(symname) == FOUND ){
-		*fp<< "ERROR: Repeat entry symbol table \""<<symname<<"\""<<endl;
+		*fp<< "ERROR: On line"<< yylineno <<" Repeat entry in symbol table \""<<symname<<"\""<<endl;
 		return false;
 	}
 	string scoped_name = fullscope + " " + symname;
