@@ -21,7 +21,6 @@ typedef umap< string, Type* > symtab_t;
 extern umap< string, symtab_t* > symtab_top; 
 extern string fullscope;
 extern symtab_t *symtab;
-
 extern std::ostream* fp;
 
 symtab_t* init_symtab_top();

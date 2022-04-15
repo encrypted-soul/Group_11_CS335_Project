@@ -9,8 +9,10 @@ extern int yylineno;
 extern char* yytext;
 astnode *theprogram;
 
+ofstream symbolTable;					//for symtab_print					
+std::ostream* fp = &cout; 
+		
 umap< string, symtab_t* > symtab_top;
-
 symtab_t *symtab =  init_symtab_top();	//universal block + symtab "0" aka global
 int currscope = 0;
 string fullscope = "0";
@@ -632,13 +634,15 @@ void prettyPrint(ofstream& astFile, astnode* root){
 }
 
 int main (int argc, char **argv) {
-	yyparse ( );
-	print_symtab();
-	//ofstream symbolTable;
 	int fileNo = atoi(argv[1]);
-	//symbolTable.open("symbolTable" + to_string(fileNo) + ".txt");
-	//print_symtab(symbolTable);
-	//symbolTable.close();
+	symbolTable.open("symbolTable" + to_string(fileNo) + ".txt");
+	fp =  & symbolTable;
+	
+	yyparse ( );
+	
+	print_symtab();
+	symbolTable.close();
+	
 	ofstream astFile;
 	astFile.open("ast" + to_string(fileNo) + ".dot" );
 	if(!astFile) {
