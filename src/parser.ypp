@@ -103,7 +103,7 @@ stack <int > is_argument_list_empty;
 %type <node> Assignment Declaration ConstDecl VarSpec string_lit Signature Result Parameters ParameterDecl ParameterDeclStar
 %type <node> ConstSpec MethodDecl Receiver TopLevelDecl TopLevelDeclStar LabeledStmt
 %type <node> ReturnStmt BreakStmt ContinueStmt StructType
-%type <node> FunctionDecl TypeList Function FunctionBody FunctionCall FunctionStmt FunctionType FunctionName
+%type <node> FunctionDecl TypeList Function FunctionBody FunctionCall FunctionStmt FunctionType /*FunctionName*/
 %type <node> ForStmt ForClause InitStmt ArgumentList Arguments
 %type <node> PostStmt Condition UnaryExpr PrimaryExpr AliasDecl TypeDef FunctionLit
 %type <node> Selector Index TypeDecl TypeSpecList TypeSpec VarDecl
@@ -185,6 +185,7 @@ LabeledStmt:
 IncDecStmt:
 	Expression INC {
 		$$ = new astnode("IncDecStmt", false, {$1, new astnode(INC, $2)});
+			/*
 			string tac;
 			tac.append(to_string(lineno));
 			tac.append(",");
@@ -198,9 +199,11 @@ IncDecStmt:
 			tac.append("\n");
 			prog.push_back(tac);
 			lineno++;
+			*/
 		}
 	| Expression DEC {
 		$$ = new astnode("IncDecStmt", false, {$1, new astnode(INC, $2)});
+		/*
 		string tac;
 		tac.append(to_string(lineno));
 		tac.append(",");
@@ -214,13 +217,14 @@ IncDecStmt:
 		tac.append("\n");
 		prog.push_back(tac);
 		lineno++;
+		*/
 	}
 	;
 
 Assignment:
 	ExpressionList assign_op ExpressionList {
 		$$ = new astnode("Assignment", false, {$1,$2, $3});
-
+		/*
 		string temp1 = $1;
 		string temp2 = $3;
 		vector <string> expr1 = split(temp, ',');
@@ -288,6 +292,7 @@ Assignment:
 				}
 			}
 		}
+		*/
 	}
 	;
 
@@ -298,7 +303,7 @@ VarDecl:
 VarSpec:
 		IdentifierList Type ASSIGN ExpressionList {$$ = new astnode("VarSpec", false, {$1, $2, new astnode(ASSIGN, $3),  $4});
 			symadd_list($1, $2->type, IDENTIFIER);
-
+			/*
 			string temp1 = $1->id;
 			string temp2 = $4->id;
 			vector <string> expr1 = temp1.split(temp1, ',');
@@ -324,10 +329,11 @@ VarSpec:
 					lineno++;
 				}
 			}
+			*/
 		}
 		| IdentifierList Type {$$ = new astnode("VarSpec", false, {$1, $2});
 			symadd_list($1, $2->type, IDENTIFIER);
-
+			/*
 			string temp1 = $1->id;
 			string temp2 = $2->id;
 
@@ -348,6 +354,7 @@ VarSpec:
 				prog.push_back(tac);
 				lineno++;
 			}
+			*/
 		}
 		;
 
