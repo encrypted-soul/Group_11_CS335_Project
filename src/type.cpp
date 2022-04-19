@@ -85,14 +85,14 @@ string FunctionType::getType() {
 
 Type* FunctionType::copy() { return (new FunctionType(*this)); }
 
-PointerType::PointerType(Type* _baseType) {
+PntrType::PntrType(Type* _baseType) {
   this->baseType = _baseType;
   this->typeClass = POINTER_TYPE;
 }
 
-string PointerType::getType() {
+string PntrType::getType() {
   // baseType*
   return baseType->getType() + "*";
 }
 
-Type* PointerType::copy() { return (new PointerType(*this)); }
+Type* PntrType::copy() { return (new PntrType(*this)); }

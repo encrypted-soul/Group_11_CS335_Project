@@ -11,9 +11,9 @@ vector <string> prog;
 int lineno = 1;
 astnode *theprogram;
 
-ofstream symbolTable;					//for symtab_print					
-std::ostream* fp = &cout; 
-		
+ofstream symbolTable;					//for symtab_print
+std::ostream* fp = &cout;
+
 umap< string, symtab_t* > symtab_top;
 symtab_t *symtab =  init_symtab_top();	//universal block + symtab "0" aka global
 int currscope = 0;
@@ -56,7 +56,7 @@ string fullscope = "0";
 
 %type <node> StartFile Expression Expression1 Expression2 Expression3 Expression4 Expression5
 %type <node> Block StatementList Statement SimpleStmt int_lit
-%type <node> EmptyStmt IncDecStmt OPENB CLOSEB SYMTABS SYMTABE 
+%type <node> EmptyStmt IncDecStmt OPENB CLOSEB SYMTABS SYMTABE
 %type <node> Assignment Declaration ConstDecl VarSpec string_lit Signature Result Parameters ParameterDecl ParameterDeclStar
 %type <node> ConstSpec MethodDecl Receiver TopLevelDecl TopLevelDeclStar LabeledStmt
 %type <node> ReturnStmt BreakStmt ContinueStmt StructType
@@ -76,7 +76,9 @@ string fullscope = "0";
 
 /* START OF FILE */
 StartFile:
-    PackageClause SEMICOLON ImportDeclStar TopLevelDeclStar { theprogram = new astnode("StartFile",false, {$1,$3,$4});}
+    PackageClause SEMICOLON ImportDeclStar TopLevelDeclStar {
+		cout << "I am inside the program" << endl;
+		theprogram = new astnode("StartFile",false, {$1,$3,$4});}
     ;
 
 Block:
@@ -100,7 +102,7 @@ CLOSEB:
 	}
 	;
 
-SYMTABS: 
+SYMTABS:
 	/*empty*/ {
 		currscope++;
 		fullscope = fullscope + "/" + to_string(currscope);
@@ -109,7 +111,7 @@ SYMTABS:
 		//cout<<fullscope<<endl;
 	}
 	;
-	
+
 SYMTABE:
 	/*empty*/ {
 		print_symtab();
@@ -272,7 +274,7 @@ VarDecl:
 
 VarSpec:
 		IdentifierList Type ASSIGN ExpressionList {$$ = new astnode("VarSpec", false, {$1, $2, new astnode(ASSIGN, $3),  $4});
-			symadd_list($1, $2->type, IDENTIFIER);
+			// symadd_list($1, $2->type, IDENTIFIER);
 			/*
 			string temp1 = $1->id;
 			string temp2 = $4->id;
@@ -302,7 +304,7 @@ VarSpec:
 			*/
 		}
 		| IdentifierList Type {$$ = new astnode("VarSpec", false, {$1, $2});
-			symadd_list($1, $2->type, IDENTIFIER);
+			// symadd_list($1, $2->type, IDENTIFIER);
 			/*
 			string temp1 = $1->id;
 			string temp2 = $2->id;
@@ -346,10 +348,10 @@ Declaration:
 
 FunctionDecl:
 		FUNC IDENTIFIER SYMTABS Function SYMTABE { $$ = new astnode("FunctionDecl", false, {new astnode(IDENTIFIER, $2), $4});
-			symadd($2->v_str, $4->type);
+			// symadd($2->value, $4->type);
 		}
 		| FUNC IDENTIFIER SYMTABS Signature SYMTABE { $$ = new astnode("FunctionDecl", false, {new astnode(IDENTIFIER, $2), $4});
-			symadd($2->v_str, $4->type);		
+			// symadd($2->value, $4->type);
 		}
 		;
 
@@ -360,7 +362,7 @@ FunctionName:
 /* taking care of that params scope same as fcn block using mid rule + normal end rule actions */
 Function:
 		Signature {fullscope=fullscope.substr(0,fullscope.find_last_of("/"));currscope--;} FunctionBody {
-			fullscope = fullscope +"/"+ to_string(currscope); 
+			fullscope = fullscope +"/"+ to_string(currscope);
 			$$ = new astnode("Function", false, {$1, $3});
 		}
 		;
@@ -410,7 +412,7 @@ ParameterDeclStar:
 
 ParameterDecl:
 	IdentifierList Type {
-		symadd_list($1, $2->type, IDENTIFIER);
+		// symadd_list($1, $2->type, IDENTIFIER);
 		$$ = new astnode("ParameterDecl", false, {$1, $2});
 	}
 	| IdentifierList ELLIPSIS  Type {$$ = new astnode("ParameterDecl", false, {$1, new astnode(ELLIPSIS,$2), $3});}; 	/* no support for now ELLIPSIS*/
@@ -559,7 +561,7 @@ Tag:
 	;
 
 PointerType:
-	MUL BaseType { $$ = new astnode(new PointerType($2->type),"PointerType",false,{$2}); }
+	MUL BaseType { $$ = new astnode(new PntrType($2->type),"PointerType",false,{$2}); }
 	;
 BaseType:
 	Type { $$ = new astnode($1->type, "BaseType",false,{$1}); }
@@ -575,12 +577,12 @@ ConstDecl:
 		;
 
 ConstSpec:
-		IDENTIFIER Type ASSIGN Expression { $$ = new astnode("ConstSpec",false,{$2,$4}); 
-			symadd($1->v_str, $2->type);
+		IDENTIFIER Type ASSIGN Expression { $$ = new astnode("ConstSpec",false,{$2,$4});
+			// symadd($1->value, $2->type);
 			//cout<<"SCOPE"<<any_scope("test")<<endl;
 		}
-		| IDENTIFIER Type { $$ = newId($2, "ConstSpec"); 
-			symadd($1->v_str, $2->type);
+		| IDENTIFIER Type { $$ = newId($2, "ConstSpec");
+			// symadd($1->value, $2->type);
 			//cout<<"SCOPE"<<any_scope("test")<<endl;
 		}
 		;
@@ -618,7 +620,9 @@ Literal:
 	;
 
 string_lit:
-	STRING { new astnode(new PointerType(new DefinedType("string")) , STRING, $1);}
+	STRING {
+		cout << "I am a string lite" << endl;
+		new astnode(new PntrType(new DefinedType("string")) , STRING, $1);}
 	;
 
 byte_lit:
@@ -766,7 +770,9 @@ ImportDeclStar:
     ;
 
 ImportDecl:
-	IMPORT ImportSpec SEMICOLON { $$ = new astnode("ImportDecl", false, {new astnode(IMPORT),$2}); }
+	IMPORT ImportSpec SEMICOLON {
+		cout << "I am inside import decl" << endl;
+		$$ = new astnode("ImportDecl", false, {new astnode(IMPORT),$2}); }
 	| IMPORT LPAREN ImportSpecStar RPAREN { $$ = new astnode("ImportDecl", false, {new astnode(IMPORT), $3}); }
 	;
 
@@ -778,7 +784,9 @@ ImportSpecStar:
 ImportSpec:
 	 PERIOD ImportPath { $$ = new astnode("ImportSpec", false, {new astnode(PERIOD), $2}); }
 	| AlternatePackageName ImportPath { $$ = new astnode("ImportSpec", false, {$1,$2}); }
-	| AlternatePackageName { $$ = newId($1,"ImportSpec"); }
+	| AlternatePackageName {
+		cout << "I am inside import spec" << endl;
+		$$ = newId($1,"ImportSpec"); }
 	;
 
 ImportPath:
@@ -786,7 +794,11 @@ ImportPath:
 	;
 
 AlternatePackageName:
-	string_lit { $$ = newId($1, "AlternatePackageName");}
+	string_lit {
+		cout << "I am insdiee the alternatepackagename" << endl;
+		$$ = newId($1, "AlternatePackageName");
+		cout << "hello world" <<endl;
+		}
 	;
 
 %%
@@ -806,12 +818,12 @@ int main (int argc, char **argv) {
 	int fileNo = atoi(argv[1]);
 	symbolTable.open("symbolTable" + to_string(fileNo) + ".txt");
 	fp =  & symbolTable;
-	
+
 	yyparse ( );
-	
+
 	print_symtab();
 	symbolTable.close();
-	
+
 	ofstream astFile;
 	astFile.open("ast" + to_string(fileNo) + ".dot" );
 	if(!astFile) {
