@@ -9,15 +9,58 @@ extern int yylineno;
 extern char* yytext;
 vector <string> prog;
 int lineno = 1;
-astnode *theprogram;
+int tempno = 0;
+int temp_str_no = 0;
+int labelno = 0;
+string get_tempvar(){
+	string str_t = "t";
+	string ans =  str_t.append(to_string(tempno));
+	tempno++;
+	return ans;
+}
 
-ofstream symbolTable;					//for symtab_print					
-std::ostream* fp = &cout; 
-		
-umap< string, symtab_t* > symtab_top;
-symtab_t *symtab =  init_symtab_top();	//universal block + symtab "0" aka global
-int currscope = 0;
-string fullscope = "0";
+
+string get_temp_strvar(){
+	string str_t = "t_str";
+	string ans =  str_t.append(to_string(temp_str_no));
+	temp_str_no++;
+	return ans;
+}
+
+string get_label(){
+	string str_l = "label";
+	string ans =  str_l.append(to_string(labelno));
+	labelno++;
+	return ans;
+}
+
+stack <string> if_endlabels;
+stack <string> if_bwlabels;
+
+stack <string> for_initlabels;
+stack <string> for_endlabels;
+stack <string> for_blocklabels;
+stack <string> for_postlabels;
+stack <string> for_breaklabels;	//not used
+stack <string> for_continuelabels;
+//string used for argumentlist
+string argumentlist_str;
+stack <int > is_argument_list_empty;
+
+//splitting strings separated by comma
+vector<string> split(const string &s, char delim) {
+    stringstream ss(s);
+    string item;
+    vector<string> tokens;
+    while (getline(ss, item, delim)) {
+        tokens.push_back(item);
+    }
+    return tokens;
+}
+
+
+
+stack <int > is_argument_list_empty;
 %}
 
 // error-verbose
@@ -25,7 +68,7 @@ string fullscope = "0";
 
 // These must go into paser.tab.h
 %code requires{
-    #include <bits/stdc++.h>
+        #include <bits/stdc++.h>
 	#include "src/ast.h"
 	#include "src/symtab.h"
 	using namespace std;
@@ -56,7 +99,7 @@ string fullscope = "0";
 
 %type <node> StartFile Expression Expression1 Expression2 Expression3 Expression4 Expression5
 %type <node> Block StatementList Statement SimpleStmt int_lit
-%type <node> EmptyStmt IncDecStmt OPENB CLOSEB SYMTABS SYMTABE 
+%type <node> EmptyStmt IncDecStmt OPENB CLOSEB
 %type <node> Assignment Declaration ConstDecl VarSpec string_lit Signature Result Parameters ParameterDecl ParameterDeclStar
 %type <node> ConstSpec MethodDecl Receiver TopLevelDecl TopLevelDeclStar LabeledStmt
 %type <node> ReturnStmt BreakStmt ContinueStmt StructType
@@ -100,28 +143,15 @@ CLOSEB:
 	}
 	;
 
-SYMTABS: 
-	/*empty*/ {
-		currscope++;
-		fullscope = fullscope + "/" + to_string(currscope);
-		symtab = new symtab_t;
-		symtab_top[fullscope] = symtab;
-		//cout<<fullscope<<endl;
-	}
-	;
-	
-SYMTABE:
-	/*empty*/ {
-		print_symtab();
-		delete symtab;
-		symtab = symtab_top["0"];
-		fullscope = "0";
-	}
-	;
-
 StatementList:
-    StatementList Statement SEMICOLON { $$ = new astnode("StatementList", false, {$1, $2});}
-    | Statement SEMICOLON { $$ = newId($1, "StatementList"); }
+    StatementList Statement SEMICOLON { 
+		$$ = new astnode("StatementList", false, {$1, $2});
+		
+	}
+    | Statement SEMICOLON { 
+		$$ = newId($1, "StatementList");
+
+	}
     ;
 
 Statement:
@@ -338,21 +368,42 @@ Declaration:
 
 
 FunctionDecl:
-		FUNC IDENTIFIER SYMTABS Function SYMTABE { $$ = new astnode("FunctionDecl", false, {new astnode(IDENTIFIER, $2), $4});
-			symadd($2->v_str, $4->type);
+		FUNC FunctionName OPENB Function CLOSEB { $$ = new astnode("FunctionDecl", false, {new astnode(IDENTIFIER, $2), $4});
+			if( !symadd($2->v_str, $4->type) ) exit(-1);
+			prog.push_back(to_string(lineno)+",exit\n");
+			lineno++;
+			$$=$2;	//for now
+			
 		}
-		| FUNC IDENTIFIER SYMTABS Signature SYMTABE { $$ = new astnode("FunctionDecl", false, {new astnode(IDENTIFIER, $2), $4});
-			symadd($2->v_str, $4->type);		
+		| FUNC FunctionName OPENB Signature CLOSEB { $$ = new astnode("FunctionDecl", false, {new astnode(IDENTIFIER, $2), $4});
+			if( !symadd($2->v_str, $4->type) ) exit(-1);
+
 		}
 		;
-
+// Ashutosh : Update the symbol table corresponding to it.
 FunctionName:
-		IDENTIFIER
+		IDENTIFIER{
+			(*$$).value=strdup($1);
+		    $1=(*$$).value;
+		    string temp_str = $1;
+		    lhs.push_back("FunctionName");rhs.push_back("IDENTIFIER");
+		    string tac = to_string(lineno);
+			tac.append(",function,");
+			tac.append($1);
+			tac.append("\n");
+			prog.push_back(tac);
+			lineno++;
+			//insert in symbol table
+			//$1=(*$$).value;
+			string type_temp = "function";
+			insert(temp_str,curr,type_temp);
+		}
 		;
 /* taking care of that params scope same as fcn block using mid rule + normal end rule actions */
 Function:
 		Signature {fullscope=fullscope.substr(0,fullscope.find_last_of("/"));currscope--;} FunctionBody {
-			fullscope = fullscope +"/"+ to_string(currscope); 
+			currscope++;
+			fullscope = fullscope +"/"+ to_string(currscope);
 			$$ = new astnode("Function", false, {$1, $3});
 		}
 		;
@@ -362,17 +413,105 @@ FunctionBody:
 		;
 
 FunctionStmt:
-		VarDecl DEFINE FunctionCall {$$ = new astnode("FunctionStmt", false, {$1, $3});}
-		| IDENTIFIER DEFINE FunctionCall {$$ = new astnode("FunctionStmt", false, {new astnode(IDENTIFIER, $1), $3});}
+		VarDecl DEFINE FunctionCall {
+			$$ = new astnode("FunctionStmt", false, {$1, $3});
+			
+			string tac;
+			tac.append(to_string(lineno));
+			tac.append(",");
+			tac = tac + "getreturn,"; 
+			tac.append($1->value);
+			tac.append("\n");
+			prog.push_back(tac);
+			lineno++;
+			//pass to $$
+		}
+		| IDENTIFIER DEFINE FunctionCall {
+			$$ = new astnode("FunctionStmt", false, {new astnode(IDENTIFIER, $1), $3});
+			
+			check_entry($1,curr); // what is this ?
+			
+			string tac;
+			tac.append(to_string(lineno));
+			tac.append(",");
+			tac = tac + "getreturn,"; 
+			tac.append($1);
+			tac.append("\n");
+			prog.push_back(tac);
+			lineno++;
+		}
 		;
 
-FunctionCall:	PrimaryExpr LPAREN ArgumentList RPAREN {$$ = new astnode("FunctionCall", false, {$1, $3});}
+FunctionCall:	PrimaryExpr LPAREN ArgumentList RPAREN {
+			$$ = new astnode("FunctionCall", false, {$1, $3});
+			string str1 = strdup($1->value);
+			string str2 = "print";
+			string str3 = "fmt.Println";
+			if(is_argument_list_empty.top()!=1){
+				string temp_str = $3->value;
+				vector <string> vec_arguments = split(temp_str, ',');
+				if(str1!= str2 && str1!=str3){
+					//param here
+					for(int i=0;i<vec_arguments.size();i++){
+						string tac;
+						tac.append(to_string(lineno));
+						tac.append(",");
+						tac = tac + "param,"; 
+						tac.append(vec_arguments[i]);
+						tac.append("\n");
+						prog.push_back(tac);
+						lineno++;
+					}
+					string tac;
+					tac.append(to_string(lineno));
+					tac.append(",");
+					tac = tac + "call,"; 
+					tac.append($1->value);
+					tac.append(",");
+					tac.append(to_string(vec_arguments.size()));
+					tac.append("\n");
+					prog.push_back(tac);
+					lineno++;
+				} else {
+					//printing part
+					for(int i=0;i<vec_arguments.size();i++){
+						string tac;
+						tac.append(to_string(lineno));
+						tac.append(",");
+						tac = tac + "print,"; 
+						tac.append(vec_arguments[i]);
+						tac.append("\n");
+						prog.push_back(tac);
+						lineno++;
+					}
+				}	
+			} else{
+				is_argument_list_empty.pop();
+				string tac;
+				tac.append(to_string(lineno));
+				tac.append(",");
+				tac = tac + "call,"; 
+				tac.append($1->value);
+				tac.append(",");
+				tac.append("0");
+				tac.append("\n");
+				prog.push_back(tac);
+				lineno++;
+			}
+		}
 		;
 
 ArgumentList:
-		ArgumentList COMMA Arguments {$$ = new astnode("ArgumentList", false, {$1, $3});}
+		ArgumentList COMMA Arguments {$$ = new astnode("ArgumentList", false, {$1, $3});
+			argumentlist_str = $1->value;
+			argumentlist_str.append(",");
+			argumentlist_str.append($3->value);
+			(*$$).value = strdup(argumentlist_str.c_str());
+		}
 		| Arguments {$$ = newId($1, "ArgumentList");}
-		| /*empty*/ { $$ = new astnode();}
+		| /*empty*/ { $$ = new astnode();
+			is_argument_list_empty.push(1);
+		}
 		;
 
 Arguments:	PrimaryExpr {$$ = newId($1, "Arguments");}
@@ -390,8 +529,21 @@ Result:
 	;
 
 Parameters:
-	LPAREN RPAREN {$$ = new astnode(LPAREN);}
-	| LPAREN ParameterDeclStar RPAREN {$$ = newId($2, "Parameters");}
+	LPAREN RPAREN {$$ = new astnode(LPAREN);
+		$$->value = strdup("");
+	}
+	| LPAREN ParameterDeclStar RPAREN {$$ = newId($2, "Parameters");
+		string temp_str = $2->value;
+		vector <string> vec_params = split(temp_str, ',');
+		for(int i= vec_params.size()-1;i>=0;i--){
+			string tac = to_string(lineno);
+			tac.append(",pop,");
+			tac.append(vec_params[i]);
+			tac.append("\n");
+			prog.push_back(tac);
+			lineno++;
+		}
+	}
 	| LPAREN ParameterDeclStar COMMA RPAREN {$$ = newId($2, "Parameters");} /* --COMMA WHY?-- */
 	;
 
@@ -466,32 +618,148 @@ OperandName:
 	;
 
 ReturnStmt:
-	RETURN Expression {$$ = newId($2, "ReturnStmt");}
-	| RETURN {$$ = new astnode(RETURN);}
+	RETURN Expression {$$ = newId($2, "ReturnStmt");
+		string tac = to_string(lineno);
+		tac.append(",return,");
+		tac.append($2->value);
+		tac.append("\n");
+		prog.push_back(tac);
+		lineno++;
+	}
+	| RETURN {$$ = new astnode(RETURN);
+		string tac = to_string(lineno);
+		tac.append(",exit\n");
+		prog.push_back(tac);
+		lineno++;
+	}
 	;
 
 BreakStmt:
 	BREAK IDENTIFIER {$$ = new astnode("BreakStmt", false, {new astnode(BREAK, $1), new astnode(IDENTIFIER, $2)});}
-	| BREAK {$$ = new astnode(BREAK);}
+	| BREAK {$$ = new astnode(BREAK);
+		string tac = to_string(lineno);
+		tac.append(",goto,");
+		tac.append(for_endlabels.top());
+		tac.append("\n");
+		prog.push_back(tac);
+		lineno++;
+	}
 	;
 
 ContinueStmt:
 	CONTINUE IDENTIFIER {$$ = new astnode("ContinueStmt", false, {new astnode(BREAK, $1), new astnode(IDENTIFIER, $2)});}
-	| CONTINUE {$$ = new astnode(CONTINUE);}
+	| CONTINUE {$$ = new astnode(CONTINUE);
+		string tac = to_string(lineno);
+		tac.append(",goto,");
+		tac.append(for_continuelabels.top());
+		tac.append("\n");
+		prog.push_back(tac);
+		lineno++;
+	}
 	;
 
 IfStmt:
-	IF OPENB Expression Block CLOSEB {$$ = new astnode("IfStmt", false, {$3, $4});}
-	|IF OPENB SimpleStmt SEMICOLON Expression Block CLOSEB {$$ = new astnode("IfStmt", false, {$3, $5, $6});}
-	|IF OPENB SimpleStmt SEMICOLON Expression Block ELSE IfStmt CLOSEB {$$ = new astnode("IfStmt", false, {$3, $5, $6, $8});}
-	|IF OPENB SimpleStmt SEMICOLON Expression Block ELSE  Block CLOSEB {$$ = new astnode("IfStmt", false, {$3, $5, $6, $8});}
-	|IF OPENB Expression Block ELSE IfStmt CLOSEB {$$ = new astnode("IfStmt", false, {$3, $4, $6});}
-	|IF OPENB Expression Block ELSE  Block CLOSEB {$$ = new astnode("IfStmt", false, {$3, $4, $6});}
+	IF OPENB Expression if_mark1 Block if_mark2 CLOSEB {$$ = new astnode("IfStmt", false, {$3, $4});}
+	|IF OPENB SimpleStmt SEMICOLON Expression if_mark1 Block CLOSEB {$$ = new astnode("IfStmt", false, {$3, $5, $6});}
+	|IF OPENB SimpleStmt SEMICOLON Expression if_mark2 Block if_markend1 ELSE IfStmt CLOSEB {$$ = new astnode("IfStmt", false, {$3, $5, $6, $8});}
+	|IF OPENB SimpleStmt SEMICOLON Expression if_mark2 Block if_markend1 ELSE  Block CLOSEB {$$ = new astnode("IfStmt", false, {$3, $5, $6, $8});}
+	|IF OPENB Expression if_mark1 Block if_markend1 ELSE if_mark2 IfStmt if_markend2 CLOSEB if_markend{$$ = new astnode("IfStmt", false, {$3, $4, $6});}
+	|IF OPENB Expression if_mark1 Block if_markend1 ELSE if_mark2 Block  if_markend2 CLOSEB if_markend{$$ = new astnode("IfStmt", false, {$3, $4, $6});}
 	;
 
+if_mark1: {
+		string tac;
+		tac.append(to_string(lineno));
+		tac.append(",");
+		tac.append("ifgoto,=,");
+		string togo_label = get_label();
+		tac.append("t"+to_string(tempno-1)+",1,"+togo_label+"\n");
+		prog.push_back(tac);
+		lineno++;
+		//
+		tac=to_string(lineno);
+		tac.append(",");
+		tac.append("goto,");
+		string topush_label = get_label();
+		if_bwlabels.push(topush_label);
+		tac.append(topush_label+"\n");//TO correct
+		prog.push_back(tac);
+		lineno++;
+		//
+		tac=to_string(lineno);
+		tac.append(",");
+		tac.append("label,");
+		tac.append(togo_label+"\n");//TO correct
+		prog.push_back(tac);
+		lineno++;
+	};
+
+if_mark2: {	//
+		//
+		string tac;
+		tac=to_string(lineno);
+		tac.append(",");
+		tac.append("label,");
+		string toget_label = if_bwlabels.top();
+		if_bwlabels.pop();
+		tac.append(toget_label+"\n");//TO correct
+		prog.push_back(tac);
+		lineno++;		
+	};
+
+//from here for if else
+
+if_markend1: {
+		string tac;
+		//
+		tac=to_string(lineno);
+		tac.append(",");
+		tac.append("goto,");
+		string topush_label = get_label();
+		if_endlabels.push(topush_label);
+		tac.append(topush_label+"\n");//TO correct
+		prog.push_back(tac);
+		lineno++;
+		//
+	};	
+
+if_mark22: {
+		string tac;
+		tac=to_string(lineno);
+		tac.append(",");
+		tac.append("label,");
+		string toget_label = if_bwlabels.top();
+		if_bwlabels.pop();
+		tac.append(toget_label+"\n");//TO correct
+		prog.push_back(tac);
+		lineno++;
+	};
+
+if_markend2: {
+		string tac;
+		tac=to_string(lineno);
+		tac.append(",");
+		tac.append("goto,");
+		string toget_label = if_endlabels.top();
+		tac.append(toget_label+"\n");//TO correct
+		prog.push_back(tac);
+		lineno++;
+	};
+if_markend: {
+		string tac;
+		tac=to_string(lineno);
+		tac.append(",");
+		tac.append("label,");
+		string togo_label = if_endlabels.top();	//top of second stack
+		if_endlabels.pop();				//pop here
+		tac.append(togo_label+"\n");//TO correct
+		prog.push_back(tac);
+		lineno++;
+	};
+
 ForStmt:
-	FOR OPENB Condition Block CLOSEB {$$ = new astnode("ForStmt", false, {$3, $4});}
-	|FOR OPENB ForClause Block CLOSEB {$$ = new astnode("ForStmt", false, {$3, $4});}
+	FOR OPENB for_initmark Condition for_mark1 Block for_mark2 CLOSEB for_markend1 {$$ = new astnode("ForStmt", false, {$3, $4});}
+	|FOR OPENB for_initmark ForClause Block for_mark2 CLOSEB for_markend1 {$$ = new astnode("ForStmt", false, {$3, $4});}
 	;
 
 Condition:
@@ -499,8 +767,163 @@ Condition:
 	;
 
 ForClause:
-	InitStmt SEMICOLON Condition SEMICOLON PostStmt {$$ = new astnode("ForClause", false, {$1, $3, $5});}
+	InitStmt for_clause_mark1 SEMICOLON Condition for_clause_mark2 SEMICOLON PostStmt for_clause_mark3 {$$ = new astnode("ForClause", false, {$1, $3, $5});}
 	;
+
+
+for_clause_mark1:{
+		for_initlabels.pop();
+		for_continuelabels.pop();
+		string tac;
+		tac = to_string(lineno);
+		string for_initlabel = get_label();
+		tac.append(",label,"+for_initlabel+"\n");
+		for_initlabels.push(for_initlabel);
+		for_continuelabels.push(for_initlabel);
+		prog.push_back(tac);
+		lineno++;
+
+	};
+
+for_clause_mark2: {	
+		//
+		string tac;
+		tac=to_string(lineno);
+		tac.append(",");
+		tac.append("ifgoto,=,");
+		string togo_label = get_label();
+		tac.append("t"+to_string(tempno-1)+",1,"+togo_label+"\n");
+		prog.push_back(tac);
+		lineno++;
+		//
+		tac=to_string(lineno);
+		tac.append(",goto,");
+		string for_endlabel = get_label();
+		tac.append(for_endlabel+"\n");
+		for_endlabels.push(for_endlabel);
+		prog.push_back(tac);
+		lineno++;
+		//
+		tac=to_string(lineno);
+		tac.append(",label,");
+		tac.append(togo_label+"\n");
+		prog.push_back(tac);
+		lineno++;
+		//
+		//
+		tac=to_string(lineno);
+		tac.append(",goto,");
+		string for_blocklabel = get_label();
+		tac.append(for_blocklabel+"\n");
+		for_blocklabels.push(for_blocklabel);
+		prog.push_back(tac);
+		lineno++;
+		//
+		tac=to_string(lineno);
+		tac.append(",label,");
+		string for_postlabel = get_label();
+		tac.append(for_postlabel+"\n");
+		for_postlabels.push(for_postlabel);
+		prog.push_back(tac);
+		lineno++;
+		
+	};	
+	
+for_clause_mark3:
+		{
+		//
+		string tac;
+		tac=to_string(lineno);
+		tac.append(",goto,");
+		string togo_label = for_initlabels.top();
+		for_initlabels.pop();
+		//for_continuelabels.pop();
+		tac.append(togo_label+"\n");
+		prog.push_back(tac);
+		lineno++;
+		//
+		tac=to_string(lineno);
+		tac.append(",label,");
+		string for_blocklabel = for_blocklabels.top();
+		tac.append(for_blocklabel+"\n");
+		for_blocklabels.pop();
+		prog.push_back(tac);
+		lineno++;
+	};
+
+for_mark22: {
+		string tac;
+		tac=to_string(lineno);
+		tac.append(",goto,");
+		string togo_postlabel = for_postlabels.top();
+		for_postlabels.pop();
+		tac.append(togo_postlabel+"\n");
+		prog.push_back(tac);
+		lineno++;
+	};			
+
+//for - 1 
+for_initmark:{
+		string tac;
+		tac = to_string(lineno);
+		string for_initlabel = get_label();
+		tac.append(",label,"+for_initlabel+"\n");
+		for_initlabels.push(for_initlabel);
+		for_continuelabels.push(for_initlabel);
+		prog.push_back(tac);
+		lineno++;
+	};
+
+for_mark1: {	
+		//
+		string tac;
+		tac=to_string(lineno);
+		tac.append(",");
+		tac.append("ifgoto,=,");
+		string togo_label = get_label();
+		tac.append("t"+to_string(tempno-1)+",1,"+togo_label+"\n");
+		prog.push_back(tac);
+		lineno++;
+		//
+		tac=to_string(lineno);
+		tac.append(",goto,");
+		string for_endlabel = get_label();
+		tac.append(for_endlabel+"\n");
+		for_endlabels.push(for_endlabel);
+		prog.push_back(tac);
+		lineno++;
+		//
+		tac=to_string(lineno);
+		tac.append(",label,");
+		tac.append(togo_label+"\n");
+		prog.push_back(tac);
+		lineno++;
+	};
+
+for_mark2: {
+		string tac;
+		tac=to_string(lineno);
+		tac.append(",goto,");
+		string togo_label = for_initlabels.top();
+		for_initlabels.pop();
+		//for_continuelabels.pop();
+		tac.append(togo_label+"\n");
+		prog.push_back(tac);
+		lineno++;
+	};
+
+for_markend1: {
+		string tac;
+		tac=to_string(lineno);
+		tac.append(",label,");
+		string for_endlabel = for_endlabels.top();
+		for_endlabels.pop();
+		for_continuelabels.pop();
+		tac.append(for_endlabel+"\n");
+		prog.push_back(tac);
+		lineno++;
+	};	
+
 
 InitStmt:
 	SimpleStmt {$$ = newId($1, "InitStmt");}
@@ -567,12 +990,20 @@ ConstDecl:
 		;
 
 ConstSpec:
-		IDENTIFIER Type ASSIGN Expression { $$ = new astnode("ConstSpec",false,{$2,$4}); 
-			symadd($1->v_str, $2->type);
+		IDENTIFIER Type ASSIGN Expression { $$ = new astnode("ConstSpec",false,{$2,$4});
+			if( !symadd($1->v_str, $2->type) ) exit(1);
+			string tac = to_string(lineno);
+			tac.append(",=,");
+			tac.append($1);
+			tac.append(",");
+			tac.append($4->value);
+			tac.append("\n");
+			prog.push_back(tac);
+			lineno++;
 			//cout<<"SCOPE"<<any_scope("test")<<endl;
 		}
-		| IDENTIFIER Type { $$ = newId($2, "ConstSpec"); 
-			symadd($1->v_str, $2->type);
+		| IDENTIFIER Type { $$ = newId($2, "ConstSpec");
+			if( !symadd($1->v_str, $2->type) ) exit(1);
 			//cout<<"SCOPE"<<any_scope("test")<<endl;
 		}
 		;
@@ -620,7 +1051,18 @@ byte_lit:
 BasicLit:
 	int_lit { $$ = newId($1, "BasicLit"); }
 	| float_lit { $$ = newId($1, "BasicLit"); }
-	| string_lit { $$ = newId($1, "BasicLit"); }
+	| string_lit { $$ = newId($1, "BasicLit"); 
+		string temp_str = $1->value;
+		string temp_var = get_temp_strvar();
+		string tac = to_string(lineno);
+		tac.append(",string,");
+		tac.append(temp_var);
+		tac.append(",");
+		tac.append(temp_str);
+		tac.append("\n");
+		prog.push_back(tac);
+		lineno++;
+	}
 	| byte_lit { $$ = newId($1, "BasicLit"); }
 	;
 
@@ -668,27 +1110,105 @@ Expression:
     ;
 
 Expression1:
-    Expression1 LOR Expression2 { $$ = new astnode("Expression1",false,{$1,new astnode(LOR),$3}); }
+    Expression1 LOR Expression2 { $$ = new astnode("Expression1",false,{$1,new astnode(LOR),$3}); 
+		string temp_var = get_tempvar();
+		string tac;
+		tac.append(to_string(lineno));
+		tac.append(",");
+		tac.append($2);
+		tac.append(",");
+		tac.append(temp_var);
+		tac.append(",");
+		tac.append($1->value);
+		tac.append(",");
+		tac.append($3->value);
+		tac.append("\n");
+		prog.push_back(tac);
+		lineno++;
+	}
     | Expression2 { newId($1,"Expression1"); }
     ;
 
 Expression2:
-    Expression2 LAND Expression3 { $$ = new astnode("Expression2",false,{$1,new astnode(LAND),$3}); }
-    | Expression3 { newId($1,"Expression2"); }
+    Expression2 LAND Expression3 { $$ = new astnode("Expression2",false,{$1,new astnode(LAND),$3});
+		string temp_var = get_tempvar();
+		string tac;
+		tac.append(to_string(lineno));
+		tac.append(",");
+		tac.append($2);
+		tac.append(",");
+		tac.append(temp_var);
+		tac.append(",");
+		tac.append($1->value);
+		tac.append(",");
+		tac.append($3->value);
+		tac.append("\n");
+		prog.push_back(tac);
+		lineno++;
+	}
+    | Expression3 { 
+		$$newId($1,"Expression2"); 
+
+	}
     ;
 
 Expression3:
-    Expression3 rel_op Expression4 { $$ = new astnode("Expression3",false,{$1,$2,$3}); }
+    Expression3 rel_op Expression4 { $$ = new astnode("Expression3",false,{$1,$2,$3}); 
+		string temp_var = get_tempvar();
+		string tac;
+		tac.append(to_string(lineno));
+		tac.append(",");
+		tac.append($2->value);
+		tac.append(",");
+		tac.append(temp_var);
+		tac.append(",");
+		tac.append($1->value);
+		tac.append(",");
+		tac.append($3->value);
+		tac.append("\n");
+		prog.push_back(tac);
+		lineno++;
+	}
     | Expression4 { newId($1,"Expression3"); }
     ;
 
 Expression4:
-    Expression4 add_op Expression5 { $$ = new astnode("Expression4",false,{$1,$2,$3}); }
+    Expression4 add_op Expression5 { $$ = new astnode("Expression4",false,{$1,$2,$3}); 
+		string temp_var = get_tempvar();
+		string tac;
+		tac.append(to_string(lineno));
+		tac.append(",");
+		tac.append($2->value);
+		tac.append(",");
+		tac.append(temp_var);
+		tac.append(",");
+		tac.append($1->value);
+		tac.append(",");
+		tac.append($3->value);
+		tac.append("\n");
+		prog.push_back(tac);
+		lineno++;
+	}
     | Expression5 { newId($1,"Expression4"); }
     ;
 
 Expression5:
-    Expression5 mul_op PrimaryExpr { $$ = new astnode("Expression5",false,{$1,$2,$3}); }
+    Expression5 mul_op PrimaryExpr { $$ = new astnode("Expression5",false,{$1,$2,$3}); 
+		string temp_var = get_tempvar();
+		string tac;
+		tac.append(to_string(lineno));
+		tac.append(",");
+		tac.append($2->value);
+		tac.append(",");
+		tac.append(temp_var);
+		tac.append(",");
+		tac.append($1->value);
+		tac.append(",");
+		tac.append($3->value);
+		tac.append("\n");
+		prog.push_back(tac);
+		lineno++;
+	}
     | UnaryExpr { $$ = newId($1, "Expression5"); }
     ;
 
@@ -744,7 +1264,15 @@ assign_op:
 	;
 
 PackageClause:
-	PACKAGE PackageName { $$ = new astnode("PackageClause", false, {new astnode(PACKAGE), $2});}
+	PACKAGE PackageName { $$ = new astnode("PackageClause", false, {new astnode(PACKAGE), $2});
+		string tac = to_string(lineno) + ",call," + $2->value;
+		tac.append(",0\n");
+		prog.push_back(tac);
+		lineno++;
+		tac = to_string(lineno) + ",exit\n";
+		prog.push_back(tac);
+		lineno++;
+	}
 	;
 
 PackageName:
@@ -795,15 +1323,15 @@ void prettyPrint(ofstream& astFile, astnode* root){
 }
 
 int main (int argc, char **argv) {
+	yyparse ( );
+	ofstream symbolTable;
+
+	is_argument_list_empty.push(0);
+
 	int fileNo = atoi(argv[1]);
 	symbolTable.open("symbolTable" + to_string(fileNo) + ".txt");
-	fp =  & symbolTable;
-	
-	yyparse ( );
-	
-	print_symtab();
+	print_symtab(symbolTable);
 	symbolTable.close();
-	
 	ofstream astFile;
 	astFile.open("ast" + to_string(fileNo) + ".dot" );
 	if(!astFile) {
@@ -814,4 +1342,11 @@ int main (int argc, char **argv) {
 	prettyPrint(astFile, theprogram);
 	astFile << "}" << endl;
 	astFile.close();
+
+	if(error_status==1){
+		exit (EXIT_FAILURE);
+	}
+	for(int i=0;i<prog.size();i++){
+		cout << prog[i];
+	}
 }
