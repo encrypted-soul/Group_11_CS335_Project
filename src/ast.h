@@ -12,7 +12,7 @@ struct astnode {
   bool isTerminal = true;
   std::vector<astnode*> children = vector<astnode*>();  // empty by default
   
-  vector<
+  
 
   astnode();
   astnode(int tokenId);  // useful for terminals having no type e.g. PACKAGE
