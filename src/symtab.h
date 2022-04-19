@@ -22,6 +22,7 @@ extern umap< string, symtab_t* > symtab_top;
 extern string fullscope;
 extern symtab_t *symtab;
 extern std::ostream* fp;
+extern int yylineno;
 
 symtab_t* init_symtab_top();
 bool symadd(string symname, Type* symtype);
