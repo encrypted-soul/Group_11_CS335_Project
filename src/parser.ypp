@@ -220,7 +220,6 @@ IncDecStmt:
 Assignment:
 	ExpressionList assign_op ExpressionList {
 		$$ = new astnode("Assignment", false, {$1,$2, $3});
-		/*
 		string temp1 = $1;
 		string temp2 = $3;
 		vector <string> expr1 = split(temp, ',');
@@ -288,7 +287,6 @@ Assignment:
 				}
 			}
 		}
-		*/
 	}
 	;
 
@@ -299,7 +297,6 @@ VarDecl:
 VarSpec:
 		IdentifierList Type ASSIGN ExpressionList {$$ = new astnode("VarSpec", false, {$1, $2, new astnode(ASSIGN, $3),  $4});
 			symadd_list($1, $2->type, IDENTIFIER);
-			/*
 			string temp1 = $1->id;
 			string temp2 = $4->id;
 			vector <string> expr1 = temp1.split(temp1, ',');
@@ -325,7 +322,6 @@ VarSpec:
 					lineno++;
 				}
 			}
-			*/
 		}
 		| IdentifierList Type {$$ = new astnode("VarSpec", false, {$1, $2});
 			symadd_list($1, $2->type, IDENTIFIER);
