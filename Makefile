@@ -20,6 +20,9 @@ test_go:
 	./bin/parser 4 < ./test/parser_test_file/test4.go
 	./bin/parser 5 < ./test/parser_test_file/test5.go
 
+test_one:
+	./bin/parser $(num) < ./test/parser_test_file/test$(num).go
+
 clean_graph:
 	rm automata.png
 

@@ -152,8 +152,19 @@ void print_symtab( ostream& symbolTable /* =  *fp */ ){
 	symbolTable <<"Scope_num Sym_name"<<endl;
 	for( auto i=symtab->begin(); i != symtab->end(); i++ ){
 		symbolTable <<i->first;
-		if( i->second != NULL ) symbolTable<<" "<< i->second->typeClass;
-		symbolTable<<endl;
+		if( i->second != NULL ) {
+			int x = i->second->typeClass;
+			//symbolTable<<" "<< x;
+			switch(x){
+				case NULL_TYPE: 	break;
+				case DEFINED_TYPE:	DefinedType *tmp = static_cast<DefinedType*>(i->second);
+							symbolTable<<" " << tmp -> basename; 
+							if(tmp->cons == true) symbolTable<<" "<<"Const";
+							break;
+			}
+			
+			symbolTable<<endl;
+		}
 	}
 	symbolTable <<"----DONE----"<<endl;
 }

@@ -271,8 +271,8 @@ VarDecl:
 		;
 
 VarSpec:
-		IdentifierList Type ASSIGN ExpressionList {$$ = new astnode("VarSpec", false, {$1, $2, new astnode(ASSIGN, $3),  $4});
-			symadd_list($1, $2->type, IDENTIFIER);
+		IdentifierList Type ASSIGN ExpressionList {$$ = new astnode($2->type,"VarSpec", false, {$1, $2, new astnode(ASSIGN, $3),  $4});
+			int num_ele = symadd_list($1, $2->type, IDENTIFIER);
 			/*
 			string temp1 = $1->id;
 			string temp2 = $4->id;
@@ -301,7 +301,7 @@ VarSpec:
 			}
 			*/
 		}
-		| IdentifierList Type {$$ = new astnode("VarSpec", false, {$1, $2});
+		| IdentifierList Type {$$ = new astnode($2->type,"VarSpec", false, {$1, $2});
 			symadd_list($1, $2->type, IDENTIFIER);
 			/*
 			string temp1 = $1->id;
@@ -393,8 +393,8 @@ Signature:
 	;
 
 Result:
-	LPAREN TypeList RPAREN {$$ = newId($2, "Result");}
-	| Type {$$ = newId($1, "Result");}
+	LPAREN TypeList RPAREN {$$ = newId($2, "Result");}	/*no support atm */
+	| Type {$$ = newId($1, "Result");} 
 	;
 
 Parameters:
@@ -527,8 +527,8 @@ float_lit:
 	  ;
 
 TypeName:
-	IDENTIFIER { $$ = new astnode(IDENTIFIER,$1);}
-	| VAR_TYPE { $$ = new astnode(VAR_TYPE,$1);}
+	IDENTIFIER { $$ = new astnode(IDENTIFIER,$1); } //type from typtab 
+	| VAR_TYPE { $$ = new astnode(new DefinedType($1->v_str) , VAR_TYPE); }
 	;
 
 ArrayType:
@@ -571,11 +571,11 @@ FunctionType:
 	;
 
 ConstDecl:
-		CONST ConstSpec { $$ = newId($2, "ConstDecl"); }
+		CONST ConstSpec { $$ = newId($2, "ConstDecl"); $$->type->cons=true; }
 		;
 
 ConstSpec:
-		IDENTIFIER Type ASSIGN Expression { $$ = new astnode("ConstSpec",false,{$2,$4}); 
+		IDENTIFIER Type ASSIGN Expression { $$ = new astnode( $2->type ,"ConstSpec",false,{$2,$4}); 
 			symadd($1->v_str, $2->type);
 			//cout<<"SCOPE"<<any_scope("test")<<endl;
 		}

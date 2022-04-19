@@ -7,5 +7,6 @@ func ast() int {
 };
 
 func main() {
+	const a int = 5;
 	fmt.Println("hello world");
 }

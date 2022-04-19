@@ -18,7 +18,8 @@ enum TypeClass {
 struct Type {
   virtual string getType();
   virtual Type* copy();
-  Type* next = NULL;  // type linked list
+  Type* next = NULL;	// type linked list
+  bool cons = false;	//const or not		
   TypeClass typeClass = NULL_TYPE;
 };
 

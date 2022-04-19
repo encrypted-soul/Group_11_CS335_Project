@@ -13,21 +13,16 @@ struct astnode {
   std::vector<astnode*> children = vector<astnode*>();  // empty by default
 
   astnode();
-  astnode(int tokenId);  // useful for terminals having no type e.g. PACKAGE
-  astnode(Type* type,
-          int tokenId);  // useful for terminals having type e.g. IDENTIFIER
-  astnode(string id, bool isTerminal,
-          vector<astnode*> children);  // for non-terminal having NULL_TYPE
+  astnode(int tokenId); 							 					// useful for terminals having no type e.g. PACKAGE
+  astnode(Type* type,int tokenId);  									// useful for terminals having type e.g. IDENTIFIER
+  astnode(string id, bool isTerminal, vector<astnode*> children);  		// for non-terminal having NULL_TYPE
   astnode(Type* type, string id, bool isTerminal, vector<astnode*> children);
-
-  astnode(int tokenId,
-          Data* data);  // useful for terminals having no type e.g. PACKAGE
-  astnode(Type* type, int tokenId,
-          Data* data);  // useful for terminals having type e.g. IDENTIFIER
-  astnode(string id, bool isTerminal, vector<astnode*> children,
-          Data* data);  // for non-terminal having NULL_TYPE
-  astnode(Type* type, string id, bool isTerminal, vector<astnode*> children,
-          Data* data);
+  
+  astnode(int tokenId, Data* data);  									// useful for terminals having no type e.g. PACKAGE
+  astnode(Type* type, int tokenId, Data* data); 						// useful for terminals having type e.g. IDENTIFIER
+  astnode(string id, bool isTerminal, vector<astnode*> children, Data* data);	// for non-terminal having NULL_TYPE
+  
+  astnode(Type* type, string id, bool isTerminal, vector<astnode*> children, Data* data);
 };
 
 // astnode& operator>>(astnode& node, const char* appendId);
