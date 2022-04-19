@@ -185,7 +185,6 @@ LabeledStmt:
 IncDecStmt:
 	Expression INC {
 		$$ = new astnode("IncDecStmt", false, {$1, new astnode(INC, $2)});
-			/*
 			string tac;
 			tac.append(to_string(lineno));
 			tac.append(",");
@@ -199,11 +198,9 @@ IncDecStmt:
 			tac.append("\n");
 			prog.push_back(tac);
 			lineno++;
-			*/
 		}
 	| Expression DEC {
 		$$ = new astnode("IncDecStmt", false, {$1, new astnode(INC, $2)});
-		/*
 		string tac;
 		tac.append(to_string(lineno));
 		tac.append(",");
@@ -217,7 +214,6 @@ IncDecStmt:
 		tac.append("\n");
 		prog.push_back(tac);
 		lineno++;
-		*/
 	}
 	;
 
