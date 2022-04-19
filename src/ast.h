@@ -1,6 +1,5 @@
 #ifndef AST_H
 #define AST_H
-#include "data.h"
 #include "type.h"
 
 struct astnode {
@@ -8,26 +7,17 @@ struct astnode {
   // for non-terminal : grammar symbol, data type, children
   Type* type = new Type();  // NULL_TYPE by default
   string id = "";
-  Data* data = new Data();
   bool isTerminal = true;
   std::vector<astnode*> children = vector<astnode*>();  // empty by default
 
   astnode();
   astnode(int tokenId);  // useful for terminals having no type e.g. PACKAGE
-  astnode(Type* type,
-          int tokenId);  // useful for terminals having type e.g. IDENTIFIER
+  // Use symbol table for type information
+//   astnode(Type* type,
+//           int tokenId);  // useful for terminals having type e.g. IDENTIFIER
   astnode(string id, bool isTerminal,
           vector<astnode*> children);  // for non-terminal having NULL_TYPE
   astnode(Type* type, string id, bool isTerminal, vector<astnode*> children);
-
-  astnode(int tokenId,
-          Data* data);  // useful for terminals having no type e.g. PACKAGE
-  astnode(Type* type, int tokenId,
-          Data* data);  // useful for terminals having type e.g. IDENTIFIER
-  astnode(string id, bool isTerminal, vector<astnode*> children,
-          Data* data);  // for non-terminal having NULL_TYPE
-  astnode(Type* type, string id, bool isTerminal, vector<astnode*> children,
-          Data* data);
 };
 
 // astnode& operator>>(astnode& node, const char* appendId);

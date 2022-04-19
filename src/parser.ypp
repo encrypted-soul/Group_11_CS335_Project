@@ -11,9 +11,9 @@ vector <string> prog;
 int lineno = 1;
 astnode *theprogram;
 
-ofstream symbolTable;					//for symtab_print					
-std::ostream* fp = &cout; 
-		
+ofstream symbolTable;					//for symtab_print
+std::ostream* fp = &cout;
+
 umap< string, symtab_t* > symtab_top;
 symtab_t *symtab =  init_symtab_top();	//universal block + symtab "0" aka global
 int currscope = 0;
@@ -32,31 +32,31 @@ string fullscope = "0";
 }
 
 %union {
-	Data* data;
+	string value;
 	astnode *node;
 }
 
-%token <data> PACKAGE IMPORT FUNC BREAK CASE CONST CONTINUE DEFAULT
-%token <data> ELSE FOR GO IF RANGE RETURN STRUCT SWITCH TYPE VAR VAR_TYPE
-%token <data> BOOL_CONST NIL_VAL // REVIEW -  Usage of NIL_VAL
-%token <data> IDENTIFIER
-%token <data> BYTE STRING
-%token <data> ELLIPSIS
-%token <data> SHL SHR INC DEC
-%token <data> INTEGER
-%token <data> FLOAT
-%left  <data> ADD SUB MUL QUO REM
-%right <data> ASSIGN AND NOT DEFINE AND_NOT
-%left  <data> OR XOR ARROW
-%right <data> ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN QUO_ASSIGN REM_ASSIGN
-%right <data> AND_ASSIGN OR_ASSIGN XOR_ASSIGN
-%right <data> SHL_ASSIGN SHR_ASSIGN AND_NOT_ASSIGN COLON
-%left  <data> LAND LOR EQL NEQ LEQ GEQ SEMICOLON
-%left  <data> GTR LSS LPAREN RPAREN LBRACE RBRACE LBRACK RBRACK COMMA PERIOD
+%token <value> PACKAGE IMPORT FUNC BREAK CASE CONST CONTINUE DEFAULT
+%token <value> ELSE FOR GO IF RANGE RETURN STRUCT SWITCH TYPE VAR VAR_TYPE
+%token <value> BOOL_CONST NIL_VAL // REVIEW -  Usage of NIL_VAL
+%token <value> IDENTIFIER
+%token <value> BYTE STRING
+%token <value> ELLIPSIS
+%token <value> SHL SHR INC DEC
+%token <value> INTEGER
+%token <value> FLOAT
+%left  <value> ADD SUB MUL QUO REM
+%right <value> ASSIGN AND NOT DEFINE AND_NOT
+%left  <value> OR XOR ARROW
+%right <value> ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN QUO_ASSIGN REM_ASSIGN
+%right <value> AND_ASSIGN OR_ASSIGN XOR_ASSIGN
+%right <value> SHL_ASSIGN SHR_ASSIGN AND_NOT_ASSIGN COLON
+%left  <value> LAND LOR EQL NEQ LEQ GEQ SEMICOLON
+%left  <value> GTR LSS LPAREN RPAREN LBRACE RBRACE LBRACK RBRACK COMMA PERIOD
 
 %type <node> StartFile Expression Expression1 Expression2 Expression3 Expression4 Expression5
 %type <node> Block StatementList Statement SimpleStmt int_lit
-%type <node> EmptyStmt IncDecStmt OPENB CLOSEB SYMTABS SYMTABE 
+%type <node> EmptyStmt IncDecStmt OPENB CLOSEB SYMTABS SYMTABE
 %type <node> Assignment Declaration ConstDecl VarSpec string_lit Signature Result Parameters ParameterDecl ParameterDeclStar
 %type <node> ConstSpec MethodDecl Receiver TopLevelDecl TopLevelDeclStar LabeledStmt
 %type <node> ReturnStmt BreakStmt ContinueStmt StructType
@@ -100,7 +100,7 @@ CLOSEB:
 	}
 	;
 
-SYMTABS: 
+SYMTABS:
 	/*empty*/ {
 		currscope++;
 		fullscope = fullscope + "/" + to_string(currscope);
@@ -109,7 +109,7 @@ SYMTABS:
 		//cout<<fullscope<<endl;
 	}
 	;
-	
+
 SYMTABE:
 	/*empty*/ {
 		print_symtab();
@@ -345,11 +345,11 @@ Declaration:
 
 
 FunctionDecl:
-		FUNC IDENTIFIER SYMTABS Function SYMTABE { $$ = new astnode("FunctionDecl", false, {new astnode(IDENTIFIER, $2), $4});
-			symadd($2->v_str, $4->type);
+		FUNC IDENTIFIER SYMTABS Function SYMTABE { $$ = new astnode("FunctionDecl", false, {new astnode(IDENTIFIER), $4});
+			symadd($2, $4->type);
 		}
-		| FUNC IDENTIFIER SYMTABS Signature SYMTABE { $$ = new astnode("FunctionDecl", false, {new astnode(IDENTIFIER, $2), $4});
-			symadd($2->v_str, $4->type);		
+		| FUNC IDENTIFIER SYMTABS Signature SYMTABE { $$ = new astnode("FunctionDecl", false, {new astnode(IDENTIFIER), $4});
+			symadd($2, $4->type);
 		}
 		;
 
@@ -360,7 +360,7 @@ FunctionName:
 /* taking care of that params scope same as fcn block using mid rule + normal end rule actions */
 Function:
 		Signature {fullscope=fullscope.substr(0,fullscope.find_last_of("/"));currscope--;} FunctionBody {
-			fullscope = fullscope +"/"+ to_string(currscope); 
+			fullscope = fullscope +"/"+ to_string(currscope);
 			$$ = new astnode("Function", false, {$1, $3});
 		}
 		;
@@ -575,12 +575,12 @@ ConstDecl:
 		;
 
 ConstSpec:
-		IDENTIFIER Type ASSIGN Expression { $$ = new astnode("ConstSpec",false,{$2,$4}); 
-			symadd($1->v_str, $2->type);
+		IDENTIFIER Type ASSIGN Expression { $$ = new astnode("ConstSpec",false,{$2,$4});
+			symadd($1, $2->type);
 			//cout<<"SCOPE"<<any_scope("test")<<endl;
 		}
-		| IDENTIFIER Type { $$ = newId($2, "ConstSpec"); 
-			symadd($1->v_str, $2->type);
+		| IDENTIFIER Type { $$ = newId($2, "ConstSpec");
+			symadd($1, $2->type);
 			//cout<<"SCOPE"<<any_scope("test")<<endl;
 		}
 		;
@@ -806,12 +806,12 @@ int main (int argc, char **argv) {
 	int fileNo = atoi(argv[1]);
 	symbolTable.open("symbolTable" + to_string(fileNo) + ".txt");
 	fp =  & symbolTable;
-	
+
 	yyparse ( );
-	
+
 	print_symtab();
 	symbolTable.close();
-	
+
 	ofstream astFile;
 	astFile.open("ast" + to_string(fileNo) + ".dot" );
 	if(!astFile) {
