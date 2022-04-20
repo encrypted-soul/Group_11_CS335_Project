@@ -11,13 +11,33 @@ vector <string> prog;
 int lineno = 1;
 astnode *theprogram;
 
-ofstream symbolTable;					//for symtab_print					
-std::ostream* fp = &cout; 
-		
+ofstream symbolTable;					//for symtab_print
+std::ostream* fp = &cout;
+
 umap< string, symtab_t* > symtab_top;
 symtab_t *symtab =  init_symtab_top();	//universal block + symtab "0" aka global
 int currscope = 0;
 string fullscope = "0";
+
+int temp_var_counter = 0;
+
+//splitting strings separated by comma
+vector<string> split(const string &s, char delim) {
+    stringstream ss(s);
+    string item;
+    vector<string> tokens;
+    while (getline(ss, item, delim)) {
+        tokens.push_back(item);
+    }
+    return tokens;
+}
+
+string get_temp_var() {
+
+	string v = "temp_" + to_string(temp_var_counter);
+	temp_var_counter++;
+	return v;
+}
 %}
 
 // error-verbose
@@ -55,8 +75,8 @@ string fullscope = "0";
 %left  <data> GTR LSS LPAREN RPAREN LBRACE RBRACE LBRACK RBRACK COMMA PERIOD
 
 %type <node> StartFile Expression Expression1 Expression2 Expression3 Expression4 Expression5
-%type <node> Block StatementList Statement SimpleStmt int_lit
-%type <node> EmptyStmt IncDecStmt OPENB CLOSEB SYMTABS SYMTABE 
+%type <node> Block StatementList Statement SimpleStmt int_lit Label
+%type <node> EmptyStmt IncDecStmt OPENB CLOSEB SYMTABS SYMTABE
 %type <node> Assignment Declaration ConstDecl VarSpec string_lit Signature Result Parameters ParameterDecl ParameterDeclStar
 %type <node> ConstSpec MethodDecl Receiver TopLevelDecl TopLevelDeclStar LabeledStmt
 %type <node> ReturnStmt BreakStmt ContinueStmt StructType
@@ -76,7 +96,9 @@ string fullscope = "0";
 
 /* START OF FILE */
 StartFile:
-    PackageClause SEMICOLON ImportDeclStar TopLevelDeclStar { theprogram = new astnode("StartFile",false, {$1,$3,$4});}
+    PackageClause SEMICOLON ImportDeclStar TopLevelDeclStar {
+		// cout << "I am inside the program" << endl;
+		theprogram = new astnode("StartFile",false, {$1,$3,$4});}
     ;
 
 Block:
@@ -100,7 +122,7 @@ CLOSEB:
 	}
 	;
 
-SYMTABS: 
+SYMTABS:
 	/*empty*/ {
 		currscope++;
 		fullscope = fullscope + "/" + to_string(currscope);
@@ -109,7 +131,7 @@ SYMTABS:
 		//cout<<fullscope<<endl;
 	}
 	;
-	
+
 SYMTABE:
 	/*empty*/ {
 		print_symtab();
@@ -149,58 +171,61 @@ EmptyStmt:
 	;
 
 LabeledStmt:
-	IDENTIFIER COLON Statement {$$ = new astnode("LabeledStmt", false, {new astnode(IDENTIFIER, $1), new astnode(COLON), $3});}
+	Label COLON Statement {$$ = new astnode("LabeledStmt", false, {$1, new astnode(COLON), $3});}
+	;
+
+Label:
+	IDENTIFIER {
+		$$ = new astnode(IDENTIFIER, $1);
+		$$->data=$1;
+	}
 	;
 
 IncDecStmt:
 	Expression INC {
 		$$ = new astnode("IncDecStmt", false, {$1, new astnode(INC, $2)});
-			/*
 			string tac;
 			tac.append(to_string(lineno));
 			tac.append(",");
 			tac.append("+");
 			tac.append(",");
-			tac.append($1->id);
+			tac.append($1->data->value);
 			tac.append(",");
-			tac.append($1->id);
+			tac.append($1->data->value);
 			tac.append(",");
 			tac.append("1");
 			tac.append("\n");
 			prog.push_back(tac);
 			lineno++;
-			*/
 		}
 	| Expression DEC {
-		$$ = new astnode("IncDecStmt", false, {$1, new astnode(INC, $2)});
-		/*
+		$$ = new astnode("IncDecStmt", false, {$1, new astnode(DEC, $2)});
 		string tac;
 		tac.append(to_string(lineno));
 		tac.append(",");
 		tac.append("-");
 		tac.append(",");
-		tac.append($1->id);
+		tac.append($1->data->value);
 		tac.append(",");
-		tac.append($1->id);
+		tac.append($1->data->value);
 		tac.append(",");
 		tac.append("1");
 		tac.append("\n");
 		prog.push_back(tac);
 		lineno++;
-		*/
 	}
 	;
 
 Assignment:
 	ExpressionList assign_op ExpressionList {
 		$$ = new astnode("Assignment", false, {$1,$2, $3});
-		/*
-		string temp1 = $1;
-		string temp2 = $3;
-		vector <string> expr1 = split(temp, ',');
-		vector <string> expr2 = split(temp1, ',');
+		string temp1 = $1->data->value;
+		string temp2 = $3->data->value;
+		vector <string> expr1 = split(temp1, ',');
+		vector <string> expr2 = split(temp2, ',');
 
 		// if there are unequal number of elements in either side of the assignment
+		cout << temp1 << " " << temp2 << endl;
 		if(expr1.size() != expr2.size()){
 			cout<<"Error: Incompatible assignment"<<endl;
 			// probably shouldn't be putting exit(0) here not sure though
@@ -209,25 +234,25 @@ Assignment:
 
 		// if it is a valid assignment
 		else {
-			string operator = $2->value;
+			string op = $2->data->value;
 
-			if (operator == "+=") {
-				operator = "+";
+			if (op == "+=") {
+				op = "+";
 			}
-			else if (operator == "-=") {
-				operator = "-";
+			else if (op == "-=") {
+				op = "-";
 			}
-			else if (operator == "*=") {
-				operator = "*";
+			else if (op == "*=") {
+				op = "*";
 			}
-			else if (operator == "/=") {
-				operator = "/";
+			else if (op == "/=") {
+				op = "/";
 			}
-			else if (operator == "%=") {
-				operator = "%";
+			else if (op == "%=") {
+				op = "%";
 			}
 
-			if (operator == "=") {
+			if (op == "=") {
 				for (int i = 0; i < expr1.size(); i++) {
 					string tac;
 					tac.append(to_string(lineno));
@@ -237,8 +262,6 @@ Assignment:
 					tac.append(expr1[i]);
 					tac.append(",");
 					tac.append(expr2[i]);
-					tac.append(",");
-					tac.append("1");
 					tac.append("\n");
 					prog.push_back(tac);
 					lineno++;
@@ -249,20 +272,19 @@ Assignment:
 					string tac;
 					tac.append(to_string(lineno));
 					tac.append(",");
-					tac.append(operator);
+					tac.append(op );
+					tac.append(",");
+					tac.append(expr1[i]);
 					tac.append(",");
 					tac.append(expr1[i]);
 					tac.append(",");
 					tac.append(expr2[i]);
-					tac.append(",");
-					tac.append("1");
 					tac.append("\n");
 					prog.push_back(tac);
 					lineno++;
 				}
 			}
 		}
-		*/
 	}
 	;
 
@@ -273,11 +295,10 @@ VarDecl:
 VarSpec:
 		IdentifierList Type ASSIGN ExpressionList {$$ = new astnode("VarSpec", false, {$1, $2, new astnode(ASSIGN, $3),  $4});
 			symadd_list($1, $2->type, IDENTIFIER);
-			/*
-			string temp1 = $1->id;
-			string temp2 = $4->id;
-			vector <string> expr1 = temp1.split(temp1, ',');
-			vector <string> expr2 = temp2.split(temp2, ',');
+			string temp1 = $1->data->value;
+			string temp2 = $4->data->value;
+			vector <string> expr1 = split(temp1, ',');
+			vector <string> expr2 = split(temp2, ',');
 
 			if (expr1.size() != expr2.size()) {
 				cout<<"Error: Incompatible assignment"<<endl;
@@ -289,7 +310,7 @@ VarSpec:
 					string tac;
 					tac.append(to_string(lineno));
 					tac.append(",");
-					tac.append($3->id);
+					tac.append($3->value);
 					tac.append(",");
 					tac.append(expr1[i]);
 					tac.append(",");
@@ -299,22 +320,17 @@ VarSpec:
 					lineno++;
 				}
 			}
-			*/
 		}
 		| IdentifierList Type {$$ = new astnode("VarSpec", false, {$1, $2});
 			symadd_list($1, $2->type, IDENTIFIER);
-			/*
-			string temp1 = $1->id;
-			string temp2 = $2->id;
+			string temp1 = $1->data->value;
+			string temp2 = $2->data->value;
 
-			char temp_char = temp2[0];
+			Type* typeInfo = $2->type;
 
-			if (temp_char == '[') {
-				int index = 1;
-				while (temp2[index] != ']') {
-					index++;
-				}
-				string length = temp2.substr(1, index-1);
+			if (typeInfo->typeClass == ARRAY_TYPE) {
+				ArrayType* arrayTypeInfo = (ArrayType*) typeInfo;
+				string length = to_string(arrayTypeInfo->arrayLength);
 				string tac = to_string(lineno);
 				tac.append(",array,");
 				tac.append(temp1);
@@ -324,7 +340,6 @@ VarSpec:
 				prog.push_back(tac);
 				lineno++;
 			}
-			*/
 		}
 		;
 
@@ -346,10 +361,10 @@ Declaration:
 
 FunctionDecl:
 		FUNC IDENTIFIER SYMTABS Function SYMTABE { $$ = new astnode("FunctionDecl", false, {new astnode(IDENTIFIER, $2), $4});
-			symadd($2->v_str, $4->type);
+			// symadd($2->value, $4->type);
 		}
 		| FUNC IDENTIFIER SYMTABS Signature SYMTABE { $$ = new astnode("FunctionDecl", false, {new astnode(IDENTIFIER, $2), $4});
-			symadd($2->v_str, $4->type);		
+			// symadd($2->value, $4->type);
 		}
 		;
 
@@ -360,7 +375,7 @@ FunctionName:
 /* taking care of that params scope same as fcn block using mid rule + normal end rule actions */
 Function:
 		Signature {fullscope=fullscope.substr(0,fullscope.find_last_of("/"));currscope--;} FunctionBody {
-			fullscope = fullscope +"/"+ to_string(currscope); 
+			fullscope = fullscope +"/"+ to_string(currscope);
 			$$ = new astnode("Function", false, {$1, $3});
 		}
 		;
@@ -410,7 +425,7 @@ ParameterDeclStar:
 
 ParameterDecl:
 	IdentifierList Type {
-		symadd_list($1, $2->type, IDENTIFIER);
+		// symadd_list($1, $2->type, IDENTIFIER);
 		$$ = new astnode("ParameterDecl", false, {$1, $2});
 	}
 	| IdentifierList ELLIPSIS  Type {$$ = new astnode("ParameterDecl", false, {$1, new astnode(ELLIPSIS,$2), $3});}; 	/* no support for now ELLIPSIS*/
@@ -470,7 +485,9 @@ Operand:
 	;
 
 OperandName:
-	IDENTIFIER {$$ = new astnode(IDENTIFIER);}
+	IDENTIFIER {$$ = new astnode(IDENTIFIER);
+		$$->data = $1;
+	}
 	;
 
 ReturnStmt:
@@ -559,7 +576,7 @@ Tag:
 	;
 
 PointerType:
-	MUL BaseType { $$ = new astnode(new PointerType($2->type),"PointerType",false,{$2}); }
+	MUL BaseType { $$ = new astnode(new PntrType($2->type),"PointerType",false,{$2}); }
 	;
 BaseType:
 	Type { $$ = new astnode($1->type, "BaseType",false,{$1}); }
@@ -575,18 +592,20 @@ ConstDecl:
 		;
 
 ConstSpec:
-		IDENTIFIER Type ASSIGN Expression { $$ = new astnode("ConstSpec",false,{$2,$4}); 
-			symadd($1->v_str, $2->type);
+		IDENTIFIER Type ASSIGN Expression { $$ = new astnode("ConstSpec",false,{$2,$4});
+			// symadd($1->value, $2->type);
 			//cout<<"SCOPE"<<any_scope("test")<<endl;
 		}
-		| IDENTIFIER Type { $$ = newId($2, "ConstSpec"); 
-			symadd($1->v_str, $2->type);
+		| IDENTIFIER Type { $$ = newId($2, "ConstSpec");
+			// symadd($1->value, $2->type);
 			//cout<<"SCOPE"<<any_scope("test")<<endl;
 		}
 		;
 
 ExpressionList:
-		ExpressionList COMMA Expression { $$ = new astnode("ExpressionList",false,{$1,$3}); }
+		ExpressionList COMMA Expression { $$ = new astnode("ExpressionList",false,{$1,$3});
+			$$->data->value = $1->data->value + "," + $3->data->value;
+		}
 		| Expression { $$ = newId($1, "ExpressionList"); }
 		;
 
@@ -618,7 +637,9 @@ Literal:
 	;
 
 string_lit:
-	STRING { new astnode(new PointerType(new DefinedType("string")) , STRING, $1);}
+	STRING {
+		// cout << "I am a string lite" << endl;
+		$$ = new astnode(new PntrType(new DefinedType("string")) , STRING, $1);}
 	;
 
 byte_lit:
@@ -638,8 +659,12 @@ FunctionLit:
 
 PrimaryExpr:
 	Operand { $$ = newId($1, "PrimaryExpr"); }
-	| PrimaryExpr Selector { $$ = new astnode("PrimaryExpr",false,{$1,$2}); }
-	| PrimaryExpr Index { $$ = new astnode("PrimaryExpr",false,{$1,$2}); }
+	| PrimaryExpr Selector { $$ = new astnode("PrimaryExpr",false,{$1,$2});
+		$$->data->value = $1->data->value + $2->data->value;
+	}
+	| PrimaryExpr Index { $$ = new astnode("PrimaryExpr",false,{$1,$2});
+		$$->data->value = $1->data->value + $2->data->value;
+	}
 	| PrimaryExpr TypeAssertion { $$ = new astnode("PrimaryExpr",false,{$1,$2}); }
 	| OperandName StructLiteral { $$ = new astnode("PrimaryExpr",false,{$1,$2}); }
 	;
@@ -676,27 +701,109 @@ Expression:
     ;
 
 Expression1:
-    Expression1 LOR Expression2 { $$ = new astnode("Expression1",false,{$1,new astnode(LOR),$3}); }
+    Expression1 LOR Expression2 { $$ = new astnode("Expression1",false,{$1,new astnode(LOR),$3});
+	    string temp_var = get_temp_var();
+		string tac;
+		tac.append(to_string(lineno));
+		tac.append(",");
+		tac.append($2->value);
+		tac.append(",");
+		tac.append(temp_var);
+		tac.append(",");
+		tac.append($1->data->value);
+		tac.append(",");
+		tac.append($3->data->value);
+		tac.append("\n");
+		prog.push_back(tac);
+		lineno++;
+		$$->data->value = temp_var;
+	}
     | Expression2 { newId($1,"Expression1"); }
     ;
 
 Expression2:
-    Expression2 LAND Expression3 { $$ = new astnode("Expression2",false,{$1,new astnode(LAND),$3}); }
+    Expression2 LAND Expression3 { $$ = new astnode("Expression2",false,{$1,new astnode(LAND),$3});
+		string temp_var = get_temp_var();
+		string tac;
+		tac.append(to_string(lineno));
+		tac.append(",");
+		tac.append($2->value);
+		tac.append(",");
+		tac.append(temp_var);
+		tac.append(",");
+		tac.append($1->data->value);
+		tac.append(",");
+		tac.append($3->data->value);
+		tac.append("\n");
+		prog.push_back(tac);
+		lineno++;
+		$$->data->value = temp_var;
+	}
     | Expression3 { newId($1,"Expression2"); }
     ;
 
 Expression3:
-    Expression3 rel_op Expression4 { $$ = new astnode("Expression3",false,{$1,$2,$3}); }
+    Expression3 rel_op Expression4 { $$ = new astnode("Expression3",false,{$1,$2,$3});
+
+		string temp_var = get_temp_var();
+		string tac;
+		tac.append(to_string(lineno));
+		tac.append(",");
+		tac.append($2->data->value);
+		tac.append(",");
+		tac.append(temp_var);
+		tac.append(",");
+		tac.append($1->data->value);
+		tac.append(",");
+		tac.append($3->data->value);
+		tac.append("\n");
+		prog.push_back(tac);
+		lineno++;
+		$$->data->value = temp_var;
+
+	}
     | Expression4 { newId($1,"Expression3"); }
     ;
 
 Expression4:
-    Expression4 add_op Expression5 { $$ = new astnode("Expression4",false,{$1,$2,$3}); }
+    Expression4 add_op Expression5 { $$ = new astnode("Expression4",false,{$1,$2,$3});
+		string temp_var = get_temp_var();
+		string tac;
+		tac.append(to_string(lineno));
+		tac.append(",");
+		tac.append($2->data->value);
+		tac.append(",");
+		tac.append(temp_var);
+		tac.append(",");
+		tac.append($1->data->value);
+		tac.append(",");
+		tac.append($3->data->value);
+		tac.append("\n");
+		prog.push_back(tac);
+		lineno++;
+		$$->data->value = temp_var;
+	}
     | Expression5 { newId($1,"Expression4"); }
     ;
 
 Expression5:
-    Expression5 mul_op PrimaryExpr { $$ = new astnode("Expression5",false,{$1,$2,$3}); }
+    Expression5 mul_op PrimaryExpr { $$ = new astnode("Expression5",false,{$1,$2,$3});
+		string temp_var = get_temp_var();
+		string tac;
+		tac.append(to_string(lineno));
+		tac.append(",");
+		tac.append($2->data->value);
+		tac.append(",");
+		tac.append(temp_var);
+		tac.append(",");
+		tac.append($1->data->value);
+		tac.append(",");
+		tac.append($3->data->value);
+		tac.append("\n");
+		prog.push_back(tac);
+		lineno++;
+		$$->data->value = temp_var;
+	}
     | UnaryExpr { $$ = newId($1, "Expression5"); }
     ;
 
@@ -708,47 +815,47 @@ UnaryExpr:
 
 
 rel_op:
-	EQL   { $$ = new astnode(EQL);}
-	| NEQ { $$ = new astnode(NEQ);}
-	| LSS { $$ = new astnode(LSS);}
-	| LEQ { $$ = new astnode(LEQ);}
-	| GTR { $$ = new astnode(GTR);}
-	| GEQ { $$ = new astnode(GEQ);}
+	EQL   { $$ = new astnode(EQL, $1);}
+	| NEQ { $$ = new astnode(NEQ, $1);}
+	| LSS { $$ = new astnode(LSS, $1);}
+	| LEQ { $$ = new astnode(LEQ, $1);}
+	| GTR { $$ = new astnode(GTR, $1);}
+	| GEQ { $$ = new astnode(GEQ, $1);}
 	;
 
 add_op:
-	ADD { $$ = new astnode(ADD);}
-	| SUB { $$ = new astnode(SUB);}
-	| OR  { $$ = new astnode(OR);}
-	| XOR { $$ = new astnode(XOR);}
+	ADD { $$ = new astnode(ADD, $1);}
+	| SUB { $$ = new astnode(SUB, $1);}
+	| OR  { $$ = new astnode(OR, $1);}
+	| XOR { $$ = new astnode(XOR, $1);}
 	;
 
 mul_op:
-	MUL   { $$ = new astnode(MUL);}
-	| QUO { $$ = new astnode(QUO);}
-	| REM { $$ = new astnode(REM);}
-	| SHL { $$ = new astnode(SHL);}
-	| SHR { $$ = new astnode(SHR);}
-	| AND { $$ = new astnode(AND);}
-	| AND_NOT  { $$ = new astnode(AND_NOT);}
+	MUL   { $$ = new astnode(MUL, $1);}
+	| QUO { $$ = new astnode(QUO, $1);}
+	| REM { $$ = new astnode(REM, $1);}
+	| SHL { $$ = new astnode(SHL, $1);}
+	| SHR { $$ = new astnode(SHR, $1);}
+	| AND { $$ = new astnode(AND, $1);}
+	| AND_NOT  { $$ = new astnode(AND_NOT, $1);}
 	;
 
 unary_op:
-	ADD  { $$ = new astnode(ADD);}
-	| SUB { $$ = new astnode(SUB);}
-	| NOT { $$ = new astnode(NOT);}
-	| XOR { $$ = new astnode(XOR);}
-	| MUL { $$ = new astnode(MUL);}
-	| AND { $$ = new astnode(AND);}
+	ADD  { $$ = new astnode(ADD, $1);}
+	| SUB { $$ = new astnode(SUB, $1);}
+	| NOT { $$ = new astnode(NOT, $1);}
+	| XOR { $$ = new astnode(XOR, $1);}
+	| MUL { $$ = new astnode(MUL, $1);}
+	| AND { $$ = new astnode(AND, $1);}
 	;
 
 assign_op:
-	ASSIGN { $$ = new astnode(ASSIGN);}
-	| ADD_ASSIGN { $$ = new astnode(ADD_ASSIGN);}
-	| SUB_ASSIGN { $$ = new astnode(SUB_ASSIGN);}
-	| MUL_ASSIGN { $$ = new astnode(MUL_ASSIGN);}
-	| QUO_ASSIGN { $$ = new astnode(QUO_ASSIGN);}
-	| REM_ASSIGN { $$ = new astnode(REM_ASSIGN);}
+	ASSIGN { $$ = new astnode(ASSIGN, $1);}
+	| ADD_ASSIGN { $$ = new astnode(ADD_ASSIGN, $1);}
+	| SUB_ASSIGN { $$ = new astnode(SUB_ASSIGN, $1);}
+	| MUL_ASSIGN { $$ = new astnode(MUL_ASSIGN, $1);}
+	| QUO_ASSIGN { $$ = new astnode(QUO_ASSIGN, $1);}
+	| REM_ASSIGN { $$ = new astnode(REM_ASSIGN, $1);}
 	;
 
 PackageClause:
@@ -766,7 +873,9 @@ ImportDeclStar:
     ;
 
 ImportDecl:
-	IMPORT ImportSpec SEMICOLON { $$ = new astnode("ImportDecl", false, {new astnode(IMPORT),$2}); }
+	IMPORT ImportSpec SEMICOLON {
+		// cout << "I am inside import decl" << endl;
+		$$ = new astnode("ImportDecl", false, {new astnode(IMPORT),$2}); }
 	| IMPORT LPAREN ImportSpecStar RPAREN { $$ = new astnode("ImportDecl", false, {new astnode(IMPORT), $3}); }
 	;
 
@@ -778,7 +887,9 @@ ImportSpecStar:
 ImportSpec:
 	 PERIOD ImportPath { $$ = new astnode("ImportSpec", false, {new astnode(PERIOD), $2}); }
 	| AlternatePackageName ImportPath { $$ = new astnode("ImportSpec", false, {$1,$2}); }
-	| AlternatePackageName { $$ = newId($1,"ImportSpec"); }
+	| AlternatePackageName {
+		// cout << "I am inside import spec" << endl;
+		$$ = newId($1,"ImportSpec"); }
 	;
 
 ImportPath:
@@ -786,7 +897,11 @@ ImportPath:
 	;
 
 AlternatePackageName:
-	string_lit { $$ = newId($1, "AlternatePackageName");}
+	string_lit {
+		// cout << "I am insdiee the alternatepackagename" << endl;
+		$$ = newId($1, "AlternatePackageName");
+		// cout << "hello world" <<endl;
+		}
 	;
 
 %%
@@ -806,12 +921,12 @@ int main (int argc, char **argv) {
 	int fileNo = atoi(argv[1]);
 	symbolTable.open("symbolTable" + to_string(fileNo) + ".txt");
 	fp =  & symbolTable;
-	
+
 	yyparse ( );
-	
+
 	print_symtab();
 	symbolTable.close();
-	
+
 	ofstream astFile;
 	astFile.open("ast" + to_string(fileNo) + ".dot" );
 	if(!astFile) {
@@ -822,4 +937,8 @@ int main (int argc, char **argv) {
 	prettyPrint(astFile, theprogram);
 	astFile << "}" << endl;
 	astFile.close();
+
+	for (auto it : prog) {
+		cout << it << endl;
+	}
 }

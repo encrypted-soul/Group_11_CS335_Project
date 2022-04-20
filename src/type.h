@@ -25,7 +25,7 @@ struct Type {
 struct DefinedType : Type {
   string basename;
   string getType();
-  DefinedType(string);
+  DefinedType(string basename);
   Type* copy();
 };
 
@@ -56,12 +56,12 @@ struct FunctionType : Type {
   Type* copy();
 };
 
-struct PointerType : Type {
+struct PntrType : Type {
   Type* baseType;  // int* -> int
-
   string getType();
-  PointerType(Type*);
+  PntrType(Type*);
   Type* copy();
+
 };
 
 #endif
