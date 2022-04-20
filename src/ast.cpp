@@ -45,8 +45,8 @@ astnode* appendId(astnode* node, const char* appendId) {
   return node;
 }
 
-astnode* newId(astnode* node, const char* newId) {
-  node->id = string(newId);
+astnode* newId(astnode* node, string idk) {
+  node->id = idk;
   return node;
 }
 
