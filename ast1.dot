@@ -1,0 +1,88 @@
+digraph "src/parser.ypp"
+ {
+ node [fontname = courier, shape = box, colorscheme = paired6]
+ edge [fontname = courier]
+0 [label="StartFile"]
+0->1
+1 [label="PackageClause"]
+1->2
+2 [label="258"]
+1->3
+3 [label="279"]
+0->4
+4 [label="ImportDeclStar"]
+4->5
+5 [label="259"]
+4->6
+6 [label="ImportSpec"]
+0->7
+7 [label="TopLevelDeclStar"]
+7->8
+8 [label="TopLevelDeclStar"]
+8->9
+9 [label="279"]
+8->10
+10 [label="Function"]
+10->11
+11 [label="Signature"]
+11->12
+12 [label="323"]
+11->13
+13 [label="Result"]
+10->14
+14 [label="FunctionBody"]
+14->15
+15 [label="StatementList"]
+15->16
+16 [label="StatementList"]
+16->17
+17 [label="StatementList"]
+17->18
+18 [label="275"]
+17->19
+19 [label="VarSpec"]
+19->20
+20 [label="279"]
+19->21
+21 [label="Type"]
+19->22
+22 [label="294"]
+19->23
+23 [label="ExpressionList"]
+16->24
+24 [label="Declaration"]
+24->25
+25 [label="Expression"]
+24->26
+26 [label="285"]
+15->27
+27 [label="Declaration"]
+27->28
+28 [label="Expression"]
+27->29
+29 [label="286"]
+14->30
+30 [label="Declaration"]
+7->31
+31 [label="TopLevelDecl"]
+31->32
+32 [label="279"]
+31->33
+33 [label="Function"]
+33->34
+34 [label="Signature"]
+33->35
+35 [label="FunctionBody"]
+35->36
+36 [label="PrimaryExpr"]
+36->37
+37 [label="PrimaryExpr"]
+36->38
+38 [label="Selector"]
+38->39
+39 [label="330"]
+38->40
+40 [label="279"]
+35->41
+41 [label="ArgumentList"]
+}

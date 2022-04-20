@@ -1,0 +1,202 @@
+digraph "src/parser.ypp"
+ {
+ node [fontname = courier, shape = box, colorscheme = paired6]
+ edge [fontname = courier]
+0 [label="StartFile"]
+0->1
+1 [label="PackageClause"]
+1->2
+2 [label="258"]
+1->3
+3 [label="279"]
+0->4
+4 [label=""]
+0->5
+5 [label="TopLevelDeclStar"]
+5->6
+6 [label="TopLevelDeclStar"]
+6->7
+7 [label="TopLevelDeclStar"]
+7->8
+8 [label="TopLevelDeclStar"]
+8->9
+9 [label="TopLevelDeclStar"]
+9->10
+10 [label="TopLevelDeclStar"]
+10->11
+11 [label="275"]
+10->12
+12 [label="VarSpec"]
+12->13
+13 [label="279"]
+12->14
+14 [label="Type"]
+9->15
+15 [label="TopLevelDecl"]
+15->16
+16 [label="Type"]
+15->17
+17 [label="Expression"]
+8->18
+18 [label="TopLevelDecl"]
+18->19
+19 [label="279"]
+18->20
+20 [label="Function"]
+20->21
+21 [label="Signature"]
+21->22
+22 [label="Parameters"]
+22->23
+23 [label="ParameterDeclStar"]
+22->24
+24 [label="279"]
+21->25
+25 [label="Result"]
+20->26
+26 [label="FunctionBody"]
+26->27
+27 [label="StatementList"]
+26->28
+28 [label="Declaration"]
+28->29
+29 [label="Expression4"]
+28->30
+30 [label="289"]
+28->31
+31 [label="Expression5"]
+7->32
+32 [label="TopLevelDecl"]
+32->33
+33 [label="279"]
+32->34
+34 [label="Function"]
+34->35
+35 [label="Signature"]
+35->36
+36 [label="Parameters"]
+36->37
+37 [label="279"]
+36->38
+38 [label="279"]
+35->39
+39 [label="Result"]
+34->40
+40 [label="FunctionBody"]
+6->41
+41 [label="TopLevelDecl"]
+41->42
+42 [label="279"]
+41->43
+43 [label="Function"]
+43->44
+44 [label="Signature"]
+43->45
+45 [label="FunctionBody"]
+45->46
+46 [label="StatementList"]
+46->47
+47 [label="StatementList"]
+47->48
+48 [label="StatementList"]
+48->49
+49 [label="StatementList"]
+49->50
+50 [label="StatementList"]
+50->51
+51 [label="275"]
+50->52
+52 [label="VarSpec"]
+52->53
+53 [label="IdentifierList"]
+53->54
+54 [label="279"]
+53->55
+55 [label="IdentifierLIST"]
+55->56
+56 [label="IdentifierLIST"]
+56->57
+57 [label="IdentifierLIST"]
+57->58
+58 [label="IdentifierLIST"]
+58->59
+59 [label="279"]
+58->60
+60 [label="279"]
+57->61
+61 [label="279"]
+56->62
+62 [label="279"]
+55->63
+63 [label="279"]
+52->64
+64 [label="Type"]
+49->65
+65 [label="Declaration"]
+48->66
+66 [label="Declaration"]
+66->67
+67 [label="275"]
+66->68
+68 [label="VarSpec"]
+68->69
+69 [label="279"]
+68->70
+70 [label="Type"]
+47->71
+71 [label="Declaration"]
+71->72
+72 [label="275"]
+71->73
+73 [label="VarSpec"]
+73->74
+74 [label="279"]
+73->75
+75 [label="Type"]
+46->76
+76 [label="Declaration"]
+45->77
+77 [label="Declaration"]
+77->78
+78 [label="275"]
+77->79
+79 [label="VarSpec"]
+79->80
+80 [label="279"]
+79->81
+81 [label="Type"]
+5->82
+82 [label="TopLevelDecl"]
+82->83
+83 [label="279"]
+82->84
+84 [label="Function"]
+84->85
+85 [label="Signature"]
+85->86
+86 [label="Parameters"]
+86->87
+87 [label="279"]
+86->88
+88 [label="IdentifierLIST"]
+88->89
+89 [label="279"]
+88->90
+90 [label="279"]
+85->91
+91 [label="Result"]
+84->92
+92 [label="FunctionBody"]
+92->93
+93 [label="Expression4"]
+93->94
+94 [label="Expression4"]
+93->95
+95 [label="289"]
+93->96
+96 [label="Expression5"]
+92->97
+97 [label="289"]
+92->98
+98 [label="Expression5"]
+}
