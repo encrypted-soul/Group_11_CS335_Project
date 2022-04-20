@@ -153,18 +153,41 @@ void print_symtab( ostream& symbolTable /* =  *fp */ ){
 	for( auto i=symtab->begin(); i != symtab->end(); i++ ){
 		symbolTable <<i->first;
 		if( i->second != NULL ) {
+			symbolTable << " " << i->second->getType() <<endl;
+			/*
 			int x = i->second->typeClass;
-			//symbolTable<<" "<< x;
 			switch(x){
-				case NULL_TYPE: 	break;
-				case DEFINED_TYPE:	DefinedType *tmp = static_cast<DefinedType*>(i->second);
+				case NULL_TYPE: 	{break;}
+				
+				case DEFINED_TYPE:	{DefinedType *tmp = static_cast<DefinedType*>(i->second);
 									symbolTable<<" " << tmp -> basename; 
 									if(tmp->cons == true) symbolTable<<" "<<"Const";
-									break;
+									break;}
+									
+				case FUNCTION_TYPE:	{
+									symbolTable<< i->second->getType();
+									/*
+									FunctionType *tmp = static_cast<FunctionType*>(i->second);
+									vector<Type*> arglist = tmp->args;
+									
+									symbolTable<<"(";
+									
+									for( vector<Type*>::iterator itr = arglist.begin(); itr != arglist.end(); itr++ ) {
+										//TEMPORARY
+										symbolTable<< (*itr) -> typeClass << " ";
+									}
+									symbolTable<<")";
+									if (tmp->rets) symbolTable<<" " << tmp->rets->typeClass;
+									
+									break;}
+									
 			}
 			
 			symbolTable<<endl;
+			*/
+		
 		}
+		
 	}
 	symbolTable <<"----DONE----"<<endl;
 }

@@ -21,7 +21,7 @@ struct Type {
   //virtual string getname();
   Type* next = NULL;	// type linked list
   bool cons = false;	//const or not		
-  TypeClass typeClass = NULL_TYPE;
+  TypeClass typeClass = NULL_TYPE; 
 };
 
 struct DefinedType : Type {
@@ -50,21 +50,17 @@ struct StructType : Type {
 };
 
 struct FunctionType : Type {
-  Type* returnType;
-  Type* argTypeList;
-  /*
-  vector<Type*> rettype;
+  //Type* returnType;
+  //Type* argTypeList;
   
-  vector<Type*> argtype;  
-  vector<int> argtype_num;
-  */
-  string argtype;
-  string rettype;
+  Type* rets;
+  vector<Type*> args;  
   
   string getType();
-  FunctionType(Type*, Type*);
-  FunctionType(string, string);
-  int fcn_addtype(string);
+  FunctionType( vector<Type*> args, Type* rets); 
+  //FunctionType(Type*, Type*);
+  //FunctionType(string, string);
+  //int fcn_addtype(string);
   Type* copy();
 };
 

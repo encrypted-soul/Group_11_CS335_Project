@@ -390,9 +390,24 @@ Declaration:
 
 
 FunctionDecl:
-		FUNC FunctionName SYMTABS Function SYMTABE { $$ = new astnode("FunctionDecl", false, {$2, $4});
-			symadd($2->data->value, $4->type);
+/*		FUNC FunctionName SYMTABS Function SYMTABE { $$ = new astnode("FunctionDecl", false, {$2, $4});
+			//symadd($2->data->value, $4->type);
 		}
+*/
+		FUNC FunctionName SYMTABS Signature {
+				//this is a mid rule
+				fullscope=fullscope.substr(0,fullscope.find_last_of("/"));currscope--;
+				
+				symtab_t* temp = symtab;
+				symtab = symtab_top["0"];
+				symadd($2->data->value, $4->type);
+				symtab = temp;
+				
+		} FunctionBody {
+				//guess what? mid rule
+				fullscope = fullscope +"/"+ to_string(currscope);	//$$ = new astnode($1->type,"Function", false, {$1, $3});
+		} SYMTABE { $$ = new astnode("FunctionDecl", false, {$2, $4, $6}); }
+		;
 		| FUNC FunctionName SYMTABS Signature SYMTABE { $$ = new astnode("FunctionDecl", false, {$2, $4});
 			symadd($2->data->value, $4->type);
 		}
@@ -401,22 +416,25 @@ FunctionDecl:
 
 FunctionName:
 		IDENTIFIER {$$ = new astnode(IDENTIFIER, $1);
-			// TODO:: Ashutosh
+			// TODO:: Ashutosh -- done
 			$$->data=$1;
+			//symadd($1->value, new FunctionType( ))	
+			
 			string temp_str = $1->value;
 			string tac = to_string(lineno) + ",function," + $1->value + "\n";
 			prog.push_back(tac);
 			lineno++;
 		}
-		;
-/* taking care of that params scope same as fcn block using mid rule + normal end rule actions */
+		;	
+
+/* taking care of that params scope same as fcn block using mid rule + normal end rule actions 
 Function:
 		Signature {fullscope=fullscope.substr(0,fullscope.find_last_of("/"));currscope--;} FunctionBody {
 			fullscope = fullscope +"/"+ to_string(currscope);
 			$$ = new astnode($1->type,"Function", false, {$1, $3});
 		}
 		;
-
+*/
 FunctionBody:
 		Block {$$ = newId($1, "FunctionBody");}
 		;
@@ -437,7 +455,8 @@ FunctionStmt:
 		;
 
 FunctionCall:
-		PrimaryExpr LPAREN ArgumentList RPAREN {$$ = new astnode("FunctionCall", false, {$1, $3});
+		PrimaryExpr LPAREN ArgumentList RPAREN {
+			$$ = new astnode("FunctionCall", false, {$1, $3});
 			string str1 = $1->data->value;
 			string str2 = "print";
 			string str3 = "fmt.Println";
@@ -494,10 +513,11 @@ Arguments:	PrimaryExpr {$$ = newId($1, "Arguments");}
 
 Signature:
 	Parameters {
-		$$ = newId($1, "Signature");
-		 
+		$$ = newId($1, "Signature"); 
 	}
-	| Parameters Result {$$ = new astnode(new FunctionType($1->type->getType(), $2->type->getType()) ,"Signature", false, {$1, $2});}
+	| Parameters Result {
+		vector <Type*> params = (static_cast<FunctionType*> ($1->type)) -> args;
+		$$ = new astnode(new FunctionType(params,$2->type), "Signature", false, {$1, $2});}
 	;
 
 Result:
@@ -506,10 +526,13 @@ Result:
 	;
 
 Parameters:
-	LPAREN RPAREN {$$ = new astnode(new FunctionType("",""), LPAREN);
+	LPAREN RPAREN {
+		vector <Type*> a;
+		$$ = new astnode(new FunctionType(a, NULL), LPAREN);
 		$$->data->value = "";
 	}
-	| LPAREN ParameterDeclStar RPAREN {$$ = newId($2, "Parameters");
+	| LPAREN ParameterDeclStar RPAREN {
+		$$ = newId($2, "Parameters");
 		string temp_str = $2->data->value;
 		vector <string> vec_params = split(temp_str, ',');
 		for(int i= vec_params.size()-1;i>=0;i--){
@@ -523,7 +546,14 @@ Parameters:
 
 ParameterDeclStar:
 	ParameterDecl {$$ = newId($1, "ParameterDeclStar");}
-	| ParameterDeclStar COMMA ParameterDecl {$$ = new astnode(new FunctionType($1->type->getType() + " " +$3->type->getType(), ""), "ParameterDeclStar", false, {$1, $3});
+	| ParameterDeclStar COMMA ParameterDecl {
+		vector<Type*> paramd = (static_cast<FunctionType*> ($3->type))->args;
+		vector<Type*> paramstar = (static_cast<FunctionType*> ($1->type)) -> args;
+		paramstar.insert( paramstar.end(), paramd.begin(), paramd.end());
+		//(static_cast<FunctionType*> $$->type) -> args = paramstar;
+		
+		$$ = new astnode(new FunctionType(paramstar, NULL), "ParameterDeclStar", false, {$1, $3});
+		
 		string temp_str = $1->data->value + "," + $3->data->value;
 		$$->data->value = temp_str;
 	}
@@ -532,7 +562,9 @@ ParameterDeclStar:
 ParameterDecl:
 	IdentifierList Type {
 		int num_ele = symadd_list($1, $2->type, IDENTIFIER);
-		$$ = new astnode(new FunctionType( to_string(num_ele)+"."+$2->type->getType(), "") ,"ParameterDecl", false, {$1, $2});
+		vector <Type*> tmp;
+		for( int i=0; i<num_ele; i++) tmp.push_back($2->type);
+		$$ = new astnode(new FunctionType(tmp, NULL) ,"ParameterDecl", false, {$1, $2});
 	}
 	| IdentifierList ELLIPSIS  Type {$$ = new astnode("ParameterDecl", false, {$1, new astnode(ELLIPSIS,$2), $3});}; 	/* no support for now ELLIPSIS*/
 	| ELLIPSIS Type {$$ = new astnode("ParameterDecl", false, {new astnode(ELLIPSIS, $1), $2});} 						/* no support for now ELLIPSIS*/
@@ -562,11 +594,12 @@ IdentifierLIST:	IdentifierLIST COMMA IDENTIFIER { $$ = new astnode("IdentifierLI
 			$$->data->value = temp_str;
 		}
 		;
-
+/*
 MethodDecl:
 	FUNC Receiver IDENTIFIER Function {$$ = new astnode("MethodDecl", false, {$2, $4});};
 	| FUNC Receiver IDENTIFIER Signature {$$ = new astnode("MethodDecl", false, {$2, $4});}
 	;
+*/
 
 Receiver:
 	Parameters {$$ = newId($1, "Receiver");}
@@ -580,7 +613,7 @@ TopLevelDeclStar:
 TopLevelDecl:
 	Declaration {$$ = newId($1, "TopLevelDecl");}
 	| FunctionDecl {$$ = newId($1, "TopLevelDecl");}
-	| MethodDecl {$$ = newId($1, "TopLevelDecl");}
+/*	| MethodDecl {$$ = newId($1, "TopLevelDecl");}  */
 	;
 
 TypeLit:
@@ -994,7 +1027,7 @@ TypeDef:
 
 Literal:
 	BasicLit { $$ = newId($1, "Literal"); }
-	| FunctionLit { $$ = newId($1, "Literal"); }
+/*	| FunctionLit { $$ = newId($1, "Literal"); } */
 	;
 
 string_lit:
@@ -1027,9 +1060,11 @@ BasicLit:
 	| byte_lit { $$ = newId($1, "BasicLit"); }
 	;
 
+/*
 FunctionLit:
 	FUNC Function { $$ = new astnode("FunctionLit",false,{new astnode(FUNC,$1), $2}); }
 	;
+*/
 
 PrimaryExpr:
 	Operand { $$ = newId($1, "PrimaryExpr"); }

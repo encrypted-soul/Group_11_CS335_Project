@@ -19,6 +19,7 @@ DefinedType::DefinedType(string _basename) {
 }
 
 string DefinedType::getType() {
+  if(this->cons == true) return (basename +" Const");
   return basename;  // int, float , ...
 }
 
@@ -62,12 +63,20 @@ string StructType::getType() {
 
 Type* StructType::copy() { return (new StructType(*this)); }
 
+/*
 FunctionType::FunctionType(Type* _returnType, Type* _argTypeList) {
   this->returnType = _returnType;
   this->argTypeList = _argTypeList;
   this->typeClass = FUNCTION_TYPE;
 }
+*/
 
+FunctionType::FunctionType(vector<Type*> _args, Type* _rets)
+    : args(_args), rets(_rets) {
+    typeClass = FUNCTION_TYPE;
+}
+
+/*
 FunctionType::FunctionType(string _rettype, string _argtype) {
   this->rettype = _rettype;
   this->argtype = _argtype;
@@ -78,19 +87,21 @@ int FunctionType::fcn_addtype(string type_name){
 	this->argtype = this->argtype + " " + type_name;
 	return 1;
 }
+*/
 
 string FunctionType::getType() {
-  // returnType( argType1, argType2, ....)
+  // rets( argType1, argType2, ....)
+  
   string funcTypeName;
-  funcTypeName += returnType->getType();
-  funcTypeName += "(";
-  Type* temp = argTypeList;
-  while (temp != NULL) {
-    funcTypeName += temp->getType();
-    temp = temp->next;
+  funcTypeName = "(";
+  bool flag = false;
+  for( auto i : args ){
+  	funcTypeName += i->getType() + ",";
+  	flag = true;
   }
+  if(flag) funcTypeName.pop_back();
   funcTypeName += ")";
-
+  if(rets) funcTypeName += rets->getType();
   return funcTypeName;
 }
 
