@@ -3,7 +3,10 @@ package main;
 import "fmt";
 
 func ast() int {
-	return 5;
+	var test int = 5;
+	test++;
+	test--;
+	return test;
 };
 
 func main() {
