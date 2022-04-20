@@ -45,13 +45,13 @@ astnode* appendId(astnode* node, const char* appendId) {
   return node;
 }
 
-astnode* newId(astnode* node, const char* id) {
+astnode* newId(astnode* node, string idk) {
   cout << "I am inside new ID hehe" << endl;
   cout << "Here is the type " << node->type << endl;
   cout << "Here is the data " << node->data << endl;
   cout << "Here is the isterminal " << node->isTerminal << endl;
   cout << "Here is the id " << node->id << endl;
-  node->id = id;
+  node->id = idk;
   cout << "I am outside new ID hehe" << endl;
   return node;
 }

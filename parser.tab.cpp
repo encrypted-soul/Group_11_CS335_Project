@@ -817,25 +817,25 @@ static const yytype_int16 yyrline[] =
 {
        0,    79,    79,    85,    89,    98,   106,   116,   125,   126,
      130,   131,   132,   133,   134,   135,   136,   137,   138,   139,
-     140,   144,   145,   146,   150,   154,   158,   176,   197,   272,
-     276,   306,   334,   338,   342,   350,   353,   364,   364,   371,
-     375,   376,   379,   383,   384,   385,   388,   389,   393,   394,
-     398,   399,   403,   404,   405,   409,   410,   414,   418,   419,
-     423,   424,   428,   429,   432,   433,   437,   438,   442,   446,
-     447,   451,   452,   453,   457,   458,   459,   460,   464,   465,
-     469,   470,   471,   475,   479,   480,   484,   485,   489,   490,
-     494,   495,   496,   497,   498,   499,   503,   504,   508,   512,
-     516,   520,   524,   528,   532,   533,   537,   541,   545,   546,
-     550,   551,   555,   556,   560,   564,   567,   572,   576,   580,
-     584,   591,   592,   596,   597,   601,   602,   605,   606,   610,
-     614,   618,   619,   623,   629,   633,   634,   635,   636,   640,
-     644,   645,   646,   647,   648,   652,   656,   657,   658,   662,
-     665,   670,   679,   683,   684,   688,   689,   693,   694,   698,
-     699,   703,   704,   708,   709,   715,   716,   717,   718,   719,
-     720,   724,   725,   726,   727,   731,   732,   733,   734,   735,
-     736,   737,   741,   742,   743,   744,   745,   746,   750,   751,
-     752,   753,   754,   755,   759,   763,   767,   768,   769,   773,
-     776,   780,   781,   785,   786,   787,   793,   797
+     140,   144,   145,   146,   150,   154,   158,   174,   193,   268,
+     272,   302,   330,   334,   338,   346,   349,   360,   360,   367,
+     371,   372,   375,   379,   380,   381,   384,   385,   389,   390,
+     394,   395,   399,   400,   401,   405,   406,   410,   414,   415,
+     419,   420,   424,   425,   428,   429,   433,   434,   438,   442,
+     443,   447,   448,   449,   453,   454,   455,   456,   460,   461,
+     465,   466,   467,   471,   475,   476,   480,   481,   485,   486,
+     490,   491,   492,   493,   494,   495,   499,   500,   504,   508,
+     512,   516,   520,   524,   528,   529,   533,   537,   541,   542,
+     546,   547,   551,   552,   556,   560,   563,   568,   572,   576,
+     580,   587,   588,   592,   593,   597,   598,   601,   602,   606,
+     610,   614,   615,   619,   625,   629,   630,   631,   632,   636,
+     640,   641,   642,   643,   644,   648,   652,   653,   654,   658,
+     661,   666,   675,   679,   680,   684,   685,   689,   690,   694,
+     695,   699,   700,   704,   705,   711,   712,   713,   714,   715,
+     716,   720,   721,   722,   723,   727,   728,   729,   730,   731,
+     732,   733,   737,   738,   739,   740,   741,   742,   746,   747,
+     748,   749,   750,   751,   755,   759,   763,   764,   765,   769,
+     772,   776,   777,   781,   782,   783,   789,   793
 };
 #endif
 
@@ -2080,50 +2080,46 @@ yyreduce:
 #line 158 "src/parser.ypp"
                        {
 		(yyval.node) = new astnode("IncDecStmt", false, {(yyvsp[-1].node), new astnode(INC, (yyvsp[0].data))});
-			/*
 			string tac;
 			tac.append(to_string(lineno));
 			tac.append(",");
 			tac.append("+");
 			tac.append(",");
-			tac.append($1->id);
+			tac.append((yyvsp[-1].node)->id);
 			tac.append(",");
-			tac.append($1->id);
+			tac.append((yyvsp[-1].node)->id);
 			tac.append(",");
 			tac.append("1");
 			tac.append("\n");
 			prog.push_back(tac);
 			lineno++;
-			*/
 		}
-#line 2100 "parser.tab.cpp"
+#line 2098 "parser.tab.cpp"
     break;
 
   case 27: /* IncDecStmt: Expression DEC  */
-#line 176 "src/parser.ypp"
+#line 174 "src/parser.ypp"
                          {
 		(yyval.node) = new astnode("IncDecStmt", false, {(yyvsp[-1].node), new astnode(INC, (yyvsp[0].data))});
-		/*
 		string tac;
 		tac.append(to_string(lineno));
 		tac.append(",");
 		tac.append("-");
 		tac.append(",");
-		tac.append($1->id);
+		tac.append((yyvsp[-1].node)->id);
 		tac.append(",");
-		tac.append($1->id);
+		tac.append((yyvsp[-1].node)->id);
 		tac.append(",");
 		tac.append("1");
 		tac.append("\n");
 		prog.push_back(tac);
 		lineno++;
-		*/
 	}
-#line 2123 "parser.tab.cpp"
+#line 2119 "parser.tab.cpp"
     break;
 
   case 28: /* Assignment: ExpressionList assign_op ExpressionList  */
-#line 197 "src/parser.ypp"
+#line 193 "src/parser.ypp"
                                                 {
 		(yyval.node) = new astnode("Assignment", false, {(yyvsp[-2].node),(yyvsp[-1].node), (yyvsp[0].node)});
 		/*
@@ -2196,19 +2192,19 @@ yyreduce:
 		}
 		*/
 	}
-#line 2200 "parser.tab.cpp"
+#line 2196 "parser.tab.cpp"
     break;
 
   case 29: /* VarDecl: VAR VarSpec  */
-#line 272 "src/parser.ypp"
+#line 268 "src/parser.ypp"
                             {(yyval.node) = new astnode("VarDecl", false, {new astnode(VAR, (yyvsp[-1].data)), (yyvsp[0].node)});}
-#line 2206 "parser.tab.cpp"
+#line 2202 "parser.tab.cpp"
     break;
 
   case 30: /* VarSpec: IdentifierList Type ASSIGN ExpressionList  */
-#line 276 "src/parser.ypp"
+#line 272 "src/parser.ypp"
                                                           {(yyval.node) = new astnode("VarSpec", false, {(yyvsp[-3].node), (yyvsp[-2].node), new astnode(ASSIGN, (yyvsp[-1].data)),  (yyvsp[0].node)});
-			// symadd_list($1, $2->type, IDENTIFIER);
+			symadd_list((yyvsp[-3].node), (yyvsp[-2].node)->type, IDENTIFIER);
 			/*
 			string temp1 = $1->id;
 			string temp2 = $4->id;
@@ -2237,11 +2233,11 @@ yyreduce:
 			}
 			*/
 		}
-#line 2241 "parser.tab.cpp"
+#line 2237 "parser.tab.cpp"
     break;
 
   case 31: /* VarSpec: IdentifierList Type  */
-#line 306 "src/parser.ypp"
+#line 302 "src/parser.ypp"
                                       {(yyval.node) = new astnode("VarSpec", false, {(yyvsp[-1].node), (yyvsp[0].node)});
 			// symadd_list($1, $2->type, IDENTIFIER);
 			/*
@@ -2267,1105 +2263,1103 @@ yyreduce:
 			}
 			*/
 		}
-#line 2271 "parser.tab.cpp"
+#line 2267 "parser.tab.cpp"
     break;
 
   case 32: /* Declaration: ConstDecl  */
-#line 334 "src/parser.ypp"
+#line 330 "src/parser.ypp"
                   {
 		(yyval.node) = newId((yyvsp[0].node), "Declaration");
 		// nahi kr rha abhi toh
 	}
-#line 2280 "parser.tab.cpp"
+#line 2276 "parser.tab.cpp"
     break;
 
   case 33: /* Declaration: TypeDecl  */
-#line 338 "src/parser.ypp"
+#line 334 "src/parser.ypp"
                    {
 		(yyval.node) = newId((yyvsp[0].node), "Declaration");
 		// nahi kr rha abhi toh
 	}
-#line 2289 "parser.tab.cpp"
+#line 2285 "parser.tab.cpp"
     break;
 
   case 34: /* Declaration: VarDecl  */
-#line 342 "src/parser.ypp"
+#line 338 "src/parser.ypp"
                   {
 		(yyval.node) = newId((yyvsp[0].node), "Declaration");
 		// nahi kr rha abhi toh
 	}
-#line 2298 "parser.tab.cpp"
+#line 2294 "parser.tab.cpp"
     break;
 
   case 35: /* FunctionDecl: FUNC IDENTIFIER SYMTABS Function SYMTABE  */
-#line 350 "src/parser.ypp"
+#line 346 "src/parser.ypp"
                                                          { (yyval.node) = new astnode("FunctionDecl", false, {new astnode(IDENTIFIER, (yyvsp[-3].data)), (yyvsp[-1].node)});
 			// symadd($2->value, $4->type);
 		}
-#line 2306 "parser.tab.cpp"
+#line 2302 "parser.tab.cpp"
     break;
 
   case 36: /* FunctionDecl: FUNC IDENTIFIER SYMTABS Signature SYMTABE  */
-#line 353 "src/parser.ypp"
+#line 349 "src/parser.ypp"
                                                             { (yyval.node) = new astnode("FunctionDecl", false, {new astnode(IDENTIFIER, (yyvsp[-3].data)), (yyvsp[-1].node)});
 			// symadd($2->value, $4->type);
 		}
-#line 2314 "parser.tab.cpp"
+#line 2310 "parser.tab.cpp"
     break;
 
   case 37: /* $@1: %empty  */
-#line 364 "src/parser.ypp"
+#line 360 "src/parser.ypp"
                           {fullscope=fullscope.substr(0,fullscope.find_last_of("/"));currscope--;}
-#line 2320 "parser.tab.cpp"
+#line 2316 "parser.tab.cpp"
     break;
 
   case 38: /* Function: Signature $@1 FunctionBody  */
-#line 364 "src/parser.ypp"
+#line 360 "src/parser.ypp"
                                                                                                                 {
 			fullscope = fullscope +"/"+ to_string(currscope);
 			(yyval.node) = new astnode("Function", false, {(yyvsp[-2].node), (yyvsp[0].node)});
 		}
-#line 2329 "parser.tab.cpp"
+#line 2325 "parser.tab.cpp"
     break;
 
   case 39: /* FunctionBody: Block  */
-#line 371 "src/parser.ypp"
+#line 367 "src/parser.ypp"
                       {(yyval.node) = newId((yyvsp[0].node), "FunctionBody");}
-#line 2335 "parser.tab.cpp"
+#line 2331 "parser.tab.cpp"
     break;
 
   case 40: /* FunctionStmt: VarDecl DEFINE FunctionCall  */
-#line 375 "src/parser.ypp"
+#line 371 "src/parser.ypp"
                                             {(yyval.node) = new astnode("FunctionStmt", false, {(yyvsp[-2].node), (yyvsp[0].node)});}
-#line 2341 "parser.tab.cpp"
+#line 2337 "parser.tab.cpp"
     break;
 
   case 41: /* FunctionStmt: IDENTIFIER DEFINE FunctionCall  */
-#line 376 "src/parser.ypp"
+#line 372 "src/parser.ypp"
                                                  {(yyval.node) = new astnode("FunctionStmt", false, {new astnode(IDENTIFIER, (yyvsp[-2].data)), (yyvsp[0].node)});}
-#line 2347 "parser.tab.cpp"
+#line 2343 "parser.tab.cpp"
     break;
 
   case 42: /* FunctionCall: PrimaryExpr LPAREN ArgumentList RPAREN  */
-#line 379 "src/parser.ypp"
+#line 375 "src/parser.ypp"
                                                        {(yyval.node) = new astnode("FunctionCall", false, {(yyvsp[-3].node), (yyvsp[-1].node)});}
-#line 2353 "parser.tab.cpp"
+#line 2349 "parser.tab.cpp"
     break;
 
   case 43: /* ArgumentList: ArgumentList COMMA Arguments  */
-#line 383 "src/parser.ypp"
+#line 379 "src/parser.ypp"
                                              {(yyval.node) = new astnode("ArgumentList", false, {(yyvsp[-2].node), (yyvsp[0].node)});}
-#line 2359 "parser.tab.cpp"
+#line 2355 "parser.tab.cpp"
     break;
 
   case 44: /* ArgumentList: Arguments  */
-#line 384 "src/parser.ypp"
+#line 380 "src/parser.ypp"
                             {(yyval.node) = newId((yyvsp[0].node), "ArgumentList");}
-#line 2365 "parser.tab.cpp"
+#line 2361 "parser.tab.cpp"
     break;
 
   case 45: /* ArgumentList: %empty  */
-#line 385 "src/parser.ypp"
+#line 381 "src/parser.ypp"
                             { (yyval.node) = new astnode();}
-#line 2371 "parser.tab.cpp"
+#line 2367 "parser.tab.cpp"
     break;
 
   case 46: /* Arguments: PrimaryExpr  */
-#line 388 "src/parser.ypp"
+#line 384 "src/parser.ypp"
                             {(yyval.node) = newId((yyvsp[0].node), "Arguments");}
-#line 2377 "parser.tab.cpp"
+#line 2373 "parser.tab.cpp"
     break;
 
   case 47: /* Arguments: FunctionCall  */
-#line 389 "src/parser.ypp"
+#line 385 "src/parser.ypp"
                                {(yyval.node) = newId((yyvsp[0].node), "Arguments");}
-#line 2383 "parser.tab.cpp"
+#line 2379 "parser.tab.cpp"
     break;
 
   case 48: /* Signature: Parameters  */
-#line 393 "src/parser.ypp"
+#line 389 "src/parser.ypp"
                    {(yyval.node) = newId((yyvsp[0].node), "Signature"); }
-#line 2389 "parser.tab.cpp"
+#line 2385 "parser.tab.cpp"
     break;
 
   case 49: /* Signature: Parameters Result  */
-#line 394 "src/parser.ypp"
+#line 390 "src/parser.ypp"
                             {(yyval.node) = new astnode("Signature", false, {(yyvsp[-1].node), (yyvsp[0].node)});}
-#line 2395 "parser.tab.cpp"
+#line 2391 "parser.tab.cpp"
     break;
 
   case 50: /* Result: LPAREN TypeList RPAREN  */
-#line 398 "src/parser.ypp"
+#line 394 "src/parser.ypp"
                                {(yyval.node) = newId((yyvsp[-1].node), "Result");}
-#line 2401 "parser.tab.cpp"
+#line 2397 "parser.tab.cpp"
     break;
 
   case 51: /* Result: Type  */
-#line 399 "src/parser.ypp"
+#line 395 "src/parser.ypp"
                {(yyval.node) = newId((yyvsp[0].node), "Result");}
-#line 2407 "parser.tab.cpp"
+#line 2403 "parser.tab.cpp"
     break;
 
   case 52: /* Parameters: LPAREN RPAREN  */
-#line 403 "src/parser.ypp"
+#line 399 "src/parser.ypp"
                       {(yyval.node) = new astnode(LPAREN);}
-#line 2413 "parser.tab.cpp"
+#line 2409 "parser.tab.cpp"
     break;
 
   case 53: /* Parameters: LPAREN ParameterDeclStar RPAREN  */
-#line 404 "src/parser.ypp"
+#line 400 "src/parser.ypp"
                                           {(yyval.node) = newId((yyvsp[-1].node), "Parameters");}
-#line 2419 "parser.tab.cpp"
+#line 2415 "parser.tab.cpp"
     break;
 
   case 54: /* Parameters: LPAREN ParameterDeclStar COMMA RPAREN  */
-#line 405 "src/parser.ypp"
+#line 401 "src/parser.ypp"
                                                 {(yyval.node) = newId((yyvsp[-2].node), "Parameters");}
-#line 2425 "parser.tab.cpp"
+#line 2421 "parser.tab.cpp"
     break;
 
   case 55: /* ParameterDeclStar: ParameterDecl  */
-#line 409 "src/parser.ypp"
+#line 405 "src/parser.ypp"
                       {(yyval.node) = newId((yyvsp[0].node), "ParameterDeclStar");}
-#line 2431 "parser.tab.cpp"
+#line 2427 "parser.tab.cpp"
     break;
 
   case 56: /* ParameterDeclStar: ParameterDeclStar COMMA ParameterDecl  */
-#line 410 "src/parser.ypp"
+#line 406 "src/parser.ypp"
                                                 {(yyval.node) = new astnode("ParameterDeclStar", false, {(yyvsp[-2].node), (yyvsp[0].node)});}
-#line 2437 "parser.tab.cpp"
+#line 2433 "parser.tab.cpp"
     break;
 
   case 57: /* ParameterDecl: IdentifierList Type  */
-#line 414 "src/parser.ypp"
+#line 410 "src/parser.ypp"
                             {
 		// symadd_list($1, $2->type, IDENTIFIER);
 		(yyval.node) = new astnode("ParameterDecl", false, {(yyvsp[-1].node), (yyvsp[0].node)});
 	}
-#line 2446 "parser.tab.cpp"
+#line 2442 "parser.tab.cpp"
     break;
 
   case 58: /* ParameterDecl: IdentifierList ELLIPSIS Type  */
-#line 418 "src/parser.ypp"
+#line 414 "src/parser.ypp"
                                         {(yyval.node) = new astnode("ParameterDecl", false, {(yyvsp[-2].node), new astnode(ELLIPSIS,(yyvsp[-1].data)), (yyvsp[0].node)});}
-#line 2452 "parser.tab.cpp"
+#line 2448 "parser.tab.cpp"
     break;
 
   case 59: /* ParameterDecl: ELLIPSIS Type  */
-#line 419 "src/parser.ypp"
+#line 415 "src/parser.ypp"
                         {(yyval.node) = new astnode("ParameterDecl", false, {new astnode(ELLIPSIS, (yyvsp[-1].data)), (yyvsp[0].node)});}
-#line 2458 "parser.tab.cpp"
+#line 2454 "parser.tab.cpp"
     break;
 
   case 60: /* TypeList: TypeList COMMA Type  */
-#line 423 "src/parser.ypp"
+#line 419 "src/parser.ypp"
                         {(yyval.node) = new astnode("TypeList", false, {(yyvsp[-2].node), (yyvsp[0].node)});}
-#line 2464 "parser.tab.cpp"
+#line 2460 "parser.tab.cpp"
     break;
 
   case 61: /* TypeList: Type  */
-#line 424 "src/parser.ypp"
+#line 420 "src/parser.ypp"
            {(yyval.node) = new astnode("TypeList", false, {(yyvsp[0].node)});}
-#line 2470 "parser.tab.cpp"
+#line 2466 "parser.tab.cpp"
     break;
 
   case 62: /* IdentifierList: IDENTIFIER IdentifierLIST  */
-#line 428 "src/parser.ypp"
+#line 424 "src/parser.ypp"
                                           {(yyval.node) = new astnode("IdentifierList", false, {new astnode(IDENTIFIER, (yyvsp[-1].data)), (yyvsp[0].node)});}
-#line 2476 "parser.tab.cpp"
+#line 2472 "parser.tab.cpp"
     break;
 
   case 63: /* IdentifierList: IDENTIFIER  */
-#line 429 "src/parser.ypp"
+#line 425 "src/parser.ypp"
                              {(yyval.node) = new astnode(IDENTIFIER, (yyvsp[0].data));}
-#line 2482 "parser.tab.cpp"
+#line 2478 "parser.tab.cpp"
     break;
 
   case 64: /* IdentifierLIST: IdentifierLIST COMMA IDENTIFIER  */
-#line 432 "src/parser.ypp"
+#line 428 "src/parser.ypp"
                                                 { (yyval.node) = new astnode("IdentifierLIST", false, {(yyvsp[-2].node), new astnode(IDENTIFIER, (yyvsp[0].data))});}
-#line 2488 "parser.tab.cpp"
+#line 2484 "parser.tab.cpp"
     break;
 
   case 65: /* IdentifierLIST: COMMA IDENTIFIER  */
-#line 433 "src/parser.ypp"
+#line 429 "src/parser.ypp"
                                    {(yyval.node) = new astnode(IDENTIFIER, (yyvsp[0].data));}
-#line 2494 "parser.tab.cpp"
+#line 2490 "parser.tab.cpp"
     break;
 
   case 66: /* MethodDecl: FUNC Receiver IDENTIFIER Function  */
-#line 437 "src/parser.ypp"
+#line 433 "src/parser.ypp"
                                           {(yyval.node) = new astnode("MethodDecl", false, {(yyvsp[-2].node), (yyvsp[0].node)});}
-#line 2500 "parser.tab.cpp"
+#line 2496 "parser.tab.cpp"
     break;
 
   case 67: /* MethodDecl: FUNC Receiver IDENTIFIER Signature  */
-#line 438 "src/parser.ypp"
+#line 434 "src/parser.ypp"
                                              {(yyval.node) = new astnode("MethodDecl", false, {(yyvsp[-2].node), (yyvsp[0].node)});}
-#line 2506 "parser.tab.cpp"
+#line 2502 "parser.tab.cpp"
     break;
 
   case 68: /* Receiver: Parameters  */
-#line 442 "src/parser.ypp"
+#line 438 "src/parser.ypp"
                    {(yyval.node) = newId((yyvsp[0].node), "Receiver");}
-#line 2512 "parser.tab.cpp"
+#line 2508 "parser.tab.cpp"
     break;
 
   case 69: /* TopLevelDeclStar: TopLevelDeclStar SEMICOLON TopLevelDecl  */
-#line 446 "src/parser.ypp"
+#line 442 "src/parser.ypp"
                                                           {(yyval.node) = new astnode("TopLevelDeclStar", false, {(yyvsp[-2].node), (yyvsp[0].node)});}
-#line 2518 "parser.tab.cpp"
+#line 2514 "parser.tab.cpp"
     break;
 
   case 70: /* TopLevelDeclStar: TopLevelDecl  */
-#line 447 "src/parser.ypp"
+#line 443 "src/parser.ypp"
                    {(yyval.node) = newId((yyvsp[0].node), "TopLevelDeclStar");}
-#line 2524 "parser.tab.cpp"
+#line 2520 "parser.tab.cpp"
     break;
 
   case 71: /* TopLevelDecl: Declaration  */
-#line 451 "src/parser.ypp"
+#line 447 "src/parser.ypp"
                     {(yyval.node) = newId((yyvsp[0].node), "TopLevelDecl");}
-#line 2530 "parser.tab.cpp"
+#line 2526 "parser.tab.cpp"
     break;
 
   case 72: /* TopLevelDecl: FunctionDecl  */
-#line 452 "src/parser.ypp"
+#line 448 "src/parser.ypp"
                        {(yyval.node) = newId((yyvsp[0].node), "TopLevelDecl");}
-#line 2536 "parser.tab.cpp"
+#line 2532 "parser.tab.cpp"
     break;
 
   case 73: /* TopLevelDecl: MethodDecl  */
-#line 453 "src/parser.ypp"
+#line 449 "src/parser.ypp"
                      {(yyval.node) = newId((yyvsp[0].node), "TopLevelDecl");}
-#line 2542 "parser.tab.cpp"
+#line 2538 "parser.tab.cpp"
     break;
 
   case 74: /* TypeLit: ArrayType  */
-#line 457 "src/parser.ypp"
+#line 453 "src/parser.ypp"
                   {(yyval.node) = newId((yyvsp[0].node), "TypeLit");}
-#line 2548 "parser.tab.cpp"
+#line 2544 "parser.tab.cpp"
     break;
 
   case 75: /* TypeLit: StructType  */
-#line 458 "src/parser.ypp"
+#line 454 "src/parser.ypp"
                      {(yyval.node) = newId((yyvsp[0].node), "TypeLit");}
-#line 2554 "parser.tab.cpp"
+#line 2550 "parser.tab.cpp"
     break;
 
   case 76: /* TypeLit: PointerType  */
-#line 459 "src/parser.ypp"
+#line 455 "src/parser.ypp"
                       {(yyval.node) = newId((yyvsp[0].node), "TypeLit");}
-#line 2560 "parser.tab.cpp"
+#line 2556 "parser.tab.cpp"
     break;
 
   case 77: /* TypeLit: FunctionType  */
-#line 460 "src/parser.ypp"
+#line 456 "src/parser.ypp"
                        {(yyval.node) = newId((yyvsp[0].node), "TypeLit");}
-#line 2566 "parser.tab.cpp"
+#line 2562 "parser.tab.cpp"
     break;
 
   case 78: /* Type: TypeName  */
-#line 464 "src/parser.ypp"
+#line 460 "src/parser.ypp"
                  {(yyval.node) = newId((yyvsp[0].node), "Type");}
-#line 2572 "parser.tab.cpp"
+#line 2568 "parser.tab.cpp"
     break;
 
   case 79: /* Type: TypeLit  */
-#line 465 "src/parser.ypp"
+#line 461 "src/parser.ypp"
                   {(yyval.node) = newId((yyvsp[0].node), "Type");}
-#line 2578 "parser.tab.cpp"
+#line 2574 "parser.tab.cpp"
     break;
 
   case 80: /* Operand: Literal  */
-#line 469 "src/parser.ypp"
+#line 465 "src/parser.ypp"
                 {(yyval.node) = newId((yyvsp[0].node), "Operand");}
-#line 2584 "parser.tab.cpp"
+#line 2580 "parser.tab.cpp"
     break;
 
   case 81: /* Operand: OperandName  */
-#line 470 "src/parser.ypp"
+#line 466 "src/parser.ypp"
                       {(yyval.node) = newId((yyvsp[0].node), "Operand");}
-#line 2590 "parser.tab.cpp"
+#line 2586 "parser.tab.cpp"
     break;
 
   case 82: /* Operand: LPAREN Expression RPAREN  */
-#line 471 "src/parser.ypp"
+#line 467 "src/parser.ypp"
                                    {(yyval.node) = newId((yyvsp[-1].node), "Operand");}
-#line 2596 "parser.tab.cpp"
+#line 2592 "parser.tab.cpp"
     break;
 
   case 83: /* OperandName: IDENTIFIER  */
-#line 475 "src/parser.ypp"
+#line 471 "src/parser.ypp"
                    {(yyval.node) = new astnode(IDENTIFIER);}
-#line 2602 "parser.tab.cpp"
+#line 2598 "parser.tab.cpp"
     break;
 
   case 84: /* ReturnStmt: RETURN Expression  */
-#line 479 "src/parser.ypp"
+#line 475 "src/parser.ypp"
                           {(yyval.node) = newId((yyvsp[0].node), "ReturnStmt");}
-#line 2608 "parser.tab.cpp"
+#line 2604 "parser.tab.cpp"
     break;
 
   case 85: /* ReturnStmt: RETURN  */
-#line 480 "src/parser.ypp"
+#line 476 "src/parser.ypp"
                  {(yyval.node) = new astnode(RETURN);}
-#line 2614 "parser.tab.cpp"
+#line 2610 "parser.tab.cpp"
     break;
 
   case 86: /* BreakStmt: BREAK IDENTIFIER  */
-#line 484 "src/parser.ypp"
+#line 480 "src/parser.ypp"
                          {(yyval.node) = new astnode("BreakStmt", false, {new astnode(BREAK, (yyvsp[-1].data)), new astnode(IDENTIFIER, (yyvsp[0].data))});}
-#line 2620 "parser.tab.cpp"
+#line 2616 "parser.tab.cpp"
     break;
 
   case 87: /* BreakStmt: BREAK  */
-#line 485 "src/parser.ypp"
+#line 481 "src/parser.ypp"
                 {(yyval.node) = new astnode(BREAK);}
-#line 2626 "parser.tab.cpp"
+#line 2622 "parser.tab.cpp"
     break;
 
   case 88: /* ContinueStmt: CONTINUE IDENTIFIER  */
-#line 489 "src/parser.ypp"
+#line 485 "src/parser.ypp"
                             {(yyval.node) = new astnode("ContinueStmt", false, {new astnode(BREAK, (yyvsp[-1].data)), new astnode(IDENTIFIER, (yyvsp[0].data))});}
-#line 2632 "parser.tab.cpp"
+#line 2628 "parser.tab.cpp"
     break;
 
   case 89: /* ContinueStmt: CONTINUE  */
-#line 490 "src/parser.ypp"
+#line 486 "src/parser.ypp"
                    {(yyval.node) = new astnode(CONTINUE);}
-#line 2638 "parser.tab.cpp"
+#line 2634 "parser.tab.cpp"
     break;
 
   case 90: /* IfStmt: IF OPENB Expression Block CLOSEB  */
-#line 494 "src/parser.ypp"
+#line 490 "src/parser.ypp"
                                          {(yyval.node) = new astnode("IfStmt", false, {(yyvsp[-2].node), (yyvsp[-1].node)});}
-#line 2644 "parser.tab.cpp"
+#line 2640 "parser.tab.cpp"
     break;
 
   case 91: /* IfStmt: IF OPENB SimpleStmt SEMICOLON Expression Block CLOSEB  */
-#line 495 "src/parser.ypp"
+#line 491 "src/parser.ypp"
                                                                {(yyval.node) = new astnode("IfStmt", false, {(yyvsp[-4].node), (yyvsp[-2].node), (yyvsp[-1].node)});}
-#line 2650 "parser.tab.cpp"
+#line 2646 "parser.tab.cpp"
     break;
 
   case 92: /* IfStmt: IF OPENB SimpleStmt SEMICOLON Expression Block ELSE IfStmt CLOSEB  */
-#line 496 "src/parser.ypp"
+#line 492 "src/parser.ypp"
                                                                            {(yyval.node) = new astnode("IfStmt", false, {(yyvsp[-6].node), (yyvsp[-4].node), (yyvsp[-3].node), (yyvsp[-1].node)});}
-#line 2656 "parser.tab.cpp"
+#line 2652 "parser.tab.cpp"
     break;
 
   case 93: /* IfStmt: IF OPENB SimpleStmt SEMICOLON Expression Block ELSE Block CLOSEB  */
-#line 497 "src/parser.ypp"
+#line 493 "src/parser.ypp"
                                                                            {(yyval.node) = new astnode("IfStmt", false, {(yyvsp[-6].node), (yyvsp[-4].node), (yyvsp[-3].node), (yyvsp[-1].node)});}
-#line 2662 "parser.tab.cpp"
+#line 2658 "parser.tab.cpp"
     break;
 
   case 94: /* IfStmt: IF OPENB Expression Block ELSE IfStmt CLOSEB  */
-#line 498 "src/parser.ypp"
+#line 494 "src/parser.ypp"
                                                       {(yyval.node) = new astnode("IfStmt", false, {(yyvsp[-4].node), (yyvsp[-3].node), (yyvsp[-1].node)});}
-#line 2668 "parser.tab.cpp"
+#line 2664 "parser.tab.cpp"
     break;
 
   case 95: /* IfStmt: IF OPENB Expression Block ELSE Block CLOSEB  */
-#line 499 "src/parser.ypp"
+#line 495 "src/parser.ypp"
                                                       {(yyval.node) = new astnode("IfStmt", false, {(yyvsp[-4].node), (yyvsp[-3].node), (yyvsp[-1].node)});}
-#line 2674 "parser.tab.cpp"
+#line 2670 "parser.tab.cpp"
     break;
 
   case 96: /* ForStmt: FOR OPENB Condition Block CLOSEB  */
-#line 503 "src/parser.ypp"
+#line 499 "src/parser.ypp"
                                          {(yyval.node) = new astnode("ForStmt", false, {(yyvsp[-2].node), (yyvsp[-1].node)});}
-#line 2680 "parser.tab.cpp"
+#line 2676 "parser.tab.cpp"
     break;
 
   case 97: /* ForStmt: FOR OPENB ForClause Block CLOSEB  */
-#line 504 "src/parser.ypp"
+#line 500 "src/parser.ypp"
                                           {(yyval.node) = new astnode("ForStmt", false, {(yyvsp[-2].node), (yyvsp[-1].node)});}
-#line 2686 "parser.tab.cpp"
+#line 2682 "parser.tab.cpp"
     break;
 
   case 98: /* Condition: Expression  */
-#line 508 "src/parser.ypp"
+#line 504 "src/parser.ypp"
                    {(yyval.node) = newId((yyvsp[0].node), "Condition");}
-#line 2692 "parser.tab.cpp"
+#line 2688 "parser.tab.cpp"
     break;
 
   case 99: /* ForClause: InitStmt SEMICOLON Condition SEMICOLON PostStmt  */
-#line 512 "src/parser.ypp"
+#line 508 "src/parser.ypp"
                                                         {(yyval.node) = new astnode("ForClause", false, {(yyvsp[-4].node), (yyvsp[-2].node), (yyvsp[0].node)});}
-#line 2698 "parser.tab.cpp"
+#line 2694 "parser.tab.cpp"
     break;
 
   case 100: /* InitStmt: SimpleStmt  */
-#line 516 "src/parser.ypp"
+#line 512 "src/parser.ypp"
                    {(yyval.node) = newId((yyvsp[0].node), "InitStmt");}
-#line 2704 "parser.tab.cpp"
+#line 2700 "parser.tab.cpp"
     break;
 
   case 101: /* PostStmt: SimpleStmt  */
-#line 520 "src/parser.ypp"
+#line 516 "src/parser.ypp"
                    {(yyval.node) = newId((yyvsp[0].node), "InitStmt");}
-#line 2710 "parser.tab.cpp"
+#line 2706 "parser.tab.cpp"
     break;
 
   case 102: /* int_lit: INTEGER  */
-#line 524 "src/parser.ypp"
+#line 520 "src/parser.ypp"
                  { (yyval.node) = new astnode(INTEGER,(yyvsp[0].data));}
-#line 2716 "parser.tab.cpp"
+#line 2712 "parser.tab.cpp"
     break;
 
   case 103: /* float_lit: FLOAT  */
-#line 528 "src/parser.ypp"
+#line 524 "src/parser.ypp"
                 { (yyval.node) = new astnode(FLOAT,(yyvsp[0].data));}
-#line 2722 "parser.tab.cpp"
+#line 2718 "parser.tab.cpp"
     break;
 
   case 104: /* TypeName: IDENTIFIER  */
-#line 532 "src/parser.ypp"
+#line 528 "src/parser.ypp"
                    { (yyval.node) = new astnode(IDENTIFIER,(yyvsp[0].data));}
-#line 2728 "parser.tab.cpp"
+#line 2724 "parser.tab.cpp"
     break;
 
   case 105: /* TypeName: VAR_TYPE  */
-#line 533 "src/parser.ypp"
+#line 529 "src/parser.ypp"
                    { (yyval.node) = new astnode(VAR_TYPE,(yyvsp[0].data));}
-#line 2734 "parser.tab.cpp"
+#line 2730 "parser.tab.cpp"
     break;
 
   case 106: /* ArrayType: LBRACK ArrayLength RBRACK Type  */
-#line 537 "src/parser.ypp"
+#line 533 "src/parser.ypp"
                                        { (yyval.node) = new astnode("",false,{(yyvsp[-2].node),(yyvsp[0].node)}); }
-#line 2740 "parser.tab.cpp"
+#line 2736 "parser.tab.cpp"
     break;
 
   case 107: /* ArrayLength: Expression  */
-#line 541 "src/parser.ypp"
+#line 537 "src/parser.ypp"
                    { (yyval.node) = newId((yyvsp[0].node), "ArrayLength"); }
-#line 2746 "parser.tab.cpp"
+#line 2742 "parser.tab.cpp"
     break;
 
   case 108: /* StructType: STRUCT LBRACE FieldDeclStar RBRACE  */
-#line 545 "src/parser.ypp"
+#line 541 "src/parser.ypp"
                                        { (yyval.node) = newId((yyvsp[-1].node), "StructType"); }
-#line 2752 "parser.tab.cpp"
+#line 2748 "parser.tab.cpp"
     break;
 
   case 109: /* StructType: STRUCT LBRACE RBRACE  */
-#line 546 "src/parser.ypp"
+#line 542 "src/parser.ypp"
                            { (yyval.node) = new astnode(STRUCT, (yyvsp[-2].data)); }
-#line 2758 "parser.tab.cpp"
+#line 2754 "parser.tab.cpp"
     break;
 
   case 110: /* FieldDeclStar: FieldDecl SEMICOLON  */
-#line 550 "src/parser.ypp"
+#line 546 "src/parser.ypp"
                         { (yyval.node) = newId((yyvsp[-1].node), "FieldDeclStar"); }
-#line 2764 "parser.tab.cpp"
+#line 2760 "parser.tab.cpp"
     break;
 
   case 111: /* FieldDeclStar: FieldDeclStar FieldDecl SEMICOLON  */
-#line 551 "src/parser.ypp"
+#line 547 "src/parser.ypp"
                                         { (yyval.node) = new astnode("FieldDeclStar",false,{(yyvsp[-2].node),(yyvsp[-1].node)}); }
-#line 2770 "parser.tab.cpp"
+#line 2766 "parser.tab.cpp"
     break;
 
   case 112: /* FieldDecl: IdentifierList Type  */
-#line 555 "src/parser.ypp"
+#line 551 "src/parser.ypp"
                             { (yyval.node) = new astnode("FieldDecl",false,{(yyvsp[-1].node),(yyvsp[0].node)}); }
-#line 2776 "parser.tab.cpp"
+#line 2772 "parser.tab.cpp"
     break;
 
   case 113: /* FieldDecl: IdentifierList Type Tag  */
-#line 556 "src/parser.ypp"
+#line 552 "src/parser.ypp"
                                   { (yyval.node) = new astnode("FieldDecl",false,{(yyvsp[-2].node),(yyvsp[-1].node),(yyvsp[0].node)}); }
-#line 2782 "parser.tab.cpp"
+#line 2778 "parser.tab.cpp"
     break;
 
   case 114: /* Tag: STRING  */
-#line 560 "src/parser.ypp"
+#line 556 "src/parser.ypp"
                { (yyval.node) = new astnode(new DefinedType("string"), STRING, (yyvsp[0].data));}
-#line 2788 "parser.tab.cpp"
+#line 2784 "parser.tab.cpp"
     break;
 
   case 115: /* PointerType: MUL BaseType  */
-#line 564 "src/parser.ypp"
+#line 560 "src/parser.ypp"
                      { (yyval.node) = new astnode(new PntrType((yyvsp[0].node)->type),"PointerType",false,{(yyvsp[0].node)}); }
-#line 2794 "parser.tab.cpp"
+#line 2790 "parser.tab.cpp"
     break;
 
   case 116: /* BaseType: Type  */
-#line 567 "src/parser.ypp"
+#line 563 "src/parser.ypp"
              { (yyval.node) = new astnode((yyvsp[0].node)->type, "BaseType",false,{(yyvsp[0].node)}); }
-#line 2800 "parser.tab.cpp"
+#line 2796 "parser.tab.cpp"
     break;
 
   case 117: /* FunctionType: FUNC Signature  */
-#line 572 "src/parser.ypp"
+#line 568 "src/parser.ypp"
                        { (yyval.node) = newId((yyvsp[0].node), "FunctionType"); }
-#line 2806 "parser.tab.cpp"
+#line 2802 "parser.tab.cpp"
     break;
 
   case 118: /* ConstDecl: CONST ConstSpec  */
-#line 576 "src/parser.ypp"
+#line 572 "src/parser.ypp"
                                 { (yyval.node) = newId((yyvsp[0].node), "ConstDecl"); }
-#line 2812 "parser.tab.cpp"
+#line 2808 "parser.tab.cpp"
     break;
 
   case 119: /* ConstSpec: IDENTIFIER Type ASSIGN Expression  */
-#line 580 "src/parser.ypp"
+#line 576 "src/parser.ypp"
                                                   { (yyval.node) = new astnode("ConstSpec",false,{(yyvsp[-2].node),(yyvsp[0].node)});
 			// symadd($1->value, $2->type);
 			//cout<<"SCOPE"<<any_scope("test")<<endl;
 		}
-#line 2821 "parser.tab.cpp"
+#line 2817 "parser.tab.cpp"
     break;
 
   case 120: /* ConstSpec: IDENTIFIER Type  */
-#line 584 "src/parser.ypp"
+#line 580 "src/parser.ypp"
                                   { (yyval.node) = newId((yyvsp[0].node), "ConstSpec");
 			// symadd($1->value, $2->type);
 			//cout<<"SCOPE"<<any_scope("test")<<endl;
 		}
-#line 2830 "parser.tab.cpp"
+#line 2826 "parser.tab.cpp"
     break;
 
   case 121: /* ExpressionList: ExpressionList COMMA Expression  */
-#line 591 "src/parser.ypp"
+#line 587 "src/parser.ypp"
                                                 { (yyval.node) = new astnode("ExpressionList",false,{(yyvsp[-2].node),(yyvsp[0].node)}); }
-#line 2836 "parser.tab.cpp"
+#line 2832 "parser.tab.cpp"
     break;
 
   case 122: /* ExpressionList: Expression  */
-#line 592 "src/parser.ypp"
+#line 588 "src/parser.ypp"
                              { (yyval.node) = newId((yyvsp[0].node), "ExpressionList"); }
-#line 2842 "parser.tab.cpp"
+#line 2838 "parser.tab.cpp"
     break;
 
   case 123: /* TypeDecl: TYPE TypeSpec  */
-#line 596 "src/parser.ypp"
+#line 592 "src/parser.ypp"
                                { (yyval.node) = new astnode("TypeDecl",false,{new astnode(TYPE,(yyvsp[-1].data)),(yyvsp[0].node)}); }
-#line 2848 "parser.tab.cpp"
+#line 2844 "parser.tab.cpp"
     break;
 
   case 124: /* TypeDecl: TYPE LPAREN TypeSpecList RPAREN  */
-#line 597 "src/parser.ypp"
+#line 593 "src/parser.ypp"
                                                   { (yyval.node) = new astnode("TypeDecl",false,{new astnode(TYPE,(yyvsp[-3].data)), (yyvsp[-1].node)}); }
-#line 2854 "parser.tab.cpp"
+#line 2850 "parser.tab.cpp"
     break;
 
   case 125: /* TypeSpecList: TypeSpecList TypeSpec SEMICOLON  */
-#line 601 "src/parser.ypp"
+#line 597 "src/parser.ypp"
                                                 { (yyval.node) = new astnode("TypeSpecList",false,{(yyvsp[-2].node),(yyvsp[-1].node)}); }
-#line 2860 "parser.tab.cpp"
+#line 2856 "parser.tab.cpp"
     break;
 
   case 126: /* TypeSpecList: TypeSpec SEMICOLON  */
-#line 602 "src/parser.ypp"
+#line 598 "src/parser.ypp"
                                      { (yyval.node) = newId((yyvsp[-1].node), "TypeSpecList"); }
-#line 2866 "parser.tab.cpp"
+#line 2862 "parser.tab.cpp"
     break;
 
   case 127: /* TypeSpec: AliasDecl  */
-#line 605 "src/parser.ypp"
+#line 601 "src/parser.ypp"
                           { (yyval.node) = newId((yyvsp[0].node), "TypeSpec"); }
-#line 2872 "parser.tab.cpp"
+#line 2868 "parser.tab.cpp"
     break;
 
   case 128: /* TypeSpec: TypeDef  */
-#line 606 "src/parser.ypp"
+#line 602 "src/parser.ypp"
                           { (yyval.node) = newId((yyvsp[0].node), "TypeSpec"); }
-#line 2878 "parser.tab.cpp"
+#line 2874 "parser.tab.cpp"
     break;
 
   case 129: /* AliasDecl: IDENTIFIER ASSIGN Type  */
-#line 610 "src/parser.ypp"
+#line 606 "src/parser.ypp"
                                        { (yyval.node) = new astnode("AliasDecl",false,{new astnode(IDENTIFIER,(yyvsp[-2].data)), new astnode(ASSIGN,(yyvsp[-1].data)), (yyvsp[0].node)}); }
-#line 2884 "parser.tab.cpp"
+#line 2880 "parser.tab.cpp"
     break;
 
   case 130: /* TypeDef: IDENTIFIER Type  */
-#line 614 "src/parser.ypp"
+#line 610 "src/parser.ypp"
                                 { (yyval.node) = new astnode("TypeDef",false,{new astnode(IDENTIFIER,(yyvsp[-1].data)), (yyvsp[0].node)}); }
-#line 2890 "parser.tab.cpp"
+#line 2886 "parser.tab.cpp"
     break;
 
   case 131: /* Literal: BasicLit  */
-#line 618 "src/parser.ypp"
+#line 614 "src/parser.ypp"
                  { (yyval.node) = newId((yyvsp[0].node), "Literal"); }
-#line 2896 "parser.tab.cpp"
+#line 2892 "parser.tab.cpp"
     break;
 
   case 132: /* Literal: FunctionLit  */
-#line 619 "src/parser.ypp"
+#line 615 "src/parser.ypp"
                       { (yyval.node) = newId((yyvsp[0].node), "Literal"); }
-#line 2902 "parser.tab.cpp"
+#line 2898 "parser.tab.cpp"
     break;
 
   case 133: /* string_lit: STRING  */
-#line 623 "src/parser.ypp"
+#line 619 "src/parser.ypp"
                {
 		cout << "I am a string lite" << endl;
-		new astnode(new PntrType(new DefinedType("string")) , STRING, (yyvsp[0].data));}
-#line 2910 "parser.tab.cpp"
+		(yyval.node) = new astnode(new PntrType(new DefinedType("string")) , STRING, (yyvsp[0].data));}
+#line 2906 "parser.tab.cpp"
     break;
 
   case 134: /* byte_lit: BYTE  */
-#line 629 "src/parser.ypp"
+#line 625 "src/parser.ypp"
               { (yyval.node) = new astnode(new DefinedType("byte") , BYTE, (yyvsp[0].data));}
-#line 2916 "parser.tab.cpp"
+#line 2912 "parser.tab.cpp"
     break;
 
   case 135: /* BasicLit: int_lit  */
-#line 633 "src/parser.ypp"
+#line 629 "src/parser.ypp"
                 { (yyval.node) = newId((yyvsp[0].node), "BasicLit"); }
-#line 2922 "parser.tab.cpp"
+#line 2918 "parser.tab.cpp"
     break;
 
   case 136: /* BasicLit: float_lit  */
-#line 634 "src/parser.ypp"
+#line 630 "src/parser.ypp"
                     { (yyval.node) = newId((yyvsp[0].node), "BasicLit"); }
-#line 2928 "parser.tab.cpp"
+#line 2924 "parser.tab.cpp"
     break;
 
   case 137: /* BasicLit: string_lit  */
-#line 635 "src/parser.ypp"
+#line 631 "src/parser.ypp"
                      { (yyval.node) = newId((yyvsp[0].node), "BasicLit"); }
-#line 2934 "parser.tab.cpp"
+#line 2930 "parser.tab.cpp"
     break;
 
   case 138: /* BasicLit: byte_lit  */
-#line 636 "src/parser.ypp"
+#line 632 "src/parser.ypp"
                    { (yyval.node) = newId((yyvsp[0].node), "BasicLit"); }
-#line 2940 "parser.tab.cpp"
+#line 2936 "parser.tab.cpp"
     break;
 
   case 139: /* FunctionLit: FUNC Function  */
-#line 640 "src/parser.ypp"
+#line 636 "src/parser.ypp"
                       { (yyval.node) = new astnode("FunctionLit",false,{new astnode(FUNC,(yyvsp[-1].data)), (yyvsp[0].node)}); }
-#line 2946 "parser.tab.cpp"
+#line 2942 "parser.tab.cpp"
     break;
 
   case 140: /* PrimaryExpr: Operand  */
-#line 644 "src/parser.ypp"
+#line 640 "src/parser.ypp"
                 { (yyval.node) = newId((yyvsp[0].node), "PrimaryExpr"); }
-#line 2952 "parser.tab.cpp"
+#line 2948 "parser.tab.cpp"
     break;
 
   case 141: /* PrimaryExpr: PrimaryExpr Selector  */
-#line 645 "src/parser.ypp"
+#line 641 "src/parser.ypp"
                                { (yyval.node) = new astnode("PrimaryExpr",false,{(yyvsp[-1].node),(yyvsp[0].node)}); }
-#line 2958 "parser.tab.cpp"
+#line 2954 "parser.tab.cpp"
     break;
 
   case 142: /* PrimaryExpr: PrimaryExpr Index  */
-#line 646 "src/parser.ypp"
+#line 642 "src/parser.ypp"
                             { (yyval.node) = new astnode("PrimaryExpr",false,{(yyvsp[-1].node),(yyvsp[0].node)}); }
-#line 2964 "parser.tab.cpp"
+#line 2960 "parser.tab.cpp"
     break;
 
   case 143: /* PrimaryExpr: PrimaryExpr TypeAssertion  */
-#line 647 "src/parser.ypp"
+#line 643 "src/parser.ypp"
                                     { (yyval.node) = new astnode("PrimaryExpr",false,{(yyvsp[-1].node),(yyvsp[0].node)}); }
-#line 2970 "parser.tab.cpp"
+#line 2966 "parser.tab.cpp"
     break;
 
   case 144: /* PrimaryExpr: OperandName StructLiteral  */
-#line 648 "src/parser.ypp"
+#line 644 "src/parser.ypp"
                                     { (yyval.node) = new astnode("PrimaryExpr",false,{(yyvsp[-1].node),(yyvsp[0].node)}); }
-#line 2976 "parser.tab.cpp"
+#line 2972 "parser.tab.cpp"
     break;
 
   case 145: /* StructLiteral: LBRACE KeyValList RBRACE  */
-#line 652 "src/parser.ypp"
+#line 648 "src/parser.ypp"
                              { (yyval.node) = newId((yyvsp[-1].node), "StructLiteral"); }
-#line 2982 "parser.tab.cpp"
+#line 2978 "parser.tab.cpp"
     break;
 
   case 146: /* KeyValList: %empty  */
-#line 656 "src/parser.ypp"
+#line 652 "src/parser.ypp"
                     { (yyval.node) = new astnode(); }
-#line 2988 "parser.tab.cpp"
+#line 2984 "parser.tab.cpp"
     break;
 
   case 147: /* KeyValList: Expression COLON Expression  */
-#line 657 "src/parser.ypp"
+#line 653 "src/parser.ypp"
                                       { (yyval.node) = new astnode("",false,{(yyvsp[-2].node),(yyvsp[0].node)}); }
-#line 2994 "parser.tab.cpp"
+#line 2990 "parser.tab.cpp"
     break;
 
   case 148: /* KeyValList: KeyValList COMMA Expression COLON Expression  */
-#line 658 "src/parser.ypp"
+#line 654 "src/parser.ypp"
                                                        { (yyval.node) = new astnode("",false,{(yyvsp[-4].node),(yyvsp[-2].node),(yyvsp[0].node)}); }
-#line 3000 "parser.tab.cpp"
+#line 2996 "parser.tab.cpp"
     break;
 
   case 149: /* Selector: PERIOD IDENTIFIER  */
-#line 662 "src/parser.ypp"
+#line 658 "src/parser.ypp"
                           { (yyval.node) = new astnode("Selector",false,{new astnode(PERIOD,(yyvsp[-1].data)), new astnode(IDENTIFIER,(yyvsp[0].data))}); }
-#line 3006 "parser.tab.cpp"
+#line 3002 "parser.tab.cpp"
     break;
 
   case 150: /* Index: LBRACK Expression RBRACK  */
-#line 665 "src/parser.ypp"
+#line 661 "src/parser.ypp"
                                  { (yyval.node) = newId((yyvsp[-1].node), "Index"); }
-#line 3012 "parser.tab.cpp"
+#line 3008 "parser.tab.cpp"
     break;
 
   case 151: /* TypeAssertion: PERIOD LPAREN Type RPAREN  */
-#line 670 "src/parser.ypp"
+#line 666 "src/parser.ypp"
                                   { (yyval.node) = new astnode("TypeAssertion",false,{new astnode(PERIOD, (yyvsp[-3].data)), (yyvsp[-1].node)}); }
-#line 3018 "parser.tab.cpp"
+#line 3014 "parser.tab.cpp"
     break;
 
   case 152: /* Expression: Expression1  */
-#line 679 "src/parser.ypp"
+#line 675 "src/parser.ypp"
                 { (yyval.node) = newId((yyvsp[0].node),"Expression");}
-#line 3024 "parser.tab.cpp"
+#line 3020 "parser.tab.cpp"
     break;
 
   case 153: /* Expression1: Expression1 LOR Expression2  */
-#line 683 "src/parser.ypp"
+#line 679 "src/parser.ypp"
                                 { (yyval.node) = new astnode("Expression1",false,{(yyvsp[-2].node),new astnode(LOR),(yyvsp[0].node)}); }
-#line 3030 "parser.tab.cpp"
+#line 3026 "parser.tab.cpp"
     break;
 
   case 154: /* Expression1: Expression2  */
-#line 684 "src/parser.ypp"
+#line 680 "src/parser.ypp"
                   { newId((yyvsp[0].node),"Expression1"); }
-#line 3036 "parser.tab.cpp"
+#line 3032 "parser.tab.cpp"
     break;
 
   case 155: /* Expression2: Expression2 LAND Expression3  */
-#line 688 "src/parser.ypp"
+#line 684 "src/parser.ypp"
                                  { (yyval.node) = new astnode("Expression2",false,{(yyvsp[-2].node),new astnode(LAND),(yyvsp[0].node)}); }
-#line 3042 "parser.tab.cpp"
+#line 3038 "parser.tab.cpp"
     break;
 
   case 156: /* Expression2: Expression3  */
-#line 689 "src/parser.ypp"
+#line 685 "src/parser.ypp"
                   { newId((yyvsp[0].node),"Expression2"); }
-#line 3048 "parser.tab.cpp"
+#line 3044 "parser.tab.cpp"
     break;
 
   case 157: /* Expression3: Expression3 rel_op Expression4  */
-#line 693 "src/parser.ypp"
+#line 689 "src/parser.ypp"
                                    { (yyval.node) = new astnode("Expression3",false,{(yyvsp[-2].node),(yyvsp[-1].node),(yyvsp[0].node)}); }
-#line 3054 "parser.tab.cpp"
+#line 3050 "parser.tab.cpp"
     break;
 
   case 158: /* Expression3: Expression4  */
-#line 694 "src/parser.ypp"
+#line 690 "src/parser.ypp"
                   { newId((yyvsp[0].node),"Expression3"); }
-#line 3060 "parser.tab.cpp"
+#line 3056 "parser.tab.cpp"
     break;
 
   case 159: /* Expression4: Expression4 add_op Expression5  */
-#line 698 "src/parser.ypp"
+#line 694 "src/parser.ypp"
                                    { (yyval.node) = new astnode("Expression4",false,{(yyvsp[-2].node),(yyvsp[-1].node),(yyvsp[0].node)}); }
-#line 3066 "parser.tab.cpp"
+#line 3062 "parser.tab.cpp"
     break;
 
   case 160: /* Expression4: Expression5  */
-#line 699 "src/parser.ypp"
+#line 695 "src/parser.ypp"
                   { newId((yyvsp[0].node),"Expression4"); }
-#line 3072 "parser.tab.cpp"
+#line 3068 "parser.tab.cpp"
     break;
 
   case 161: /* Expression5: Expression5 mul_op PrimaryExpr  */
-#line 703 "src/parser.ypp"
+#line 699 "src/parser.ypp"
                                    { (yyval.node) = new astnode("Expression5",false,{(yyvsp[-2].node),(yyvsp[-1].node),(yyvsp[0].node)}); }
-#line 3078 "parser.tab.cpp"
+#line 3074 "parser.tab.cpp"
     break;
 
   case 162: /* Expression5: UnaryExpr  */
-#line 704 "src/parser.ypp"
+#line 700 "src/parser.ypp"
                 { (yyval.node) = newId((yyvsp[0].node), "Expression5"); }
-#line 3084 "parser.tab.cpp"
+#line 3080 "parser.tab.cpp"
     break;
 
   case 163: /* UnaryExpr: PrimaryExpr  */
-#line 708 "src/parser.ypp"
+#line 704 "src/parser.ypp"
                     { (yyval.node) = newId((yyvsp[0].node),"UnaryExpr"); }
-#line 3090 "parser.tab.cpp"
+#line 3086 "parser.tab.cpp"
     break;
 
   case 164: /* UnaryExpr: unary_op PrimaryExpr  */
-#line 709 "src/parser.ypp"
+#line 705 "src/parser.ypp"
                                { (yyval.node) = new astnode("UnaryExpr",false,{(yyvsp[-1].node),(yyvsp[0].node)}); }
-#line 3096 "parser.tab.cpp"
+#line 3092 "parser.tab.cpp"
     break;
 
   case 165: /* rel_op: EQL  */
-#line 715 "src/parser.ypp"
+#line 711 "src/parser.ypp"
               { (yyval.node) = new astnode(EQL);}
-#line 3102 "parser.tab.cpp"
+#line 3098 "parser.tab.cpp"
     break;
 
   case 166: /* rel_op: NEQ  */
-#line 716 "src/parser.ypp"
+#line 712 "src/parser.ypp"
               { (yyval.node) = new astnode(NEQ);}
-#line 3108 "parser.tab.cpp"
+#line 3104 "parser.tab.cpp"
     break;
 
   case 167: /* rel_op: LSS  */
-#line 717 "src/parser.ypp"
+#line 713 "src/parser.ypp"
               { (yyval.node) = new astnode(LSS);}
-#line 3114 "parser.tab.cpp"
+#line 3110 "parser.tab.cpp"
     break;
 
   case 168: /* rel_op: LEQ  */
-#line 718 "src/parser.ypp"
+#line 714 "src/parser.ypp"
               { (yyval.node) = new astnode(LEQ);}
-#line 3120 "parser.tab.cpp"
+#line 3116 "parser.tab.cpp"
     break;
 
   case 169: /* rel_op: GTR  */
-#line 719 "src/parser.ypp"
+#line 715 "src/parser.ypp"
               { (yyval.node) = new astnode(GTR);}
-#line 3126 "parser.tab.cpp"
+#line 3122 "parser.tab.cpp"
     break;
 
   case 170: /* rel_op: GEQ  */
-#line 720 "src/parser.ypp"
+#line 716 "src/parser.ypp"
               { (yyval.node) = new astnode(GEQ);}
-#line 3132 "parser.tab.cpp"
+#line 3128 "parser.tab.cpp"
     break;
 
   case 171: /* add_op: ADD  */
-#line 724 "src/parser.ypp"
+#line 720 "src/parser.ypp"
             { (yyval.node) = new astnode(ADD);}
-#line 3138 "parser.tab.cpp"
+#line 3134 "parser.tab.cpp"
     break;
 
   case 172: /* add_op: SUB  */
-#line 725 "src/parser.ypp"
+#line 721 "src/parser.ypp"
               { (yyval.node) = new astnode(SUB);}
-#line 3144 "parser.tab.cpp"
+#line 3140 "parser.tab.cpp"
     break;
 
   case 173: /* add_op: OR  */
-#line 726 "src/parser.ypp"
+#line 722 "src/parser.ypp"
               { (yyval.node) = new astnode(OR);}
-#line 3150 "parser.tab.cpp"
+#line 3146 "parser.tab.cpp"
     break;
 
   case 174: /* add_op: XOR  */
-#line 727 "src/parser.ypp"
+#line 723 "src/parser.ypp"
               { (yyval.node) = new astnode(XOR);}
-#line 3156 "parser.tab.cpp"
+#line 3152 "parser.tab.cpp"
     break;
 
   case 175: /* mul_op: MUL  */
-#line 731 "src/parser.ypp"
+#line 727 "src/parser.ypp"
               { (yyval.node) = new astnode(MUL);}
-#line 3162 "parser.tab.cpp"
+#line 3158 "parser.tab.cpp"
     break;
 
   case 176: /* mul_op: QUO  */
-#line 732 "src/parser.ypp"
+#line 728 "src/parser.ypp"
               { (yyval.node) = new astnode(QUO);}
-#line 3168 "parser.tab.cpp"
+#line 3164 "parser.tab.cpp"
     break;
 
   case 177: /* mul_op: REM  */
-#line 733 "src/parser.ypp"
+#line 729 "src/parser.ypp"
               { (yyval.node) = new astnode(REM);}
-#line 3174 "parser.tab.cpp"
+#line 3170 "parser.tab.cpp"
     break;
 
   case 178: /* mul_op: SHL  */
-#line 734 "src/parser.ypp"
+#line 730 "src/parser.ypp"
               { (yyval.node) = new astnode(SHL);}
-#line 3180 "parser.tab.cpp"
+#line 3176 "parser.tab.cpp"
     break;
 
   case 179: /* mul_op: SHR  */
-#line 735 "src/parser.ypp"
+#line 731 "src/parser.ypp"
               { (yyval.node) = new astnode(SHR);}
-#line 3186 "parser.tab.cpp"
+#line 3182 "parser.tab.cpp"
     break;
 
   case 180: /* mul_op: AND  */
-#line 736 "src/parser.ypp"
+#line 732 "src/parser.ypp"
               { (yyval.node) = new astnode(AND);}
-#line 3192 "parser.tab.cpp"
+#line 3188 "parser.tab.cpp"
     break;
 
   case 181: /* mul_op: AND_NOT  */
-#line 737 "src/parser.ypp"
+#line 733 "src/parser.ypp"
                    { (yyval.node) = new astnode(AND_NOT);}
-#line 3198 "parser.tab.cpp"
+#line 3194 "parser.tab.cpp"
     break;
 
   case 182: /* unary_op: ADD  */
-#line 741 "src/parser.ypp"
+#line 737 "src/parser.ypp"
              { (yyval.node) = new astnode(ADD);}
-#line 3204 "parser.tab.cpp"
+#line 3200 "parser.tab.cpp"
     break;
 
   case 183: /* unary_op: SUB  */
-#line 742 "src/parser.ypp"
+#line 738 "src/parser.ypp"
               { (yyval.node) = new astnode(SUB);}
-#line 3210 "parser.tab.cpp"
+#line 3206 "parser.tab.cpp"
     break;
 
   case 184: /* unary_op: NOT  */
-#line 743 "src/parser.ypp"
+#line 739 "src/parser.ypp"
               { (yyval.node) = new astnode(NOT);}
-#line 3216 "parser.tab.cpp"
+#line 3212 "parser.tab.cpp"
     break;
 
   case 185: /* unary_op: XOR  */
-#line 744 "src/parser.ypp"
+#line 740 "src/parser.ypp"
               { (yyval.node) = new astnode(XOR);}
-#line 3222 "parser.tab.cpp"
+#line 3218 "parser.tab.cpp"
     break;
 
   case 186: /* unary_op: MUL  */
-#line 745 "src/parser.ypp"
+#line 741 "src/parser.ypp"
               { (yyval.node) = new astnode(MUL);}
-#line 3228 "parser.tab.cpp"
+#line 3224 "parser.tab.cpp"
     break;
 
   case 187: /* unary_op: AND  */
-#line 746 "src/parser.ypp"
+#line 742 "src/parser.ypp"
               { (yyval.node) = new astnode(AND);}
-#line 3234 "parser.tab.cpp"
+#line 3230 "parser.tab.cpp"
     break;
 
   case 188: /* assign_op: ASSIGN  */
-#line 750 "src/parser.ypp"
+#line 746 "src/parser.ypp"
                { (yyval.node) = new astnode(ASSIGN);}
-#line 3240 "parser.tab.cpp"
+#line 3236 "parser.tab.cpp"
     break;
 
   case 189: /* assign_op: ADD_ASSIGN  */
-#line 751 "src/parser.ypp"
+#line 747 "src/parser.ypp"
                      { (yyval.node) = new astnode(ADD_ASSIGN);}
-#line 3246 "parser.tab.cpp"
+#line 3242 "parser.tab.cpp"
     break;
 
   case 190: /* assign_op: SUB_ASSIGN  */
-#line 752 "src/parser.ypp"
+#line 748 "src/parser.ypp"
                      { (yyval.node) = new astnode(SUB_ASSIGN);}
-#line 3252 "parser.tab.cpp"
+#line 3248 "parser.tab.cpp"
     break;
 
   case 191: /* assign_op: MUL_ASSIGN  */
-#line 753 "src/parser.ypp"
+#line 749 "src/parser.ypp"
                      { (yyval.node) = new astnode(MUL_ASSIGN);}
-#line 3258 "parser.tab.cpp"
+#line 3254 "parser.tab.cpp"
     break;
 
   case 192: /* assign_op: QUO_ASSIGN  */
-#line 754 "src/parser.ypp"
+#line 750 "src/parser.ypp"
                      { (yyval.node) = new astnode(QUO_ASSIGN);}
-#line 3264 "parser.tab.cpp"
+#line 3260 "parser.tab.cpp"
     break;
 
   case 193: /* assign_op: REM_ASSIGN  */
-#line 755 "src/parser.ypp"
+#line 751 "src/parser.ypp"
                      { (yyval.node) = new astnode(REM_ASSIGN);}
-#line 3270 "parser.tab.cpp"
+#line 3266 "parser.tab.cpp"
     break;
 
   case 194: /* PackageClause: PACKAGE PackageName  */
-#line 759 "src/parser.ypp"
+#line 755 "src/parser.ypp"
                             { (yyval.node) = new astnode("PackageClause", false, {new astnode(PACKAGE), (yyvsp[0].node)});}
-#line 3276 "parser.tab.cpp"
+#line 3272 "parser.tab.cpp"
     break;
 
   case 195: /* PackageName: IDENTIFIER  */
-#line 763 "src/parser.ypp"
+#line 759 "src/parser.ypp"
                    { (yyval.node) = new astnode(new DefinedType("fillTypeUsingSymbolTable"),IDENTIFIER);}
-#line 3282 "parser.tab.cpp"
+#line 3278 "parser.tab.cpp"
     break;
 
   case 196: /* ImportDeclStar: ImportDeclStar ImportDecl  */
-#line 767 "src/parser.ypp"
+#line 763 "src/parser.ypp"
                               { (yyval.node) = new astnode("ImportDeclStar", false,{(yyvsp[-1].node),(yyvsp[0].node)});}
-#line 3288 "parser.tab.cpp"
+#line 3284 "parser.tab.cpp"
     break;
 
   case 197: /* ImportDeclStar: ImportDecl  */
-#line 768 "src/parser.ypp"
+#line 764 "src/parser.ypp"
                  { (yyval.node) = newId((yyvsp[0].node), "ImportDeclStar"); }
-#line 3294 "parser.tab.cpp"
+#line 3290 "parser.tab.cpp"
     break;
 
   case 198: /* ImportDeclStar: %empty  */
-#line 769 "src/parser.ypp"
+#line 765 "src/parser.ypp"
                 { (yyval.node) = new astnode(); }
-#line 3300 "parser.tab.cpp"
+#line 3296 "parser.tab.cpp"
     break;
 
   case 199: /* ImportDecl: IMPORT ImportSpec SEMICOLON  */
-#line 773 "src/parser.ypp"
+#line 769 "src/parser.ypp"
                                     {
 		cout << "I am inside import decl" << endl;
 		(yyval.node) = new astnode("ImportDecl", false, {new astnode(IMPORT),(yyvsp[-1].node)}); }
-#line 3308 "parser.tab.cpp"
+#line 3304 "parser.tab.cpp"
     break;
 
   case 200: /* ImportDecl: IMPORT LPAREN ImportSpecStar RPAREN  */
-#line 776 "src/parser.ypp"
+#line 772 "src/parser.ypp"
                                               { (yyval.node) = new astnode("ImportDecl", false, {new astnode(IMPORT), (yyvsp[-1].node)}); }
-#line 3314 "parser.tab.cpp"
+#line 3310 "parser.tab.cpp"
     break;
 
   case 201: /* ImportSpecStar: ImportSpecStar ImportSpec SEMICOLON  */
-#line 780 "src/parser.ypp"
+#line 776 "src/parser.ypp"
                                             { (yyval.node) = new astnode("ImportSpecStar", false, {(yyvsp[-2].node),(yyvsp[-1].node)}); }
-#line 3320 "parser.tab.cpp"
+#line 3316 "parser.tab.cpp"
     break;
 
   case 202: /* ImportSpecStar: ImportSpec SEMICOLON  */
-#line 781 "src/parser.ypp"
+#line 777 "src/parser.ypp"
                                { (yyval.node) = newId((yyvsp[-1].node), "ImportSpecStar"); }
-#line 3326 "parser.tab.cpp"
+#line 3322 "parser.tab.cpp"
     break;
 
   case 203: /* ImportSpec: PERIOD ImportPath  */
-#line 785 "src/parser.ypp"
+#line 781 "src/parser.ypp"
                            { (yyval.node) = new astnode("ImportSpec", false, {new astnode(PERIOD), (yyvsp[0].node)}); }
-#line 3332 "parser.tab.cpp"
+#line 3328 "parser.tab.cpp"
     break;
 
   case 204: /* ImportSpec: AlternatePackageName ImportPath  */
-#line 786 "src/parser.ypp"
+#line 782 "src/parser.ypp"
                                           { (yyval.node) = new astnode("ImportSpec", false, {(yyvsp[-1].node),(yyvsp[0].node)}); }
-#line 3338 "parser.tab.cpp"
+#line 3334 "parser.tab.cpp"
     break;
 
   case 205: /* ImportSpec: AlternatePackageName  */
-#line 787 "src/parser.ypp"
+#line 783 "src/parser.ypp"
                                {
 		cout << "I am inside import spec" << endl;
 		(yyval.node) = newId((yyvsp[0].node),"ImportSpec"); }
-#line 3346 "parser.tab.cpp"
+#line 3342 "parser.tab.cpp"
     break;
 
   case 206: /* ImportPath: string_lit  */
-#line 793 "src/parser.ypp"
+#line 789 "src/parser.ypp"
                     { (yyval.node) = newId((yyvsp[0].node),"ImportPath");}
-#line 3352 "parser.tab.cpp"
+#line 3348 "parser.tab.cpp"
     break;
 
   case 207: /* AlternatePackageName: string_lit  */
-#line 797 "src/parser.ypp"
+#line 793 "src/parser.ypp"
                    {
+		cout << (yyvsp[0].node)->data->value << endl;
 		cout << "I am insdiee the alternatepackagename" << endl;
-
-		(yyvsp[0].node)->id = "AlternatePackageName";
-		(yyval.node) = (yyvsp[0].node);
-		//$$ = newId($1, "AlternatePackageName");
+		(yyval.node) = newId((yyvsp[0].node), "AlternatePackageName");
 		cout << "hello world" <<endl;
 		}
-#line 3365 "parser.tab.cpp"
+#line 3359 "parser.tab.cpp"
     break;
 
 
-#line 3369 "parser.tab.cpp"
+#line 3363 "parser.tab.cpp"
 
       default: break;
     }
@@ -3589,7 +3583,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 807 "src/parser.ypp"
+#line 801 "src/parser.ypp"
 
 
 

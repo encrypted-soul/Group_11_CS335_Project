@@ -35,7 +35,7 @@ struct astnode {
 // astnode& operator>>=(astnode& node, const char* newId);
 
 astnode* appendId(astnode* node, const char* appendId);
-astnode* newId(astnode* node, const char* newId);
+astnode* newId(astnode* node, string newId);
 // struct exprNode : astnode {
 //   exprNode(Type* type, string id, bool isTerminal)
 //       : astnode(type, id, isTerminal){};

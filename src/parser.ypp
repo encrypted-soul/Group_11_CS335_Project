@@ -157,7 +157,6 @@ LabeledStmt:
 IncDecStmt:
 	Expression INC {
 		$$ = new astnode("IncDecStmt", false, {$1, new astnode(INC, $2)});
-			/*
 			string tac;
 			tac.append(to_string(lineno));
 			tac.append(",");
@@ -171,11 +170,9 @@ IncDecStmt:
 			tac.append("\n");
 			prog.push_back(tac);
 			lineno++;
-			*/
 		}
 	| Expression DEC {
 		$$ = new astnode("IncDecStmt", false, {$1, new astnode(INC, $2)});
-		/*
 		string tac;
 		tac.append(to_string(lineno));
 		tac.append(",");
@@ -189,7 +186,6 @@ IncDecStmt:
 		tac.append("\n");
 		prog.push_back(tac);
 		lineno++;
-		*/
 	}
 	;
 
@@ -274,7 +270,7 @@ VarDecl:
 
 VarSpec:
 		IdentifierList Type ASSIGN ExpressionList {$$ = new astnode("VarSpec", false, {$1, $2, new astnode(ASSIGN, $3),  $4});
-			// symadd_list($1, $2->type, IDENTIFIER);
+			symadd_list($1, $2->type, IDENTIFIER);
 			/*
 			string temp1 = $1->id;
 			string temp2 = $4->id;
@@ -622,7 +618,7 @@ Literal:
 string_lit:
 	STRING {
 		cout << "I am a string lite" << endl;
-		new astnode(new PntrType(new DefinedType("string")) , STRING, $1);}
+		$$ = new astnode(new PntrType(new DefinedType("string")) , STRING, $1);}
 	;
 
 byte_lit:
