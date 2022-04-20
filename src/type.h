@@ -18,6 +18,7 @@ enum TypeClass {
 struct Type {
   virtual string getType();
   virtual Type* copy();
+  virtual string getname();
   Type* next = NULL;	// type linked list
   bool cons = false;	//const or not		
   TypeClass typeClass = NULL_TYPE;
@@ -50,10 +51,20 @@ struct StructType : Type {
 
 struct FunctionType : Type {
   Type* returnType;
-  Type* argTypeList;  // linkedlist representation
-
+  Type* argTypeList
+  /*
+  vector<Type*> rettype;
+  
+  vector<Type*> argtype;  
+  vector<int> argtype_num;
+  */
+  string argtype;
+  string rettype
+  
   string getType();
   FunctionType(Type*, Type*);
+  FunctionType(string, string);
+  int fcn_addtype(string);
   Type* copy();
 };
 

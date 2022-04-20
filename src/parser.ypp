@@ -361,7 +361,7 @@ FunctionName:
 Function:
 		Signature {fullscope=fullscope.substr(0,fullscope.find_last_of("/"));currscope--;} FunctionBody {
 			fullscope = fullscope +"/"+ to_string(currscope); 
-			$$ = new astnode("Function", false, {$1, $3});
+			$$ = new astnode(new FunctionType($1->type) , "Function", false, {$1, $3});
 		}
 		;
 
@@ -388,8 +388,11 @@ Arguments:	PrimaryExpr {$$ = newId($1, "Arguments");}
 		;
 
 Signature:
-	Parameters {$$ = newId($1, "Signature"); }
-	| Parameters Result {$$ = new astnode("Signature", false, {$1, $2});}
+	Parameters {
+		$$ = newId($1, "Signature");
+		 
+	}
+	| Parameters Result {$$ = new astnode(new FunctionType($1->getType(), $2->getType()) ,"Signature", false, {$1, $2});}
 	;
 
 Result:
@@ -398,20 +401,20 @@ Result:
 	;
 
 Parameters:
-	LPAREN RPAREN {$$ = new astnode(LPAREN);}
+	LPAREN RPAREN {$$ = new astnode(new FunctionType("",""), LPAREN);}
 	| LPAREN ParameterDeclStar RPAREN {$$ = newId($2, "Parameters");}
 	| LPAREN ParameterDeclStar COMMA RPAREN {$$ = newId($2, "Parameters");} /* --COMMA WHY?-- */
 	;
 
 ParameterDeclStar:
 	ParameterDecl {$$ = newId($1, "ParameterDeclStar");}
-	| ParameterDeclStar COMMA ParameterDecl {$$ = new astnode("ParameterDeclStar", false, {$1, $3});}
+	| ParameterDeclStar COMMA ParameterDecl {$$ = new astnode(new FunctionType($1->getType() + " " +$2->getType(), ""), "ParameterDeclStar", false, {$1, $3});}
 	;
 
 ParameterDecl:
 	IdentifierList Type {
-		symadd_list($1, $2->type, IDENTIFIER);
-		$$ = new astnode("ParameterDecl", false, {$1, $2});
+		int num_ele = symadd_list($1, $2->type, IDENTIFIER);
+		$$ = new astnode(new FunctionType( to_string(num_ele)+"."+$2->getType(), "") ,"ParameterDecl", false, {$1, $2});
 	}
 	| IdentifierList ELLIPSIS  Type {$$ = new astnode("ParameterDecl", false, {$1, new astnode(ELLIPSIS,$2), $3});}; 	/* no support for now ELLIPSIS*/
 	| ELLIPSIS Type {$$ = new astnode("ParameterDecl", false, {new astnode(ELLIPSIS, $1), $2});} 						/* no support for now ELLIPSIS*/

@@ -158,9 +158,9 @@ void print_symtab( ostream& symbolTable /* =  *fp */ ){
 			switch(x){
 				case NULL_TYPE: 	break;
 				case DEFINED_TYPE:	DefinedType *tmp = static_cast<DefinedType*>(i->second);
-							symbolTable<<" " << tmp -> basename; 
-							if(tmp->cons == true) symbolTable<<" "<<"Const";
-							break;
+									symbolTable<<" " << tmp -> basename; 
+									if(tmp->cons == true) symbolTable<<" "<<"Const";
+									break;
 			}
 			
 			symbolTable<<endl;
