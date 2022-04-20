@@ -393,7 +393,7 @@ FunctionName:
 Function:
 		Signature {fullscope=fullscope.substr(0,fullscope.find_last_of("/"));currscope--;} FunctionBody {
 			fullscope = fullscope +"/"+ to_string(currscope);
-			$$ = new astnode(new FunctionType($1->type),"Function", false, {$1, $3});
+			$$ = new astnode($1->type,"Function", false, {$1, $3});
 		}
 		;
 
@@ -477,7 +477,7 @@ Signature:
 		$$ = newId($1, "Signature");
 		 
 	}
-	| Parameters Result {$$ = new astnode(new FunctionType($1->getType(), $2->getType()) ,"Signature", false, {$1, $2});}
+	| Parameters Result {$$ = new astnode(new FunctionType($1->type->getType(), $2->type->getType()) ,"Signature", false, {$1, $2});}
 	;
 
 Result:
@@ -503,7 +503,7 @@ Parameters:
 
 ParameterDeclStar:
 	ParameterDecl {$$ = newId($1, "ParameterDeclStar");}
-	| ParameterDeclStar COMMA ParameterDecl {$$ = new astnode(new FunctionType($1->getType() + " " +$2->getType(), ""), "ParameterDeclStar", false, {$1, $3}););
+	| ParameterDeclStar COMMA ParameterDecl {$$ = new astnode(new FunctionType($1->type->getType() + " " +$3->type->getType(), ""), "ParameterDeclStar", false, {$1, $3});
 		string temp_str = $1->data->value + "," + $3->data->value;
 		$$->data->value = temp_str;
 	}
@@ -512,7 +512,7 @@ ParameterDeclStar:
 ParameterDecl:
 	IdentifierList Type {
 		int num_ele = symadd_list($1, $2->type, IDENTIFIER);
-		$$ = new astnode(new FunctionType( to_string(num_ele)+"."+$2->getType(), "") ,"ParameterDecl", false, {$1, $2});
+		$$ = new astnode(new FunctionType( to_string(num_ele)+"."+$2->type->getType(), "") ,"ParameterDecl", false, {$1, $2});
 	}
 	| IdentifierList ELLIPSIS  Type {$$ = new astnode("ParameterDecl", false, {$1, new astnode(ELLIPSIS,$2), $3});}; 	/* no support for now ELLIPSIS*/
 	| ELLIPSIS Type {$$ = new astnode("ParameterDecl", false, {new astnode(ELLIPSIS, $1), $2});} 						/* no support for now ELLIPSIS*/
@@ -654,7 +654,7 @@ float_lit:
 
 TypeName:
 	IDENTIFIER { $$ = new astnode(IDENTIFIER,$1); } //type from typtab 
-	| VAR_TYPE { $$ = new astnode(new DefinedType($1->v_str) , VAR_TYPE); }
+	| VAR_TYPE { $$ = new astnode(new DefinedType($1->value) , VAR_TYPE); }
 	;
 
 ArrayType:

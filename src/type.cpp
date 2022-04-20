@@ -69,8 +69,8 @@ FunctionType::FunctionType(Type* _returnType, Type* _argTypeList) {
 }
 
 FunctionType::FunctionType(string _rettype, string _argtype) {
-  this->returnType = _rettype;
-  this->argTypeList = _argtype;
+  this->rettype = _rettype;
+  this->argtype = _argtype;
   this->typeClass = FUNCTION_TYPE;
 }
 
@@ -106,9 +106,6 @@ string PntrType::getType() {
   return baseType->getType() + "*";
 }
 
-<<<<<<< HEAD
-Type* PointerType::copy() { return (new PointerType(*this)); }
-
 /*
 string DefinedType::getname() { return this->basename; }
 string ArrayType::getname() { return (this->elementType->getname() + " array") } //elementype->getname WRONG?? will it call virtual getname?
@@ -117,7 +114,4 @@ string FunctionType::getname() { return this->getType(); }
 string PointerType::getname() { return (basetype->getname() + " ptr") }
 */
 
-
-=======
 Type* PntrType::copy() { return (new PntrType(*this)); }
->>>>>>> origin/main
