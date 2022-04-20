@@ -45,7 +45,7 @@
 extern int yydebug;
 #endif
 /* "%code requires" blocks.  */
-#line 56 "src/parser.ypp"
+#line 76 "src/parser.ypp"
 
     #include <bits/stdc++.h>
 	#include "src/ast.h"
@@ -144,7 +144,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 63 "src/parser.ypp"
+#line 83 "src/parser.ypp"
 
 	Data* data;
 	astnode *node;

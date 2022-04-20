@@ -9,6 +9,9 @@ extern int yylineno;
 extern char* yytext;
 vector <string> prog;
 int lineno = 1;
+int tempno = 1;
+int temp_str_no = 0;
+int labelno = 1;
 astnode *theprogram;
 
 ofstream symbolTable;					//for symtab_print
@@ -18,6 +21,9 @@ umap< string, symtab_t* > symtab_top;
 symtab_t *symtab =  init_symtab_top();	//universal block + symtab "0" aka global
 int currscope = 0;
 string fullscope = "0";
+
+stack <string> if_endlabels;
+stack <string> if_bwlabels;
 
 stack <string> for_initlabels;
 stack <string> for_endlabels;
@@ -46,6 +52,20 @@ string get_temp_var() {
 	string v = "temp_" + to_string(temp_var_counter);
 	temp_var_counter++;
 	return v;
+}
+
+string get_label(){
+	string str_l = "label";
+	string ans =  str_l.append(to_string(labelno));
+	labelno++;
+	return ans;
+}
+
+string get_temp_strvar(){
+	string str_t = "t_str";
+	string ans =  str_t.append(to_string(temp_str_no));
+	temp_str_no++;
+	return ans;
 }
 %}
 
@@ -615,17 +635,87 @@ ContinueStmt:
 	;
 
 IfStmt:
-	IF OPENB Expression Block CLOSEB {$$ = new astnode("IfStmt", false, {$3, $4});}
-	|IF OPENB SimpleStmt SEMICOLON Expression Block CLOSEB {$$ = new astnode("IfStmt", false, {$3, $5, $6});}
-	|IF OPENB SimpleStmt SEMICOLON Expression Block ELSE IfStmt CLOSEB {$$ = new astnode("IfStmt", false, {$3, $5, $6, $8});}
-	|IF OPENB SimpleStmt SEMICOLON Expression Block ELSE  Block CLOSEB {$$ = new astnode("IfStmt", false, {$3, $5, $6, $8});}
-	|IF OPENB Expression Block ELSE IfStmt CLOSEB {$$ = new astnode("IfStmt", false, {$3, $4, $6});}
-	|IF OPENB Expression Block ELSE  Block CLOSEB {$$ = new astnode("IfStmt", false, {$3, $4, $6});}
+	IF OPENB Expression if_mark1 Block if_mark2 CLOSEB {$$ = new astnode("IfStmt", false, {$3, $5});}
+	|IF OPENB SimpleStmt SEMICOLON Expression if_mark1 Block CLOSEB {$$ = new astnode("IfStmt", false, {$3, $5, $7});}
+	|IF OPENB SimpleStmt SEMICOLON Expression if_mark1 Block if_markend1 ELSE IfStmt CLOSEB {$$ = new astnode("IfStmt", false, {$3, $5, $7, $10});}
+	|IF OPENB SimpleStmt SEMICOLON Expression if_mark1 Block if_markend1 ELSE  Block CLOSEB {$$ = new astnode("IfStmt", false, {$3, $5, $7, $10});}
+	|IF OPENB Expression if_mark1 Block if_markend1 ELSE if_mark22 IfStmt if_markend2 CLOSEB if_markend {$$ = new astnode("IfStmt", false, {$3, $5, $9});}
+	|IF OPENB Expression if_mark1 Block if_markend1 ELSE  if_mark22 Block if_markend2 CLOSEB if_markend {$$ = new astnode("IfStmt", false, {$3, $5, $9});}
 	;
 
+if_mark1: {
+	string tac;
+	tac = to_string(lineno) + ",ifgoto,=,";
+	string togo_label = get_label();
+	tac = "t"+to_string(tempno-1)+",1,"+togo_label+"\n";
+	prog.push_back(tac);
+	lineno++;
+	//
+	tac=to_string(lineno) + "," + "goto," ;
+	string topush_label = get_label();
+	if_bwlabels.push(topush_label);
+	tac = tac + topush_label+"\n";//TO correct
+	prog.push_back(tac);
+	lineno++;
+	//
+	tac=to_string(lineno) + ",label," + togo_label + "\n";
+	prog.push_back(tac);
+	lineno++;
+};
+
+if_mark2: {
+	string tac;
+	tac=to_string(lineno) + ",label,";
+	string toget_label = if_bwlabels.top();
+	if_bwlabels.pop();
+	tac = tac + toget_label+"\n";//TO correct
+	prog.push_back(tac);
+	lineno++;
+}
+
+if_markend1: {
+		string tac;
+		//
+		tac=to_string(lineno) + ",goto,";
+		string topush_label = get_label();
+		if_endlabels.push(topush_label);
+		tac = tac + topush_label+"\n";//TO correct
+		prog.push_back(tac);
+		lineno++;
+		//
+	};
+
+if_mark22: {
+		string tac;
+		tac=to_string(lineno) + ",label,";
+		string toget_label = if_bwlabels.top();
+		if_bwlabels.pop();
+		tac = tac + toget_label+"\n";//TO correct
+		prog.push_back(tac);
+		lineno++;
+	};
+
+if_markend2: {
+		string tac;
+		tac=to_string(lineno) + ",goto,";
+		string toget_label = if_endlabels.top();
+		tac = tac + toget_label+"\n";//TO correct
+		prog.push_back(tac);
+		lineno++;
+	};
+if_markend: {
+		string tac;
+		tac=to_string(lineno) + ",label,";
+		string togo_label = if_endlabels.top();	//top of second stack
+		if_endlabels.pop();				//pop here
+		tac = tac + togo_label+"\n";//TO correct
+		prog.push_back(tac);
+		lineno++;
+	};
+
 ForStmt:
-	FOR OPENB Condition Block CLOSEB {$$ = new astnode("ForStmt", false, {$3, $4});}
-	|FOR OPENB ForClause Block CLOSEB {$$ = new astnode("ForStmt", false, {$3, $4});}
+	FOR OPENB for_initmark Condition for_mark1 Block for_mark2 CLOSEB for_markend1 {$$ = new astnode("ForStmt", false, {$4, $6});}
+	|FOR OPENB for_initmark ForClause Block for_mark22 CLOSEB for_markend1 {$$ = new astnode("ForStmt", false, {$4, $5});}
 	;
 
 Condition:
@@ -633,7 +723,7 @@ Condition:
 	;
 
 ForClause:
-	InitStmt SEMICOLON Condition SEMICOLON PostStmt {$$ = new astnode("ForClause", false, {$1, $3, $5});}
+	InitStmt for_clause_mark1 SEMICOLON Condition for_clause_mark2 SEMICOLON PostStmt for_clause_mark3 {$$ = new astnode("ForClause", false, {$1, $4, $7});}
 	;
 
 InitStmt:
@@ -644,21 +734,168 @@ PostStmt:
 	SimpleStmt {$$ = newId($1, "InitStmt");}
 	;
 
+for_clause_mark1:{
+		for_initlabels.pop();
+		for_continuelabels.pop();
+		string tac;
+		tac = to_string(lineno);
+		string for_initlabel = get_label();
+		tac = tac + ",label,"+for_initlabel+"\n";
+		for_initlabels.push(for_initlabel);
+		for_continuelabels.push(for_initlabel);
+		prog.push_back(tac);
+		lineno++;
+
+	};
+
+for_clause_mark2: {
+		//
+		string tac;
+		tac=to_string(lineno) + ",ifgoto,=,";
+		string togo_label = get_label();
+		tac = tac + "t"+to_string(tempno-1)+",1,"+togo_label+"\n";
+		prog.push_back(tac);
+		lineno++;
+		//
+		tac=to_string(lineno) + ",goto,";
+		string for_endlabel = get_label();
+		tac = tac + for_endlabel+"\n";
+		for_endlabels.push(for_endlabel);
+		prog.push_back(tac);
+		lineno++;
+		//
+		tac=to_string(lineno) + ",label," + togo_label+"\n";
+		prog.push_back(tac);
+		lineno++;
+		//
+		//
+		tac=to_string(lineno) + ",goto,";
+		string for_blocklabel = get_label();
+		tac = tac + for_blocklabel+"\n";
+		for_blocklabels.push(for_blocklabel);
+		prog.push_back(tac);
+		lineno++;
+		//
+		tac=to_string(lineno) + ",label,";
+		string for_postlabel = get_label();
+		tac = tac + for_postlabel+"\n";
+		for_postlabels.push(for_postlabel);
+		prog.push_back(tac);
+		lineno++;
+
+	};
+
+for_clause_mark3:
+		{
+		//
+		string tac;
+		tac=to_string(lineno) + ",goto,";
+		string togo_label = for_initlabels.top();
+		for_initlabels.pop();
+		//for_continuelabels.pop();
+		tac = tac + togo_label+"\n";
+		prog.push_back(tac);
+		lineno++;
+		//
+		tac=to_string(lineno) + ",label,";
+		string for_blocklabel = for_blocklabels.top();
+		tac = tac + for_blocklabel+"\n";
+		for_blocklabels.pop();
+		prog.push_back(tac);
+		lineno++;
+	};
+
+for_mark22: {
+		string tac;
+		tac=to_string(lineno) + ",goto,";
+		string togo_postlabel = for_postlabels.top();
+		for_postlabels.pop();
+		tac = tac + togo_postlabel+"\n";
+		prog.push_back(tac);
+		lineno++;
+	};
+
+//for - 1
+for_initmark:{
+		string tac;
+		tac = to_string(lineno);
+		string for_initlabel = get_label();
+		tac = tac + ",label,"+for_initlabel+"\n";
+		for_initlabels.push(for_initlabel);
+		for_continuelabels.push(for_initlabel);
+		prog.push_back(tac);
+		lineno++;
+	};
+
+for_mark1: {
+		//
+		string tac;
+		tac=to_string(lineno) + ",ifgoto,=,";
+		string togo_label = get_label();
+		tac = tac + "t"+to_string(tempno-1)+",1,"+togo_label+"\n";
+		prog.push_back(tac);
+		lineno++;
+		//
+		tac=to_string(lineno) + ",goto,";
+		string for_endlabel = get_label();
+		tac = tac + for_endlabel+"\n";
+		for_endlabels.push(for_endlabel);
+		prog.push_back(tac);
+		lineno++;
+		//
+		tac=to_string(lineno) + ",label," + togo_label + "\n";
+		prog.push_back(tac);
+		lineno++;
+	};
+
+for_mark2: {
+		string tac;
+		tac=to_string(lineno) + ",goto,";
+		string togo_label = for_initlabels.top();
+		for_initlabels.pop();
+		//for_continuelabels.pop();
+		tac = tac + togo_label+"\n";
+		prog.push_back(tac);
+		lineno++;
+	};
+
+for_markend1: {
+		string tac;
+		tac=to_string(lineno) + ",label,";
+		string for_endlabel = for_endlabels.top();
+		for_endlabels.pop();
+		for_continuelabels.pop();
+		tac = tac + for_endlabel+"\n";
+		prog.push_back(tac);
+		lineno++;
+	};
+
 int_lit:
-	INTEGER  { $$ = new astnode(INTEGER,$1);}
+	INTEGER  { $$ = new astnode(INTEGER,$1);
+		$$->data = $1;
+	}
 	;
 
 float_lit:
-	  FLOAT { $$ = new astnode(FLOAT,$1);}
+	  FLOAT { $$ = new astnode(FLOAT,$1);
+	  	$$->data = $1;
+	  }
 	  ;
 
 TypeName:
-	IDENTIFIER { $$ = new astnode(IDENTIFIER,$1); } //type from typtab 
-	| VAR_TYPE { $$ = new astnode(new DefinedType($1->value) , VAR_TYPE); }
+	IDENTIFIER { $$ = new astnode(IDENTIFIER,$1);
+		$$->data = $1;
+	}
+	| VAR_TYPE { $$ = new astnode(new DefinedType($1->value), VAR_TYPE);
+		$$->data = $1;
+	}
 	;
 
 ArrayType:
-	LBRACK ArrayLength RBRACK Type { $$ = new astnode("",false,{$2,$4}); }
+	LBRACK ArrayLength RBRACK Type { $$ = new astnode("",false,{$2,$4});
+		string temp_str = $1->value + $2->data->value + $3->value + $4->data->value;
+		$$->data->value = temp_str;
+	}
 	;
 
 ArrayLength:
@@ -681,11 +918,16 @@ FieldDecl:
 	;
 
 Tag:
-	STRING { $$ = new astnode(new DefinedType("string"), STRING, $1);}
+	STRING { $$ = new astnode(new DefinedType("string"), STRING, $1);
+		$$->data = $1;
+	}
 	;
 
 PointerType:
-	MUL BaseType { $$ = new astnode(new PntrType($2->type),"PointerType",false,{$2}); }
+	MUL BaseType { $$ = new astnode(new PntrType($2->type),"PointerType",false,{$2});
+		string temp_str = $1->value + $2->data->value;
+		$$->data->value = temp_str;
+	}
 	;
 BaseType:
 	Type { $$ = new astnode($1->type, "BaseType",false,{$1}); }
@@ -704,10 +946,20 @@ ConstSpec:
 		IDENTIFIER Type ASSIGN Expression { $$ = new astnode( $2->type ,"ConstSpec",false,{$2,$4});
 			symadd($1->value, $2->type);
 			//cout<<"SCOPE"<<any_scope("test")<<endl;
+			$$->data = $1;
+			string tac = to_string(lineno);
+			tac.append(",=,");
+			tac.append($1->value);
+			tac.append(",");
+			tac.append($4->data->value);
+			tac.append("\n");
+			prog.push_back(tac);
+			lineno++;
 		}
 		| IDENTIFIER Type { $$ = newId($2, "ConstSpec");
 			symadd($1->value, $2->type);
 			//cout<<"SCOPE"<<any_scope("test")<<endl;
+			$$->data = $1;
 		}
 		;
 
@@ -748,17 +1000,30 @@ Literal:
 string_lit:
 	STRING {
 		// cout << "I am a string lite" << endl;
-		$$ = new astnode(new PntrType(new DefinedType("string")) , STRING, $1);}
+		$$ = new astnode(new PntrType(new DefinedType("string")) , STRING, $1);
+		$$->data = $1;
+	}
 	;
 
 byte_lit:
-	BYTE  { $$ = new astnode(new DefinedType("byte") , BYTE, $1);}
+	BYTE  {
+		$$ = new astnode(new DefinedType("byte") , BYTE, $1);
+		$$->data = $1;
+	}
 	;
 
 BasicLit:
 	int_lit { $$ = newId($1, "BasicLit"); }
 	| float_lit { $$ = newId($1, "BasicLit"); }
-	| string_lit { $$ = newId($1, "BasicLit"); }
+	| string_lit {
+		$$ = newId($1, "BasicLit");
+		string temp_str = $1->data->value;
+		string temp_var = get_temp_strvar();
+		string tac = to_string(lineno) + ",string," + temp_var + "," + temp_str + "\n";
+		prog.push_back(tac);
+		lineno++;
+		$$->data->value = temp_var;
+	}
 	| byte_lit { $$ = newId($1, "BasicLit"); }
 	;
 
@@ -789,10 +1054,16 @@ KeyValList:
 	;
 
 Selector:
-	PERIOD IDENTIFIER { $$ = new astnode("Selector",false,{new astnode(PERIOD,$1), new astnode(IDENTIFIER,$2)}); }
+	PERIOD IDENTIFIER { $$ = new astnode("Selector",false,{new astnode(PERIOD,$1), new astnode(IDENTIFIER,$2)});
+		string temp_str = $1->value + $2->value;
+		$$->data->value = temp_str;
+	}
 	;
 Index:
-	LBRACK Expression RBRACK { $$ = newId($2, "Index"); }
+	LBRACK Expression RBRACK { $$ = newId($2, "Index");
+		string temp_str = "[" + $2->data->value + "]";
+		$$->data->value = temp_str;
+	}
 	;
 
 
@@ -918,61 +1189,133 @@ Expression5:
 
 UnaryExpr:
 	PrimaryExpr { $$ = newId($1,"UnaryExpr"); }
-	| unary_op PrimaryExpr { $$ = new astnode("UnaryExpr",false,{$1,$2}); }
+	| unary_op PrimaryExpr { $$ = new astnode("UnaryExpr",false,{$1,$2});
+		//TODO
+		string temp_str = $1->data->value + $2->data->value;
+		$$->data->value = temp_str;
+		//for now its pushing -5, *6 sort of things
+	}
 	//UnaryExpr
 	;
 
 
 rel_op:
-	EQL   { $$ = new astnode(EQL, $1);}
-	| NEQ { $$ = new astnode(NEQ, $1);}
-	| LSS { $$ = new astnode(LSS, $1);}
-	| LEQ { $$ = new astnode(LEQ, $1);}
-	| GTR { $$ = new astnode(GTR, $1);}
-	| GEQ { $$ = new astnode(GEQ, $1);}
+	EQL   { $$ = new astnode(EQL, $1);
+		$$->data = $1;
+	}
+	| NEQ { $$ = new astnode(NEQ, $1);
+	 	$$->data = $1;
+	}
+	| LSS { $$ = new astnode(LSS, $1);
+	 	$$->data = $1;
+	}
+	| LEQ { $$ = new astnode(LEQ, $1);
+	 	$$->data = $1;
+	}
+	| GTR { $$ = new astnode(GTR, $1);
+	 	$$->data = $1;
+	}
+	| GEQ { $$ = new astnode(GEQ, $1);
+	 	$$->data = $1;
+	}
 	;
 
 add_op:
-	ADD { $$ = new astnode(ADD, $1);}
-	| SUB { $$ = new astnode(SUB, $1);}
-	| OR  { $$ = new astnode(OR, $1);}
-	| XOR { $$ = new astnode(XOR, $1);}
+	ADD { $$ = new astnode(ADD, $1);
+		$$->data = $1;
+	}
+	| SUB { $$ = new astnode(SUB, $1);
+		$$->data = $1;
+	}
+	| OR  { $$ = new astnode(OR, $1);
+		$$->data = $1;
+	}
+	| XOR { $$ = new astnode(XOR, $1);
+		$$->data = $1;
+	}
 	;
 
 mul_op:
-	MUL   { $$ = new astnode(MUL, $1);}
-	| QUO { $$ = new astnode(QUO, $1);}
-	| REM { $$ = new astnode(REM, $1);}
-	| SHL { $$ = new astnode(SHL, $1);}
-	| SHR { $$ = new astnode(SHR, $1);}
-	| AND { $$ = new astnode(AND, $1);}
-	| AND_NOT  { $$ = new astnode(AND_NOT, $1);}
+	MUL   { $$ = new astnode(MUL, $1);
+		$$->data = $1;
+	}
+	| QUO { $$ = new astnode(QUO, $1);
+		$$->data = $1;
+	}
+	| REM { $$ = new astnode(REM, $1);
+		$$->data = $1;
+	}
+	| SHL { $$ = new astnode(SHL, $1);
+		$$->data = $1;
+	}
+	| SHR { $$ = new astnode(SHR, $1);
+		$$->data = $1;
+	}
+	| AND { $$ = new astnode(AND, $1);
+		$$->data = $1;
+	}
+	| AND_NOT  { $$ = new astnode(AND_NOT, $1);
+		$$->data = $1;
+	}
 	;
 
 unary_op:
-	ADD  { $$ = new astnode(ADD, $1);}
-	| SUB { $$ = new astnode(SUB, $1);}
-	| NOT { $$ = new astnode(NOT, $1);}
-	| XOR { $$ = new astnode(XOR, $1);}
-	| MUL { $$ = new astnode(MUL, $1);}
-	| AND { $$ = new astnode(AND, $1);}
+	ADD  { $$ = new astnode(ADD, $1);
+		$$->data = $1;
+	}
+	| SUB { $$ = new astnode(SUB, $1);
+		$$->data = $1;
+	}
+	| NOT { $$ = new astnode(NOT, $1);
+		$$->data = $1;
+	}
+	| XOR { $$ = new astnode(XOR, $1);
+		$$->data = $1;
+	}
+	| MUL { $$ = new astnode(MUL, $1);
+		$$->data = $1;
+	}
+	| AND { $$ = new astnode(AND, $1);
+		$$->data = $1;
+	}
 	;
 
 assign_op:
-	ASSIGN { $$ = new astnode(ASSIGN, $1);}
-	| ADD_ASSIGN { $$ = new astnode(ADD_ASSIGN, $1);}
-	| SUB_ASSIGN { $$ = new astnode(SUB_ASSIGN, $1);}
-	| MUL_ASSIGN { $$ = new astnode(MUL_ASSIGN, $1);}
-	| QUO_ASSIGN { $$ = new astnode(QUO_ASSIGN, $1);}
-	| REM_ASSIGN { $$ = new astnode(REM_ASSIGN, $1);}
+	ASSIGN { $$ = new astnode(ASSIGN, $1);
+		$$->data = $1;
+	}
+	| ADD_ASSIGN { $$ = new astnode(ADD_ASSIGN, $1);
+		$$->data = $1;
+	}
+	| SUB_ASSIGN { $$ = new astnode(SUB_ASSIGN, $1);
+		$$->data = $1;
+	}
+	| MUL_ASSIGN { $$ = new astnode(MUL_ASSIGN, $1);
+		$$->data = $1;
+	}
+	| QUO_ASSIGN { $$ = new astnode(QUO_ASSIGN, $1);
+		$$->data = $1;
+	}
+	| REM_ASSIGN { $$ = new astnode(REM_ASSIGN, $1);
+		$$->data = $1;
+	}
 	;
 
 PackageClause:
-	PACKAGE PackageName { $$ = new astnode("PackageClause", false, {new astnode(PACKAGE), $2});}
+	PACKAGE PackageName { $$ = new astnode("PackageClause", false, {new astnode(PACKAGE), $2});
+		string tac = to_string(lineno) + ",call," + $2->data->value + ",0\n";
+		prog.push_back(tac);
+		lineno++;
+		tac = to_string(lineno) + ",exit\n";
+		prog.push_back(tac);
+		lineno++;
+	}
 	;
 
 PackageName:
-	IDENTIFIER { $$ = new astnode(new DefinedType("fillTypeUsingSymbolTable"),IDENTIFIER);}
+	IDENTIFIER { $$ = new astnode(new DefinedType("fillTypeUsingSymbolTable"),IDENTIFIER);
+		$$->data = $1;
+	}
 	;
 
 ImportDeclStar:
