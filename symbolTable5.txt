@@ -1,8 +1,0 @@
-----Symbtab for scope0/1----
-Scope_num Sym_name
-0/1 a 0
-0/1 i 0
-----DONE----
-----Symbtab for scope0----
-Scope_num Sym_name
-----DONE----
