@@ -7,13 +7,14 @@ func plus(a int, b int) int {
     return a + b;
 };
 
-func mytest( a,b int ) int {
+func mytest( c,b int ) int {
+	var a [3]int;
 	return b;
 };
 
 func main() {
-
-	var a,b,c,d,e,f int;
+	var t1, t2 int = 17, 89;
+	var b,c,d,e,f int;
 	const pqr string;
 	{
 		var pqr string;
@@ -21,8 +22,11 @@ func main() {
 	{
 		var pqr string;
 	};
-	const a int;
-	var defer int;   	
+	
+	var defer int;
+	var a [5]int;   	
+	var str *string;
+	return 0;
 };
 
 func plusPlus(a, b, c int) int {

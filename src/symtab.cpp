@@ -38,8 +38,10 @@ Type* symtype(string symname){
 	while( atscope!="0" ){
 		auto symitr = symtab->find(scoped_name);
 
-		if( symitr != symtab->end() )
+		if( symitr != symtab->end() ){
+			*fp<<"TYPE "<<symitr->second->getType()<<endl;		
 			return symitr->second;
+		}
 		else{
 			size_t pos = atscope.find_last_of("/");
 			if(pos == string::npos) break;
@@ -49,11 +51,13 @@ Type* symtype(string symname){
 
 	auto symitr = symtab_top["0"]->find(scoped_name);
 	if( symitr != symtab->end() ){
+		*fp<<"TYPE "<<symitr->second->getType()<<endl;
 		return symitr->second;
 	}
 
 	symitr = symtab_top["u"]->find(scoped_name);
 	if( symitr != symtab->end() ){
+		*fp<<"TYPE "<<symitr->second->getType()<<endl;
 		return symitr->second;
 	}
 

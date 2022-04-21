@@ -55,7 +55,7 @@ string StructType::getType() {
     structTypeName += name;
     structTypeName += ":";
     structTypeName += type->getType();
-    structTypeName += ",";  // weird comma at the end, Sorry!
+    structTypeName += ",";  
   }
   structTypeName += "}";
   return structTypeName;
@@ -114,7 +114,7 @@ PntrType::PntrType(Type* _baseType) {
 
 string PntrType::getType() {
   // baseType*
-  return baseType->getType() + "*";
+  return "*"+ baseType->getType();
 }
 
 /*
