@@ -31,7 +31,7 @@ symtab_t* init_symtab_top(){
 }
 
 Type* symtype(string symname){
-	// WIP returns type of symname
+	//returns type of symname, matching in any curr + outer scope
 	string atscope = fullscope;
 	string scoped_name = atscope + " " + symname;
 
@@ -39,7 +39,7 @@ Type* symtype(string symname){
 		auto symitr = symtab->find(scoped_name);
 
 		if( symitr != symtab->end() ){
-			*fp<<"TYPE "<<symitr->second->getType()<<endl;		
+			//*fp<<"TYPE "<<symitr->second->getType()<<endl;		
 			return symitr->second;
 		}
 		else{
@@ -51,13 +51,13 @@ Type* symtype(string symname){
 
 	auto symitr = symtab_top["0"]->find(scoped_name);
 	if( symitr != symtab->end() ){
-		*fp<<"TYPE "<<symitr->second->getType()<<endl;
+		//*fp<<"TYPE "<<symitr->second->getType()<<endl;
 		return symitr->second;
 	}
 
 	symitr = symtab_top["u"]->find(scoped_name);
 	if( symitr != symtab->end() ){
-		*fp<<"TYPE "<<symitr->second->getType()<<endl;
+		//*fp<<"TYPE "<<symitr->second->getType()<<endl;
 		return symitr->second;
 	}
 
@@ -124,16 +124,19 @@ int symadd_list(astnode* node, Type* symtype, int token_name){
 	//list-like astnode such as identifierlist, token_name = IDENITIFER or ...
 	//returns num of ele added to symtab, on error returns -(num  of ele added)
 
-	if( node->children.empty() ){
-		if( symadd(node->data->value, symtype) )
+	if( node->children.empty() && node->id == to_string(token_name) ){
+		if( symadd(node->data->value, symtype) ){
 			return 1;
+		}
 		else
 			return 0;
 	}
 	int count=0;
 	for( auto i : node->children ){
 		if( i->id == to_string(token_name)){
-			if( symadd( i->data->value, symtype) != true ) return -count;
+			if( symadd( i->data->value, symtype) != true ){ 
+				return -count;
+			}
 			count++;
 		}
 		else{
@@ -156,42 +159,8 @@ void print_symtab( ostream& symbolTable /* =  *fp */ ){
 	symbolTable <<"Scope_num Sym_name"<<endl;
 	for( auto i=symtab->begin(); i != symtab->end(); i++ ){
 		symbolTable <<i->first;
-		if( i->second != NULL ) {
+		if( i->second != NULL ) 
 			symbolTable << " " << i->second->getType() <<endl;
-			/*
-			int x = i->second->typeClass;
-			switch(x){
-				case NULL_TYPE: 	{break;}
-				
-				case DEFINED_TYPE:	{DefinedType *tmp = static_cast<DefinedType*>(i->second);
-									symbolTable<<" " << tmp -> basename; 
-									if(tmp->cons == true) symbolTable<<" "<<"Const";
-									break;}
-									
-				case FUNCTION_TYPE:	{
-									symbolTable<< i->second->getType();
-									/*
-									FunctionType *tmp = static_cast<FunctionType*>(i->second);
-									vector<Type*> arglist = tmp->args;
-									
-									symbolTable<<"(";
-									
-									for( vector<Type*>::iterator itr = arglist.begin(); itr != arglist.end(); itr++ ) {
-										//TEMPORARY
-										symbolTable<< (*itr) -> typeClass << " ";
-									}
-									symbolTable<<")";
-									if (tmp->rets) symbolTable<<" " << tmp->rets->typeClass;
-									
-									break;}
-									
-			}
-			
-			symbolTable<<endl;
-			*/
-		
-		}
-		
 	}
 	symbolTable <<"----DONE----"<<endl;
 }

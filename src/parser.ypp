@@ -117,7 +117,7 @@ string get_temp_strvar(){
 %type <node> PostStmt Condition UnaryExpr PrimaryExpr AliasDecl TypeDef // FunctionLit
 %type <node> Selector Index TypeDecl TypeSpecList TypeSpec VarDecl
 %type <node> TypeAssertion ExpressionList ArrayType
-%type <node> assign_op rel_op add_op mul_op unary_op Tag byte_lit float_lit
+%type <node> assign_op rel_op add_op mul_op unary_op byte_lit float_lit //Tag
 %type <node> Operand Literal BasicLit OperandName ImportSpec IfStmt
 %type <node> ImportPath PackageClause PackageName ImportDecl ImportDeclStar ImportSpecStar
 %type <node> FieldDeclStar FieldDecl Type TypeLit ArrayLength TypeName
@@ -168,7 +168,6 @@ SYMTABS:
 
 SYMTABE:
 	/*empty*/ {
-		//guess what? mid rule
 		fullscope = fullscope +"/"+ to_string(curr_fcnscope);	//$$ = new astnode($1->type,"Function", false, {$1, $3});		
 		
 		//Type* a = symtype("a");
@@ -271,7 +270,7 @@ Assignment:
 			// probably shouldn't be putting exit(0) here not sure though
 			exit(0);
 		}
-
+		
 		// if it is a valid assignment
 		else {
 			string op = $2->data->value;
@@ -333,9 +332,7 @@ VarDecl:
 		;
 
 VarSpec:
-
-
-IdentifierList Type ASSIGN ExpressionList { $$ = new astnode($2->type,"VarSpec", false, {$1, $2, new astnode(ASSIGN, $3),  $4});
+		IdentifierList Type ASSIGN ExpressionList { $$ = new astnode($2->type,"VarSpec", false, {$1, $2, new astnode(ASSIGN, $3),  $4});
 			string temp1 = $1->data->value;
 			string temp2 = $4->data->value;
 			vector <string> expr1 = split(temp1, ',');
@@ -597,7 +594,8 @@ IdentifierLIST:	IdentifierLIST COMMA IDENTIFIER { $$ = new astnode("IdentifierLI
 			string temp_str = $1->data->value + "," + $3->value;
 			$$->data->value = temp_str;
 		}
-		| COMMA IDENTIFIER {$$ = new astnode(IDENTIFIER, $2);
+		| COMMA IDENTIFIER {//$$ = new astnode(IDENTIFIER, $2);
+			$$ = new astnode("IdentifierLIST", false, {new astnode(IDENTIFIER, $2)});
 			string temp_str = "," + $2->value;
 			$$->data->value = temp_str;
 		}
@@ -639,7 +637,12 @@ Type:
 
 Operand:
 	Literal {$$ = newId($1, "Operand");}
-	| OperandName {$$ = newId($1, "Operand");}
+	| OperandName {
+		$$ = newId($1, "Operand");
+		Type *optype = symtype($1->data->value);
+		if( optype == NULL ) { cout<<"ERROR: line"<<lineno<<" Undefined symbol "<< $1->data->value <<endl;}  			
+		
+	}
 	| LPAREN Expression RPAREN {$$ = newId($2, "Operand");}
 	;
 
@@ -713,7 +716,7 @@ if_mark2: {
 	tac = tac + toget_label+"\n";//TO correct
 	prog.push_back(tac);
 	lineno++;
-}
+};
 
 if_markend1: {
 		string tac;
@@ -935,7 +938,7 @@ TypeName:
 ArrayType:
 	LBRACK ArrayLength RBRACK Type {
 		//atm assuming arraylenth = +ve integer only
-		$$ = new astnode( new ArrayType( stoi($2->data->value), $4->type), "" ,false, {$2,$4});
+		$$ = new astnode( new ArrayType( stoi($2->data->value), $4->type), "ArrayType" ,false, {$2,$4});
 		string temp_str = $1->value + $2->data->value + $3->value + $4->data->value;
 		$$->data->value = temp_str;
 	}
@@ -952,19 +955,35 @@ StructType:
 
 FieldDeclStar:
     FieldDecl SEMICOLON { $$ = newId($1, "FieldDeclStar"); }
-    | FieldDeclStar FieldDecl SEMICOLON { $$ = new astnode("FieldDeclStar",false,{$1,$2}); }
+    | FieldDeclStar FieldDecl SEMICOLON { 
+    	umap<string, Type*> tmp_declstar = static_cast<StructType*>($1->type)->membs;
+    	umap<string, Type*> tmp_decl = static_cast<StructType*>($2->type)->membs;
+    	tmp_declstar.insert( tmp_decl.begin(), tmp_decl.end() );
+    	$$ = new astnode( new StructType("" , tmp_declstar) ,"FieldDeclStar",false,{$1,$2}); 
+    }
     ;
 
 FieldDecl:
-	IdentifierList Type { $$ = new astnode("FieldDecl",false,{$1,$2}); }
-	| IdentifierList Type Tag { $$ = new astnode("FieldDecl",false,{$1,$2,$3}); }
+	IdentifierList Type { 
+		vector<string> memb_names = split( $1->data->value, ',');
+		umap <string, Type*> tmp;
+		
+		for( auto i : memb_names ) {
+			tmp[i] = $2->type;
+		}
+		$$ = new astnode(new StructType("", tmp), "FieldDecl", false,{$1,$2}); 
+		
+	}
+	/*	| IdentifierList Type Tag { $$ = new astnode("FieldDecl",false,{$1,$2,$3}); }	*/
 	;
 
+/*
 Tag:
 	STRING { $$ = new astnode(new DefinedType("string"), STRING, $1);
 		$$->data = $1;
 	}
 	;
+*/
 
 PointerType:
 	MUL BaseType { $$ = new astnode(new PntrType($2->type),"PointerType",false,{$2});
@@ -1001,7 +1020,6 @@ ConstSpec:
 		}
 		| IDENTIFIER Type { $$ = newId($2, "ConstSpec");
 			symadd($1->value, $2->type);
-			//cout<<"SCOPE"<<any_scope("test")<<endl;
 			$$->data = $1;
 		}
 		;
@@ -1015,7 +1033,7 @@ ExpressionList:
 
 TypeDecl:
 		TYPE  TypeSpec { $$ = new astnode("TypeDecl",false,{new astnode(TYPE,$1),$2}); }
-		| TYPE LPAREN TypeSpecList RPAREN { $$ = new astnode("TypeDecl",false,{new astnode(TYPE,$1), $3}); }
+		| TYPE LPAREN TypeSpecList RPAREN { $$ = new astnode("TypeDecl",false,{new astnode(TYPE,$1), $3}); } /* LATER (sh) */
 		;
 
 TypeSpecList:
@@ -1032,7 +1050,11 @@ AliasDecl:
 		;
 
 TypeDef:
-		IDENTIFIER Type { $$ = new astnode("TypeDef",false,{new astnode(IDENTIFIER,$1), $2}); }
+		IDENTIFIER Type { 
+			$$ = new astnode("TypeDef",false,{new astnode(IDENTIFIER,$1), $2});
+			static_cast<StructType*>($2->type) ->structName = $1->value;
+			symadd($1->value, $2->type); 
+		}
 		;
 
 Literal:
@@ -1424,8 +1446,8 @@ int main (int argc, char **argv) {
 
 	yyparse ( );
 	
-	Type* a = symtype("a");
-	if( a==NULL ) *fp<<fullscope<<" -NULL-"<<endl;
+	//Type* a = symtype("a");
+	//if( a==NULL ) *fp<<fullscope<<" -NULL-"<<endl;
 	print_symtab();
 	symbolTable.close();
 

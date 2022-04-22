@@ -41,7 +41,7 @@ Type* ArrayType::copy() { return (new ArrayType(*this)); }
 
 StructType::StructType(string _name, umap<string, Type*> _typeList) {
   this->structName = _name;
-  this->memberTypes = _typeList;
+  this->membs = _typeList;
   this->typeClass = STRUCT_TYPE;
 }
 
@@ -49,14 +49,17 @@ string StructType::getType() {
   // structName { name1 : type, name2 : type, ...}
   // e.g. Type { getType: string(), copy: Type*(), .. }
   string structTypeName;
-  structTypeName += structName;
+  //structTypeName += structName;
   structTypeName += "{";
-  for (auto& [name, type] : memberTypes) {
+  bool flag=false;
+  for (auto& [name, type] : membs) {
+  	flag = true;
     structTypeName += name;
     structTypeName += ":";
     structTypeName += type->getType();
     structTypeName += ",";  
   }
+  if(flag) structTypeName.pop_back();
   structTypeName += "}";
   return structTypeName;
 }
