@@ -42,7 +42,7 @@ struct ArrayType : Type {
 
 struct StructType : Type {
   string structName;
-  umap<string, Type*> memberTypes;
+  umap<string, Type*> membs;
 
   string getType();
   StructType(string, umap<string, Type*>);

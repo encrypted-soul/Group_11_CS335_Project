@@ -7,6 +7,11 @@ func plus(a int, b int) int {
     return a + b;
 };
 
+type person struct {
+    name string;
+    age  int;
+};
+
 func mytest( c,b int ) int {
 	var a [3]int;
 	return b;
@@ -15,6 +20,10 @@ func mytest( c,b int ) int {
 func main() {
 	var t1, t2 int = 17, 89;
 	var b,c,d,e,f int;
+	f = 15;
+	g = 30;
+	c = d;
+	e = p;
 	const pqr string;
 	{
 		var pqr string;
