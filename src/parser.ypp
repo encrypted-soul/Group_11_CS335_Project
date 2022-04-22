@@ -1,5 +1,7 @@
 %{
+#include <bits/stdc++.h>
 #include "parser.tab.hpp"
+#include "src/symtab.h"
 using namespace std;
 
 // 1. check sym when used, 2. Array X / struct / pointer type 3. Expression type
@@ -15,7 +17,6 @@ int tempno = 1;
 int temp_str_no = 0;
 int labelno = 1;
 astnode *theprogram;
-
 ofstream symbolTable;					//for symtab_print
 std::ostream* fp = &cout;
 
@@ -24,6 +25,27 @@ symtab_t *symtab =  init_symtab_top();	//universal block + symtab "0" aka global
 int currscope = 0;
 string fullscope = "0";
 int curr_fcnscope = 0;
+string get_tempvar(){
+	string str_t = "t";
+	string ans =  str_t.append(to_string(tempno));
+	tempno++;
+	return ans;
+}
+
+
+string get_temp_strvar(){
+	string str_t = "t_str";
+	string ans =  str_t.append(to_string(temp_str_no));
+	temp_str_no++;
+	return ans;
+}
+
+string get_label(){
+	string str_l = "label";
+	string ans =  str_l.append(to_string(labelno));
+	labelno++;
+	return ans;
+}
 
 stack <string> if_endlabels;
 stack <string> if_bwlabels;
@@ -48,27 +70,6 @@ vector<string> split(const string &s, char delim) {
         tokens.push_back(item);
     }
     return tokens;
-}
-
-string get_temp_var() {
-
-	string v = "temp_" + to_string(temp_var_counter);
-	temp_var_counter++;
-	return v;
-}
-
-string get_label(){
-	string str_l = "label";
-	string ans =  str_l.append(to_string(labelno));
-	labelno++;
-	return ans;
-}
-
-string get_temp_strvar(){
-	string str_t = "t_str";
-	string ans =  str_t.append(to_string(temp_str_no));
-	temp_str_no++;
-	return ans;
 }
 %}
 
@@ -218,6 +219,7 @@ Label:
 	IDENTIFIER {
 		$$ = new astnode(IDENTIFIER, $1);
 		$$->data=$1;
+
 	}
 	;
 
@@ -399,7 +401,7 @@ Declaration:
 	}
 	;
 
-
+///
 FunctionDecl:
 /*		FUNC FunctionName SYMTABS Function SYMTABE { $$ = new astnode("FunctionDecl", false, {$2, $4});
 			//symadd($2->data->value, $4->type);
@@ -408,7 +410,7 @@ FunctionDecl:
 		FUNC FunctionName SYMTABS Signature {
 				//this is a mid rule
 				fullscope=fullscope.substr(0,fullscope.find_last_of("/"));currscope--;
-				
+				prog.push_back(to_string(lineno)+",exit\n");//n  Ashok
 				symtab_t* temp = symtab;
 				symtab = symtab_top["0"];
 				symadd($2->data->value, $4->type);
@@ -429,9 +431,17 @@ FunctionName:
 			//symadd($1->value, new FunctionType( ))	
 			
 			string temp_str = $1->value;
-			string tac = to_string(lineno) + ",function," + $1->value + "\n";
-			prog.push_back(tac);
-			lineno++;
+			if(temp_str !="main") {
+				string tac = to_string(lineno) + ",function," + $1->value + "\n";
+				prog.push_back(tac);
+				lineno++;
+			}
+			else{
+				string tac = to_string(lineno) + ",label," + $1->value + "_prog\n";
+				prog.push_back(tac);
+				lineno++; 
+			}
+
 		}
 		;	
 
@@ -468,10 +478,11 @@ FunctionCall:
 			string str1 = $1->data->value;
 			string str2 = "print";
 			string str3 = "fmt.Println";
+			string str4 = "fmt.Scanln";
 			if(is_argument_list_empty.top() != 1) {
 				string temp_str = $3->data->value;
 				vector <string> vec_arguments = split(temp_str, ',');
-					if(str1 != str2 && str1 !=str3){
+					if(str1 != str2 && str1 !=str3 && str1!=str4){
 						//param here
 						for(int i=0;i<vec_arguments.size();i++){
 							string tac;
@@ -484,14 +495,22 @@ FunctionCall:
 						prog.push_back(tac);
 						lineno++;
 					} else {
-						//printing part
-						for(int i=0;i<vec_arguments.size();i++){
-							string tac;
-							tac = to_string(lineno) + ",print," + vec_arguments[i] + "\n";
-							prog.push_back(tac);
-							lineno++;
+						if(str1==str2 || str1==str3){
+							for(int i=0;i<vec_arguments.size();i++){
+								string tac;
+								tac = to_string(lineno) + ",print," + vec_arguments[i] + "\n";
+								prog.push_back(tac);
+								lineno++;
+							}
+						}	
+						if(str1 ==str4){
+							for(int i=0; i<vec_arguments.size();i++){
+								string tac = to_string(lineno)+",scan,"+vec_arguments[i]+"\n";
+								prog.push_back(tac);
+								lineno++;
+							}
 						}
-				}
+					}
 			}
 			else {
 				is_argument_list_empty.pop();
@@ -543,8 +562,13 @@ Parameters:
 		$$ = newId($2, "Parameters");
 		string temp_str = $2->data->value;
 		vector <string> vec_params = split(temp_str, ',');
+
+		string tac_args = to_string(lineno) + ",args_num," + to_string(vec_params.size()) + "\n";
+		prog.push_back(tac_args);
+		lineno++;
+
 		for(int i= vec_params.size()-1;i>=0;i--){
-			string tac = to_string(lineno) + ",pop," + vec_params[i] + "\n";
+			string tac = to_string(lineno) + ",pop," + vec_params[i] + "," + to_string(vec_params.size()-i) + "\n";
 			prog.push_back(tac);
 			lineno++;
 		}
@@ -713,7 +737,7 @@ if_mark2: {
 	tac = tac + toget_label+"\n";//TO correct
 	prog.push_back(tac);
 	lineno++;
-}
+};
 
 if_markend1: {
 		string tac;
@@ -784,7 +808,6 @@ for_clause_mark1:{
 		string for_initlabel = get_label();
 		tac = tac + ",label,"+for_initlabel+"\n";
 		for_initlabels.push(for_initlabel);
-		for_continuelabels.push(for_initlabel);
 		prog.push_back(tac);
 		lineno++;
 
@@ -822,6 +845,7 @@ for_clause_mark2: {
 		string for_postlabel = get_label();
 		tac = tac + for_postlabel+"\n";
 		for_postlabels.push(for_postlabel);
+		for_continuelabels.push(for_postlabel);
 		prog.push_back(tac);
 		lineno++;
 
@@ -1127,7 +1151,7 @@ Expression:
 
 Expression1:
     Expression1 LOR Expression2 { $$ = new astnode("Expression1",false,{$1,new astnode(LOR),$3});
-	    string temp_var = get_temp_var();
+	    string temp_var = get_tempvar();
 		string tac;
 		tac.append(to_string(lineno));
 		tac.append(",");
@@ -1148,7 +1172,7 @@ Expression1:
 
 Expression2:
     Expression2 LAND Expression3 { $$ = new astnode("Expression2",false,{$1,new astnode(LAND),$3});
-		string temp_var = get_temp_var();
+		string temp_var = get_tempvar();
 		string tac;
 		tac.append(to_string(lineno));
 		tac.append(",");
@@ -1170,7 +1194,7 @@ Expression2:
 Expression3:
     Expression3 rel_op Expression4 { $$ = new astnode("Expression3",false,{$1,$2,$3});
 
-		string temp_var = get_temp_var();
+		string temp_var = get_tempvar();
 		string tac;
 		tac.append(to_string(lineno));
 		tac.append(",");
@@ -1192,7 +1216,7 @@ Expression3:
 
 Expression4:
     Expression4 add_op Expression5 { $$ = new astnode("Expression4",false,{$1,$2,$3});
-		string temp_var = get_temp_var();
+		string temp_var = get_tempvar();
 		string tac;
 		tac.append(to_string(lineno));
 		tac.append(",");
@@ -1213,7 +1237,7 @@ Expression4:
 
 Expression5:
     Expression5 mul_op PrimaryExpr { $$ = new astnode("Expression5",false,{$1,$2,$3});
-		string temp_var = get_temp_var();
+		string temp_var = get_tempvar();
 		string tac;
 		tac.append(to_string(lineno));
 		tac.append(",");
@@ -1348,10 +1372,7 @@ assign_op:
 
 PackageClause:
 	PACKAGE PackageName { $$ = new astnode("PackageClause", false, {new astnode(PACKAGE), $2});
-		string tac = to_string(lineno) + ",call," + $2->data->value + ",0\n";
-		prog.push_back(tac);
-		lineno++;
-		tac = to_string(lineno) + ",exit\n";
+		string tac = to_string(lineno) + ",goto," + $2->data->value + "_prog\n";
 		prog.push_back(tac);
 		lineno++;
 	}
