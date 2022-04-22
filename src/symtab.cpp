@@ -38,8 +38,10 @@ Type* symtype(string symname){
 	while( atscope!="0" ){
 		auto symitr = symtab->find(scoped_name);
 
-		if( symitr != symtab->end() )
+		if( symitr != symtab->end() ){
+			*fp<<"TYPE "<<symitr->second->getType()<<endl;		
 			return symitr->second;
+		}
 		else{
 			size_t pos = atscope.find_last_of("/");
 			if(pos == string::npos) break;
@@ -49,11 +51,13 @@ Type* symtype(string symname){
 
 	auto symitr = symtab_top["0"]->find(scoped_name);
 	if( symitr != symtab->end() ){
+		*fp<<"TYPE "<<symitr->second->getType()<<endl;
 		return symitr->second;
 	}
 
 	symitr = symtab_top["u"]->find(scoped_name);
 	if( symitr != symtab->end() ){
+		*fp<<"TYPE "<<symitr->second->getType()<<endl;
 		return symitr->second;
 	}
 
@@ -152,8 +156,42 @@ void print_symtab( ostream& symbolTable /* =  *fp */ ){
 	symbolTable <<"Scope_num Sym_name"<<endl;
 	for( auto i=symtab->begin(); i != symtab->end(); i++ ){
 		symbolTable <<i->first;
-		if( i->second != NULL ) symbolTable<<" "<< i->second->typeClass;
-		symbolTable<<endl;
+		if( i->second != NULL ) {
+			symbolTable << " " << i->second->getType() <<endl;
+			/*
+			int x = i->second->typeClass;
+			switch(x){
+				case NULL_TYPE: 	{break;}
+				
+				case DEFINED_TYPE:	{DefinedType *tmp = static_cast<DefinedType*>(i->second);
+									symbolTable<<" " << tmp -> basename; 
+									if(tmp->cons == true) symbolTable<<" "<<"Const";
+									break;}
+									
+				case FUNCTION_TYPE:	{
+									symbolTable<< i->second->getType();
+									/*
+									FunctionType *tmp = static_cast<FunctionType*>(i->second);
+									vector<Type*> arglist = tmp->args;
+									
+									symbolTable<<"(";
+									
+									for( vector<Type*>::iterator itr = arglist.begin(); itr != arglist.end(); itr++ ) {
+										//TEMPORARY
+										symbolTable<< (*itr) -> typeClass << " ";
+									}
+									symbolTable<<")";
+									if (tmp->rets) symbolTable<<" " << tmp->rets->typeClass;
+									
+									break;}
+									
+			}
+			
+			symbolTable<<endl;
+			*/
+		
+		}
+		
 	}
 	symbolTable <<"----DONE----"<<endl;
 }
