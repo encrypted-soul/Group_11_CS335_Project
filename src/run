@@ -1,0 +1,4 @@
+#!/bin/bash
+file_name=$(basename "$1" .go).s
+#echo $file_name
+spim -file $file_name

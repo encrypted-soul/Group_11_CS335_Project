@@ -1,0 +1,12 @@
+1,goto,main_prog
+2,function,ast
+3,=,test,5
+4,+,test,test,1
+5,-,test,test,1
+6,return,test
+7,exit
+8,label,main_prog
+9,=,a,5
+10,string,t_temporary_string0,"hello world"
+11,print,t_temporary_string0
+12,exit
