@@ -662,11 +662,14 @@ Type:
 	;
 
 Operand:
-	Literal {$$ = newId($1, "Operand");}
+	Literal {
+		$$ = newId($1, "Operand");
+	}
 	| OperandName {
 		$$ = newId($1, "Operand");
 		Type *optype = symtype($1->data->value);
 		if( optype == NULL ) { cout<<"ERROR: line "<<lineno<<" Undefined symbol "<< $1->data->value<<endl;}
+		$$->type = optype;
 
 	}
 	| LPAREN Expression RPAREN {$$ = newId($2, "Operand");}
@@ -965,14 +968,20 @@ TypeName:
 ArrayType:
 	LBRACK ArrayLength RBRACK Type {
 		//atm assuming arraylenth = +ve integer only
-		$$ = new astnode( new ArrayType( stoi($2->data->value), $4->type), "ArrayType" ,false, {$2,$4});
+		string temp = $2->data->value;
+		$$ = new astnode( new ArrayType( stoi( temp ), $4->type), "ArrayType" ,false, {$2,$4});
 		string temp_str = $1->value + $2->data->value + $3->value + $4->data->value;
 		$$->data->value = temp_str;
 	}
 	;
 
 ArrayLength:
-	Expression { $$ = newId($1, "ArrayLength"); }
+	Expression { $$ = newId($1, "ArrayLength"); 
+		if($1->type == NULL || $1->type->typeClass != DEFINED_TYPE || static_cast<DefinedType*>($1->type) ->basename != "int") {
+			cout<<"ERROR: line "<<lineno<<" Array length not int type, given "<< $1->data->value<<endl;
+			$$->data->value = "0";
+		} 
+	}
 	;
 
 StructType:
@@ -1191,6 +1200,7 @@ Expression1:
 		prog.push_back(tac);
 		lineno++;
 		$$->data->value = temp_var;
+		if( $3->type != NULL ) $$->type = $3->type;
 	}
     | Expression2 { newId($1,"Expression1"); }
     ;
@@ -1212,6 +1222,7 @@ Expression2:
 		prog.push_back(tac);
 		lineno++;
 		$$->data->value = temp_var;
+		if( $3->type != NULL ) $$->type = $3->type;
 	}
     | Expression3 { newId($1,"Expression2"); }
     ;
@@ -1234,6 +1245,7 @@ Expression3:
 		prog.push_back(tac);
 		lineno++;
 		$$->data->value = temp_var;
+		if( $3->type != NULL ) $$->type = $3->type;
 
 	}
     | Expression4 { newId($1,"Expression3"); }
@@ -1256,6 +1268,7 @@ Expression4:
 		prog.push_back(tac);
 		lineno++;
 		$$->data->value = temp_var;
+		if( $3->type != NULL ) $$->type = $3->type;
 	}
     | Expression5 { newId($1,"Expression4"); }
     ;
@@ -1277,6 +1290,7 @@ Expression5:
 		prog.push_back(tac);
 		lineno++;
 		$$->data->value = temp_var;
+		if( $3->type != NULL ) $$->type = $3->type;
 	}
     | UnaryExpr { $$ = newId($1, "Expression5"); }
     ;
