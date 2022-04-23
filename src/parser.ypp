@@ -13,9 +13,9 @@ extern int yylineno;
 extern char* yytext;
 vector <string> prog;
 int lineno = 1;
-int tempno = 1;
+int tempno = 0;
 int temp_str_no = 0;
-int labelno = 1;
+int labelno = 0;
 astnode *theprogram;
 ofstream symbolTable;					//for symtab_print
 std::ostream* fp = &cout;
@@ -34,7 +34,7 @@ string get_tempvar(){
 
 
 string get_temp_strvar(){
-	string str_t = "t_str";
+	string str_t = "t_temporary_string";
 	string ans =  str_t.append(to_string(temp_str_no));
 	temp_str_no++;
 	return ans;
@@ -159,7 +159,7 @@ SYMTABS:
 	/*empty*/ {
 		currscope++;
 		fullscope = fullscope + "/" + to_string(currscope);
-		
+
 		curr_fcnscope = currscope;
 		symtab = new symtab_t;
 		symtab_top[fullscope] = symtab;
@@ -169,11 +169,11 @@ SYMTABS:
 
 SYMTABE:
 	/*empty*/ {
-		fullscope = fullscope +"/"+ to_string(curr_fcnscope);	//$$ = new astnode($1->type,"Function", false, {$1, $3});		
-		
+		fullscope = fullscope +"/"+ to_string(curr_fcnscope);	//$$ = new astnode($1->type,"Function", false, {$1, $3});
+
 		//Type* a = symtype("a");
 		//if( a==NULL ) *fp<<fullscope<<"-NULL-"<<endl;
-		
+
 		print_symtab();
 		delete symtab;
 		symtab = symtab_top["0"];
@@ -272,7 +272,7 @@ Assignment:
 			// probably shouldn't be putting exit(0) here not sure though
 			exit(0);
 		}
-		
+
 		// if it is a valid assignment
 		else {
 			string op = $2->data->value;
@@ -330,7 +330,9 @@ Assignment:
 	;
 
 VarDecl:
-		VAR VarSpec {$$ = new astnode("VarDecl", false, {new astnode(VAR, $1), $2});}
+		VAR VarSpec {$$ = new astnode("VarDecl", false, {new astnode(VAR, $1)});
+		$$->data = $2->data;
+		}
 		;
 
 VarSpec:
@@ -339,7 +341,7 @@ VarSpec:
 			string temp2 = $4->data->value;
 			vector <string> expr1 = split(temp1, ',');
 			vector <string> expr2 = split(temp2, ',');
-
+			$$->data = $1->data;
 			if (expr1.size() != expr2.size()) {
 				cout<<"Error: Incompatible assignment"<<endl;
 				exit(0);
@@ -363,11 +365,12 @@ VarSpec:
 		}
 		| IdentifierList Type {$$ = new astnode($2->type,"VarSpec", false, {$1, $2});
 			symadd_list($1, $2->type, IDENTIFIER);
+			$$->data = $1->data;
 			string temp1 = $1->data->value;
 			string temp2 = $2->data->value;
-			
+
 			Type* typeInfo = $2->type;
-			
+
 			if (typeInfo->typeClass == ARRAY_TYPE) {
 				ArrayType* arrayTypeInfo = (ArrayType*) typeInfo;
 				string length = to_string(arrayTypeInfo->arrayLength);
@@ -407,14 +410,16 @@ FunctionDecl:
 		FUNC FunctionName SYMTABS Signature {
 				//this is a mid rule
 				fullscope=fullscope.substr(0,fullscope.find_last_of("/"));currscope--;
-				prog.push_back(to_string(lineno)+",exit\n");//n  Ashok
 				symtab_t* temp = symtab;
 				symtab = symtab_top["0"];
 				symadd($2->data->value, $4->type);
 				symtab = temp;
-				
-		} FunctionBody SYMTABE { $$ = new astnode("FunctionDecl", false, {$2, $4, $6}); }
-		;
+
+		} FunctionBody SYMTABE {
+			$$ = new astnode("FunctionDecl", false, {$2, $4, $6});
+			prog.push_back(to_string(lineno)+",exit\n");//n  Ashok
+			lineno++;
+		}
 		| FUNC FunctionName SYMTABS Signature SYMTABE { $$ = new astnode("FunctionDecl", false, {$2, $4});
 			symadd($2->data->value, $4->type);
 		}
@@ -425,8 +430,8 @@ FunctionName:
 		IDENTIFIER {$$ = new astnode(IDENTIFIER, $1);
 			// TODO:: Ashutosh -- done
 			$$->data=$1;
-			//symadd($1->value, new FunctionType( ))	
-			
+			//symadd($1->value, new FunctionType( ))
+
 			string temp_str = $1->value;
 			if(temp_str !="main") {
 				string tac = to_string(lineno) + ",function," + $1->value + "\n";
@@ -436,13 +441,13 @@ FunctionName:
 			else{
 				string tac = to_string(lineno) + ",label," + $1->value + "_prog\n";
 				prog.push_back(tac);
-				lineno++; 
+				lineno++;
 			}
 
 		}
-		;	
+		;
 
-/* taking care of that params scope same as fcn block using mid rule + normal end rule actions 
+/* taking care of that params scope same as fcn block using mid rule + normal end rule actions
 Function:
 		Signature {fullscope=fullscope.substr(0,fullscope.find_last_of("/"));currscope--;} FunctionBody {
 			fullscope = fullscope +"/"+ to_string(currscope);
@@ -499,7 +504,7 @@ FunctionCall:
 								prog.push_back(tac);
 								lineno++;
 							}
-						}	
+						}
 						if(str1 ==str4){
 							for(int i=0; i<vec_arguments.size();i++){
 								string tac = to_string(lineno)+",scan,"+vec_arguments[i]+"\n";
@@ -537,7 +542,7 @@ Arguments:	PrimaryExpr {$$ = newId($1, "Arguments");}
 
 Signature:
 	Parameters {
-		$$ = newId($1, "Signature"); 
+		$$ = newId($1, "Signature");
 	}
 	| Parameters Result {
 		vector <Type*> params = (static_cast<FunctionType*> ($1->type)) -> args;
@@ -546,7 +551,7 @@ Signature:
 
 Result:
 	LPAREN TypeList RPAREN {$$ = newId($2, "Result");}	/*no support atm */
-	| Type {$$ = newId($1, "Result");} 
+	| Type {$$ = newId($1, "Result");}
 	;
 
 Parameters:
@@ -580,9 +585,9 @@ ParameterDeclStar:
 		vector<Type*> paramstar = (static_cast<FunctionType*> ($1->type)) -> args;
 		paramstar.insert( paramstar.end(), paramd.begin(), paramd.end());
 		//(static_cast<FunctionType*> $$->type) -> args = paramstar;
-		
+
 		$$ = new astnode(new FunctionType(paramstar, NULL), "ParameterDeclStar", false, {$1, $3});
-		
+
 		string temp_str = $1->data->value + "," + $3->data->value;
 		$$->data->value = temp_str;
 	}
@@ -594,6 +599,7 @@ ParameterDecl:
 		vector <Type*> tmp;
 		for( int i=0; i<num_ele; i++) tmp.push_back($2->type);
 		$$ = new astnode(new FunctionType(tmp, NULL) ,"ParameterDecl", false, {$1, $2});
+		$$->data = $1->data;
 	}
 	| IdentifierList ELLIPSIS  Type {$$ = new astnode("ParameterDecl", false, {$1, new astnode(ELLIPSIS,$2), $3});}; 	/* no support for now ELLIPSIS*/
 	| ELLIPSIS Type {$$ = new astnode("ParameterDecl", false, {new astnode(ELLIPSIS, $1), $2});} 						/* no support for now ELLIPSIS*/
@@ -664,8 +670,8 @@ Operand:
 	| OperandName {
 		$$ = newId($1, "Operand");
 		Type *optype = symtype($1->data->value);
-		if( optype == NULL ) { cout<<"ERROR: line"<<lineno<<" Undefined symbol "<< $1->data->value <<endl;}  			
-		
+		// if( optype == NULL ) { cout<<"ERROR: line "<<lineno<<" Undefined symbol "<< $1->data->value <<endl;}
+
 	}
 	| LPAREN Expression RPAREN {$$ = newId($2, "Operand");}
 	;
@@ -679,6 +685,7 @@ OperandName:
 ReturnStmt:
 	RETURN Expression {$$ = newId($2, "ReturnStmt");
 		string tac = to_string(lineno) + ",return," + $2->data->value + "\n";
+		lineno++;
 		prog.push_back(tac);
 	}
 	| RETURN {$$ = new astnode(RETURN);
@@ -700,7 +707,11 @@ BreakStmt:
 
 ContinueStmt:
 	CONTINUE IDENTIFIER {$$ = new astnode("ContinueStmt", false, {new astnode(BREAK, $1), new astnode(IDENTIFIER, $2)});}
-	| CONTINUE {$$ = new astnode(CONTINUE);}
+	| CONTINUE {$$ = new astnode(CONTINUE);
+		string tac = to_string(lineno)+",goto," +for_continuelabels.top() + "\n";
+		prog.push_back(tac);
+		lineno++;
+	}
 	;
 
 IfStmt:
@@ -716,7 +727,7 @@ if_mark1: {
 	string tac;
 	tac = to_string(lineno) + ",ifgoto,=,";
 	string togo_label = get_label();
-	tac = "t"+to_string(tempno-1)+",1,"+togo_label+"\n";
+	tac = tac + "t"+to_string(tempno-1)+",1,"+togo_label+"\n";
 	prog.push_back(tac);
 	lineno++;
 	//
@@ -979,24 +990,24 @@ StructType:
 
 FieldDeclStar:
     FieldDecl SEMICOLON { $$ = newId($1, "FieldDeclStar"); }
-    | FieldDeclStar FieldDecl SEMICOLON { 
+    | FieldDeclStar FieldDecl SEMICOLON {
     	umap<string, Type*> tmp_declstar = static_cast<StructType*>($1->type)->membs;
     	umap<string, Type*> tmp_decl = static_cast<StructType*>($2->type)->membs;
     	tmp_declstar.insert( tmp_decl.begin(), tmp_decl.end() );
-    	$$ = new astnode( new StructType("" , tmp_declstar) ,"FieldDeclStar",false,{$1,$2}); 
+    	$$ = new astnode( new StructType("" , tmp_declstar) ,"FieldDeclStar",false,{$1,$2});
     }
     ;
 
 FieldDecl:
-	IdentifierList Type { 
+	IdentifierList Type {
 		vector<string> memb_names = split( $1->data->value, ',');
 		umap <string, Type*> tmp;
-		
+
 		for( auto i : memb_names ) {
 			tmp[i] = $2->type;
 		}
-		$$ = new astnode(new StructType("", tmp), "FieldDecl", false,{$1,$2}); 
-		
+		$$ = new astnode(new StructType("", tmp), "FieldDecl", false,{$1,$2});
+
 	}
 	/*	| IdentifierList Type Tag { $$ = new astnode("FieldDecl",false,{$1,$2,$3}); }	*/
 	;
@@ -1074,10 +1085,10 @@ AliasDecl:
 		;
 
 TypeDef:
-		IDENTIFIER Type { 
+		IDENTIFIER Type {
 			$$ = new astnode("TypeDef",false,{new astnode(IDENTIFIER,$1), $2});
 			static_cast<StructType*>($2->type) ->structName = $1->value;
-			symadd($1->value, $2->type); 
+			symadd($1->value, $2->type);
 		}
 		;
 
@@ -1089,7 +1100,7 @@ Literal:
 string_lit:
 	STRING {
 		// cout << "I am a string lite" << endl;
-		$$ = new astnode(new PntrType(new DefinedType("string")) , STRING, $1);
+		$$ = new astnode(new DefinedType("string") , STRING, $1);
 		$$->data = $1;
 	}
 	;
@@ -1425,15 +1436,14 @@ ImportSpecStar:
 	;
 
 ImportSpec:
-	 PERIOD ImportPath { $$ = new astnode("ImportSpec", false, {new astnode(PERIOD), $2}); }
-	| AlternatePackageName ImportPath { $$ = new astnode("ImportSpec", false, {$1,$2}); }
-	| AlternatePackageName {
+    ImportPath {
 		// cout << "I am inside import spec" << endl;
 		$$ = newId($1,"ImportSpec"); }
+
 	;
 
 ImportPath:
-	string_lit  { $$ = newId($1,"ImportPath");}
+	string_lit  { $$ = newId($1,"ImportPath"); symadd($1->data->value, $1->type);}
 	;
 
 AlternatePackageName:
@@ -1466,7 +1476,7 @@ int main (int argc, char **argv) {
 	fp =  & symbolTable;
 
 	yyparse ( );
-	
+
 	//Type* a = symtype("a");
 	//if( a==NULL ) *fp<<fullscope<<" -NULL-"<<endl;
 	print_symtab();
@@ -1483,7 +1493,9 @@ int main (int argc, char **argv) {
 	astFile << "}" << endl;
 	astFile.close();
 
-	for (auto it : prog) {
-		cout << it << endl;
+	fstream temp_stream;
+	temp_stream.open("temporary.ir",ios_base::out);
+	for(int i=0;i<prog.size();i++){
+		temp_stream << prog[i];
 	}
 }
