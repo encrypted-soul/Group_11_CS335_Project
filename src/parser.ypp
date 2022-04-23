@@ -18,7 +18,7 @@ int temp_str_no = 0;
 int labelno = 1;
 astnode *theprogram;
 ofstream symbolTable;					//for symtab_print
-std::ostream* fp = &cout;
+std::ostream* fp ;//= &cout;
 
 umap< string, symtab_t* > symtab_top;
 symtab_t *symtab =  init_symtab_top();	//universal block + symtab "0" aka global
@@ -122,7 +122,7 @@ vector<string> split(const string &s, char delim) {
 %type <node> Operand Literal BasicLit OperandName ImportSpec IfStmt
 %type <node> ImportPath PackageClause PackageName ImportDecl ImportDeclStar ImportSpecStar
 %type <node> FieldDeclStar FieldDecl Type TypeLit ArrayLength TypeName
-%type <node> PointerType IdentifierList IdentifierLIST BaseType AlternatePackageName
+%type <node> PointerType IdentifierList IdentifierLIST BaseType 		//AlternatePackageName
 %type <node> StructLiteral KeyValList
 
 %%
@@ -266,7 +266,7 @@ Assignment:
 		vector <string> expr2 = split(temp2, ',');
 
 		// if there are unequal number of elements in either side of the assignment
-		cout << temp1 << " " << temp2 << endl;
+		//cout << temp1 << " " << temp2 << endl;
 		if(expr1.size() != expr2.size()){
 			cout<<"Error: Incompatible assignment"<<endl;
 			// probably shouldn't be putting exit(0) here not sure though
@@ -666,7 +666,7 @@ Operand:
 	| OperandName {
 		$$ = newId($1, "Operand");
 		Type *optype = symtype($1->data->value);
-		// if( optype == NULL ) { cout<<"ERROR: line "<<lineno<<" Undefined symbol "<< $1->data->value <<endl;}
+		if( optype == NULL ) { cout<<"ERROR: line "<<lineno<<" Undefined symbol "<< $1->data->value<<endl;}
 
 	}
 	| LPAREN Expression RPAREN {$$ = newId($2, "Operand");}
@@ -1435,9 +1435,10 @@ ImportSpec:
 	;
 
 ImportPath:
-	string_lit  { $$ = newId($1,"ImportPath"); symadd($1->data->value, $1->type);}
+	string_lit  { $$ = newId($1,"ImportPath"); symadd(prep_str($1->data->value) , $1->type);}
 	;
 
+/*
 AlternatePackageName:
 	string_lit {
 		// cout << "I am insdiee the alternatepackagename" << endl;
@@ -1445,7 +1446,7 @@ AlternatePackageName:
 		// cout << "hello world" <<endl;
 		}
 	;
-
+*/
 %%
 
 
@@ -1469,8 +1470,6 @@ int main (int argc, char **argv) {
 
 	yyparse ( );
 
-	//Type* a = symtype("a");
-	//if( a==NULL ) *fp<<fullscope<<" -NULL-"<<endl;
 	print_symtab();
 	symbolTable.close();
 

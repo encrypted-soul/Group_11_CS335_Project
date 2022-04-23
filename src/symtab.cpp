@@ -34,27 +34,29 @@ Type* symtype(string symname){
 	//returns type of symname, matching in any curr + outer scope
 	string atscope = fullscope;
 	string scoped_name = atscope + " " + symname;
-
+	
 	while( atscope!="0" ){
 		auto symitr = symtab->find(scoped_name);
 
 		if( symitr != symtab->end() ){
-			//*fp<<"TYPE "<<symitr->second->getType()<<endl;		
 			return symitr->second;
 		}
 		else{
 			size_t pos = atscope.find_last_of("/");
 			if(pos == string::npos) break;
 			atscope = atscope.substr(0, pos);
+			scoped_name = atscope + " " + symname;
 		}
 	}
-
+	
+	scoped_name = "0 " + symname;
 	auto symitr = symtab_top["0"]->find(scoped_name);
 	if( symitr != symtab->end() ){
 		//*fp<<"TYPE "<<symitr->second->getType()<<endl;
 		return symitr->second;
 	}
-
+	
+	scoped_name = "u " + symname;
 	symitr = symtab_top["u"]->find(scoped_name);
 	if( symitr != symtab->end() ){
 		//*fp<<"TYPE "<<symitr->second->getType()<<endl;
@@ -164,3 +166,13 @@ void print_symtab( ostream& symbolTable /* =  *fp */ ){
 	}
 	symbolTable <<"----DONE----"<<endl;
 }
+
+string prep_str(string inp_str){
+	auto x = inp_str.size();
+	if( x>2 && inp_str[0]=='"' && inp_str[x-1]=='"' ){
+		string out_str = inp_str.substr(1, x-2 );
+		return out_str;
+	}
+	return inp_str;
+}
+
