@@ -672,7 +672,7 @@ Operand:
 	| OperandName {
 		$$ = newId($1, "Operand");
 		Type *optype = symtype($1->data->value);
-		if( optype == NULL ) { cout<<"ERROR: line "<<lineno<<" Undefined symbol "<< $1->data->value<<endl;}
+		if( optype == NULL ) { cout<<"ERROR: line "<< yylineno <<" Undefined symbol "<< $1->data->value<<endl;}
 		$$->type = optype;
 	}
 	| LPAREN Expression RPAREN {$$ = newId($2, "Operand");}
@@ -985,7 +985,7 @@ ArrayType:
 ArrayLength:
 	Expression { $$ = newId($1, "ArrayLength"); 
 		if($1->type == NULL || $1->type->typeClass != DEFINED_TYPE || static_cast<DefinedType*>($1->type) ->basename != "int") {
-			cout<<"ERROR: line "<<lineno<<" Array length not int type"<<endl;
+			cout<<"ERROR: line "<<yylineno<<" Array length not int type"<<endl;
 			$$->data->value = "0";
 		} 
 	}
@@ -1187,7 +1187,9 @@ TypeAssertion:
 // TODO - Fill Type fields after type resolution
 // TODO - Shorten this expression tree
 Expression:
-    Expression1 { $$ = newId($1,"Expression");}
+    Expression1 { $$ = newId($1,"Expression"); 
+    	//cout<<$1->data->value<<" "; if($1->type) cout<<$1->type->getType()<<endl; 
+    }
     ;
 
 Expression1:

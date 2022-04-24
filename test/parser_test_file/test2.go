@@ -25,13 +25,13 @@ func main() {
 	c = d;
 	e = p;
 	const pqr string;
-	{
-		var pqr string;
+	{ 
+		var pqr string; 
 	};
 	{
-		var pqr string;
+		var pqr string; 
 	};
-	
+	b = "abc" + d;
 	var defer int;
 	var a [5]int;   
 	var aa [5.2+1] int;	
