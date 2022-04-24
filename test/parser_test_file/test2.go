@@ -14,7 +14,7 @@ type person struct {
 
 func mytest( c,b int ) int {
 	var a [3]int;
-	return b;
+	return d;
 };
 
 func main() {
@@ -33,8 +33,10 @@ func main() {
 	};
 	
 	var defer int;
-	var a [5]int;   	
+	var a [5]int;   
+	var aa ["bcd"] int;	
 	var str *string;
+	var str1 *string;
 	return 0;
 };
 

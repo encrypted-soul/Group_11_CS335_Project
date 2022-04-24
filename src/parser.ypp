@@ -18,7 +18,7 @@ int temp_str_no = 0;
 int labelno = 0;
 astnode *theprogram;
 ofstream symbolTable;					//for symtab_print
-std::ostream* fp = &cout;
+std::ostream* fp ;//= &cout;
 
 umap< string, symtab_t* > symtab_top;
 symtab_t *symtab =  init_symtab_top();	//universal block + symtab "0" aka global
@@ -122,7 +122,7 @@ vector<string> split(const string &s, char delim) {
 %type <node> Operand Literal BasicLit OperandName ImportSpec IfStmt
 %type <node> ImportPath PackageClause PackageName ImportDecl ImportDeclStar ImportSpecStar
 %type <node> FieldDeclStar FieldDecl Type TypeLit ArrayLength TypeName
-%type <node> PointerType IdentifierList IdentifierLIST BaseType AlternatePackageName
+%type <node> PointerType IdentifierList IdentifierLIST BaseType 		//AlternatePackageName
 %type <node> StructLiteral KeyValList
 
 %%
@@ -266,7 +266,7 @@ Assignment:
 		vector <string> expr2 = split(temp2, ',');
 
 		// if there are unequal number of elements in either side of the assignment
-		cout << temp1 << " " << temp2 << endl;
+		//cout << temp1 << " " << temp2 << endl;
 		if(expr1.size() != expr2.size()){
 			cout<<"Error: Incompatible assignment"<<endl;
 			// probably shouldn't be putting exit(0) here not sure though
@@ -666,11 +666,14 @@ Type:
 	;
 
 Operand:
-	Literal {$$ = newId($1, "Operand");}
+	Literal {
+		$$ = newId($1, "Operand");
+	}
 	| OperandName {
 		$$ = newId($1, "Operand");
 		Type *optype = symtype($1->data->value);
-		// if( optype == NULL ) { cout<<"ERROR: line "<<lineno<<" Undefined symbol "<< $1->data->value <<endl;}
+		if( optype == NULL ) { cout<<"ERROR: line "<<lineno<<" Undefined symbol "<< $1->data->value<<endl;}
+		$$->type = optype;
 
 	}
 	| LPAREN Expression RPAREN {$$ = newId($2, "Operand");}
@@ -973,14 +976,20 @@ TypeName:
 ArrayType:
 	LBRACK ArrayLength RBRACK Type {
 		//atm assuming arraylenth = +ve integer only
-		$$ = new astnode( new ArrayType( stoi($2->data->value), $4->type), "ArrayType" ,false, {$2,$4});
+		string temp = $2->data->value;
+		$$ = new astnode( new ArrayType( stoi( temp ), $4->type), "ArrayType" ,false, {$2,$4});
 		string temp_str = $1->value + $2->data->value + $3->value + $4->data->value;
 		$$->data->value = temp_str;
 	}
 	;
 
 ArrayLength:
-	Expression { $$ = newId($1, "ArrayLength"); }
+	Expression { $$ = newId($1, "ArrayLength"); 
+		if($1->type == NULL || $1->type->typeClass != DEFINED_TYPE || static_cast<DefinedType*>($1->type) ->basename != "int") {
+			cout<<"ERROR: line "<<lineno<<" Array length not int type, given "<< $1->data->value<<endl;
+			$$->data->value = "0";
+		} 
+	}
 	;
 
 StructType:
@@ -1199,6 +1208,7 @@ Expression1:
 		prog.push_back(tac);
 		lineno++;
 		$$->data->value = temp_var;
+		if( $3->type != NULL ) $$->type = $3->type;
 	}
     | Expression2 { newId($1,"Expression1"); }
     ;
@@ -1220,6 +1230,7 @@ Expression2:
 		prog.push_back(tac);
 		lineno++;
 		$$->data->value = temp_var;
+		if( $3->type != NULL ) $$->type = $3->type;
 	}
     | Expression3 { newId($1,"Expression2"); }
     ;
@@ -1242,6 +1253,7 @@ Expression3:
 		prog.push_back(tac);
 		lineno++;
 		$$->data->value = temp_var;
+		if( $3->type != NULL ) $$->type = $3->type;
 
 	}
     | Expression4 { newId($1,"Expression3"); }
@@ -1264,6 +1276,7 @@ Expression4:
 		prog.push_back(tac);
 		lineno++;
 		$$->data->value = temp_var;
+		if( $3->type != NULL ) $$->type = $3->type;
 	}
     | Expression5 { newId($1,"Expression4"); }
     ;
@@ -1285,6 +1298,7 @@ Expression5:
 		prog.push_back(tac);
 		lineno++;
 		$$->data->value = temp_var;
+		if( $3->type != NULL ) $$->type = $3->type;
 	}
     | UnaryExpr { $$ = newId($1, "Expression5"); }
     ;
@@ -1443,9 +1457,10 @@ ImportSpec:
 	;
 
 ImportPath:
-	string_lit  { $$ = newId($1,"ImportPath"); symadd($1->data->value, $1->type);}
+	string_lit  { $$ = newId($1,"ImportPath"); symadd(prep_str($1->data->value) , $1->type);}
 	;
 
+/*
 AlternatePackageName:
 	string_lit {
 		// cout << "I am insdiee the alternatepackagename" << endl;
@@ -1453,7 +1468,7 @@ AlternatePackageName:
 		// cout << "hello world" <<endl;
 		}
 	;
-
+*/
 %%
 
 
@@ -1477,8 +1492,6 @@ int main (int argc, char **argv) {
 
 	yyparse ( );
 
-	//Type* a = symtype("a");
-	//if( a==NULL ) *fp<<fullscope<<" -NULL-"<<endl;
 	print_symtab();
 	symbolTable.close();
 

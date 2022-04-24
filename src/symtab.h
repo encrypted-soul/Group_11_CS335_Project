@@ -31,5 +31,6 @@ int curr_scope(string symname);
 int any_scope(string symname);
 int symadd_list(astnode* node, Type* symtype, int token_name);
 Type* symtype(string symname);
+string prep_str(string inp_str); //prepare string_lit by removing enclosing quotes, "abc" to abc
 
 #endif
