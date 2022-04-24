@@ -18,7 +18,7 @@ func mytest( c,b int ) int {
 };
 
 func main() {
-	var t1, t2 int = 17, 89;
+	var test1, test2 int = 17, 89;
 	var b,c,d,e,f int;
 	f = 15;
 	g = 30;
@@ -34,10 +34,9 @@ func main() {
 	
 	var defer int;
 	var a [5]int;   
-	var aa ["bcd"] int;	
+	var aa [5.2+1] int;	
 	var str *string;
 	var str1 *string;
-	return 0;
 };
 
 func plusPlus(a, b, c int) int {

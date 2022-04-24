@@ -985,7 +985,7 @@ ArrayType:
 ArrayLength:
 	Expression { $$ = newId($1, "ArrayLength"); 
 		if($1->type == NULL || $1->type->typeClass != DEFINED_TYPE || static_cast<DefinedType*>($1->type) ->basename != "int") {
-			cout<<"ERROR: line "<<lineno<<" Array length not int type, given "<< $1->data->value<<endl;
+			cout<<"ERROR: line "<<lineno<<" Array length not int type"<<endl;
 			$$->data->value = "0";
 		} 
 	}
@@ -1207,7 +1207,8 @@ Expression1:
 		prog.push_back(tac);
 		lineno++;
 		$$->data->value = temp_var;
-		if( $3->type != NULL ) $$->type = $3->type;
+		$$->type = get_exprtype($1->type, $3->type);   
+		//if( $3->type != NULL ) $$->type = $3->type;
 	}
     | Expression2 { newId($1,"Expression1"); }
     ;
@@ -1229,7 +1230,8 @@ Expression2:
 		prog.push_back(tac);
 		lineno++;
 		$$->data->value = temp_var;
-		if( $3->type != NULL ) $$->type = $3->type;
+		$$->type = get_exprtype($1->type, $3->type);
+		//if( $3->type != NULL ) $$->type = $3->type;
 	}
     | Expression3 { newId($1,"Expression2"); }
     ;
@@ -1252,7 +1254,8 @@ Expression3:
 		prog.push_back(tac);
 		lineno++;
 		$$->data->value = temp_var;
-		if( $3->type != NULL ) $$->type = $3->type;
+		$$->type = get_exprtype($1->type, $3->type);
+		//if( $3->type != NULL ) $$->type = $3->type;
 
 	}
     | Expression4 { newId($1,"Expression3"); }
@@ -1275,7 +1278,8 @@ Expression4:
 		prog.push_back(tac);
 		lineno++;
 		$$->data->value = temp_var;
-		if( $3->type != NULL ) $$->type = $3->type;
+		$$->type = get_exprtype($1->type, $3->type);
+		//if( $3->type != NULL ) $$->type = $3->type;
 	}
     | Expression5 { newId($1,"Expression4"); }
     ;
@@ -1297,7 +1301,8 @@ Expression5:
 		prog.push_back(tac);
 		lineno++;
 		$$->data->value = temp_var;
-		if( $3->type != NULL ) $$->type = $3->type;
+		$$->type = get_exprtype($1->type, $3->type);
+		//if( $3->type != NULL ) $$->type = $3->type;
 	}
     | UnaryExpr { $$ = newId($1, "Expression5"); }
     ;

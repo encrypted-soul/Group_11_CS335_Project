@@ -2,15 +2,12 @@ package main;
 
 import "fmt";
 
-
 func plus(a1 int, b1 int) int {
-
     return a1 + b1;
-
 };
 
 func plusPlus(a2 int, b2 int, c2 int) int {
-    	return a2 + b2 + c2;
+    return a2 + b2 + c2;
 };
 
 func main() {

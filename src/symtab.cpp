@@ -167,6 +167,28 @@ void print_symtab( ostream& symbolTable /* =  *fp */ ){
 	symbolTable <<"----DONE----"<<endl;
 }
 
+Type *get_exprtype(Type* t1, Type* t2){
+	if( t1 != NULL && t2 != NULL ){
+		if( t1->typeClass == DEFINED_TYPE && t2->typeClass == DEFINED_TYPE ){
+			DefinedType* t1_def = static_cast<DefinedType*>(t1);
+			DefinedType* t2_def = static_cast<DefinedType*>(t2);
+			
+			if( t1_def->basename == "float" &&  t2_def->basename == "float" )	return t1;
+			if( t1_def->basename == "int" &&  t2_def->basename == "float" )	return t2;
+			if( t1_def->basename == "float" &&  t2_def->basename == "int" )	return t1;
+			if( t1_def->basename == "int" &&  t2_def->basename == "int" )	return t1;
+			if( t1_def->basename == "string" &&  t2_def->basename == "string" )	return t1;
+			if( t1_def->basename == "byte" &&  t2_def->basename == "byte" )	return t1;
+			
+			return NULL;	//string + others or byte + others
+		}
+		else
+			return t2; //not def type return whatever 2nd expr
+	}
+	
+	return NULL;
+}
+
 string prep_str(string inp_str){
 	auto x = inp_str.size();
 	if( x>2 && inp_str[0]=='"' && inp_str[x-1]=='"' ){
