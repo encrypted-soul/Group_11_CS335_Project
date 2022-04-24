@@ -13,9 +13,9 @@ extern int yylineno;
 extern char* yytext;
 vector <string> prog;
 int lineno = 1;
-int tempno = 1;
+int tempno = 0;
 int temp_str_no = 0;
-int labelno = 1;
+int labelno = 0;
 astnode *theprogram;
 ofstream symbolTable;					//for symtab_print
 std::ostream* fp = &cout;
@@ -330,7 +330,9 @@ Assignment:
 	;
 
 VarDecl:
-		VAR VarSpec {$$ = new astnode("VarDecl", false, {new astnode(VAR, $1), $2});}
+		VAR VarSpec {$$ = new astnode("VarDecl", false, {new astnode(VAR, $1)});
+		$$->data = $2->data;
+		}
 		;
 
 VarSpec:
@@ -339,7 +341,7 @@ VarSpec:
 			string temp2 = $4->data->value;
 			vector <string> expr1 = split(temp1, ',');
 			vector <string> expr2 = split(temp2, ',');
-
+			$$->data = $1->data;
 			if (expr1.size() != expr2.size()) {
 				cout<<"Error: Incompatible assignment"<<endl;
 				exit(0);
@@ -363,6 +365,7 @@ VarSpec:
 		}
 		| IdentifierList Type {$$ = new astnode($2->type,"VarSpec", false, {$1, $2});
 			symadd_list($1, $2->type, IDENTIFIER);
+			$$->data = $1->data;
 			string temp1 = $1->data->value;
 			string temp2 = $2->data->value;
 
@@ -596,6 +599,7 @@ ParameterDecl:
 		vector <Type*> tmp;
 		for( int i=0; i<num_ele; i++) tmp.push_back($2->type);
 		$$ = new astnode(new FunctionType(tmp, NULL) ,"ParameterDecl", false, {$1, $2});
+		$$->data = $1->data;
 	}
 	| IdentifierList ELLIPSIS  Type {$$ = new astnode("ParameterDecl", false, {$1, new astnode(ELLIPSIS,$2), $3});}; 	/* no support for now ELLIPSIS*/
 	| ELLIPSIS Type {$$ = new astnode("ParameterDecl", false, {new astnode(ELLIPSIS, $1), $2});} 						/* no support for now ELLIPSIS*/
@@ -703,7 +707,11 @@ BreakStmt:
 
 ContinueStmt:
 	CONTINUE IDENTIFIER {$$ = new astnode("ContinueStmt", false, {new astnode(BREAK, $1), new astnode(IDENTIFIER, $2)});}
-	| CONTINUE {$$ = new astnode(CONTINUE);}
+	| CONTINUE {$$ = new astnode(CONTINUE);
+		string tac = to_string(lineno)+",goto," +for_continuelabels.top() + "\n";
+		prog.push_back(tac);
+		lineno++;
+	}
 	;
 
 IfStmt:
@@ -719,7 +727,7 @@ if_mark1: {
 	string tac;
 	tac = to_string(lineno) + ",ifgoto,=,";
 	string togo_label = get_label();
-	tac = "t"+to_string(tempno-1)+",1,"+togo_label+"\n";
+	tac = tac + "t"+to_string(tempno-1)+",1,"+togo_label+"\n";
 	prog.push_back(tac);
 	lineno++;
 	//

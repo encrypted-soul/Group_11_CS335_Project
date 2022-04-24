@@ -91,9 +91,9 @@ NIL_VAL					"nil"
 
 {LETTER_VARIABLE_START}({LETTER_VARIABLE_START}|{DIGIT})*	{ yylval.data = new Data(yytext);
 	                                                          return IDENTIFIER;}
--?{DIGIT}+							{ yylval.data = new Data(yytext);
+{DIGIT}+							{ yylval.data = new Data(yytext);
                                                                   return INTEGER;}
--?{DIGIT}+"."{DIGIT}+						{ yylval.data = new Data(yytext);
+{DIGIT}+"."{DIGIT}+						{ yylval.data = new Data(yytext);
 								  return FLOAT;}
 \'{UNICODE_CHAR}\'  						{ yylval.data = new Data(yytext);
                                                                   return BYTE; }
