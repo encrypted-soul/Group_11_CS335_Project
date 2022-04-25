@@ -1,4 +1,4 @@
 #!/bin/bash
-bin/irgen $1
-bin/codegen temporary.ir > temporary.s
+../bin/parser $1
+../bin/codegen temporary.ir > temporary.s
 mv "temporary.s" "$(basename "$1" .go).s"
