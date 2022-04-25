@@ -343,7 +343,7 @@ VarSpec:
 			vector <string> expr2 = split(temp2, ',');
 			$$->data = $1->data;
 			if (expr1.size() != expr2.size()) {
-				cout<<"Error: Incompatible assignment"<<endl;
+				cout<<"Error: line"<<yylineno <<" Incompatible assignment"<<endl;
 				exit(0);
 			}
 			else {
@@ -674,6 +674,7 @@ Operand:
 		Type *optype = symtype($1->data->value);
 		if( optype == NULL ) { cout<<"ERROR: line "<< yylineno <<" Undefined symbol "<< $1->data->value<<endl;}
 		$$->type = optype;
+
 	}
 	| LPAREN Expression RPAREN {$$ = newId($2, "Operand");}
 	;

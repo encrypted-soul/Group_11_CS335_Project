@@ -7,18 +7,14 @@ func plus(a int, b int) int {
     return a + b;
 };
 
-type person struct {
-    name string;
-    age  int;
-};
-
 func mytest( c,b int ) int {
 	var a [3]int;
 	return d;
+	//return b;
 };
 
 func main() {
-	var test1, test2 int = 17, 89;
+	var var1, var2 int = 17, 89;
 	var b,c,d,e,f int;
 	f = 15;
 	g = 30;

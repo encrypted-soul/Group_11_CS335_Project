@@ -108,13 +108,13 @@ int curr_scope(string symname){
 bool symadd(string symname, Type* symtype = NULL){
 	//check non reserved
 	if( symtab_top["r"]->find(symname) != symtab->end() ){
-		cout<< "ERROR: On line" << yylineno << " \""<<symname<<"\" is a resevered keyword"<<endl;
+		cout<< "ERROR: On line " << yylineno << " \""<<symname<<"\" is a resevered keyword"<<endl;
 		return false;
 	}
 
 	//check new sym
 	if( curr_scope(symname) == FOUND ){
-		cout<< "ERROR: On line"<< yylineno <<" Repeat entry in symbol table \""<<symname<<"\""<<endl;
+		cout<< "ERROR: On line "<< yylineno <<" Repeat entry in symbol table \""<<symname<<"\""<<endl;
 		return false;
 	}
 	string scoped_name = fullscope + " " + symname;
@@ -180,6 +180,7 @@ Type *get_exprtype(Type* t1, Type* t2){
 			if( t1_def->basename == "string" &&  t2_def->basename == "string" )	return t1;
 			if( t1_def->basename == "byte" &&  t2_def->basename == "byte" )	return t1;
 			
+			cout<<"ERROR: line "<< yylineno << " expression with incompatible types" << endl;
 			return NULL;	//string + others or byte + others
 		}
 		else
