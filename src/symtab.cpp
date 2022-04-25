@@ -108,13 +108,13 @@ int curr_scope(string symname){
 bool symadd(string symname, Type* symtype = NULL){
 	//check non reserved
 	if( symtab_top["r"]->find(symname) != symtab->end() ){
-		*fp<< "ERROR: On line" << yylineno << " \""<<symname<<"\" is a resevered keyword"<<endl;
+		cout<< "ERROR: On line " << yylineno << " \""<<symname<<"\" is a resevered keyword"<<endl;
 		return false;
 	}
 
 	//check new sym
 	if( curr_scope(symname) == FOUND ){
-		*fp<< "ERROR: On line"<< yylineno <<" Repeat entry in symbol table \""<<symname<<"\""<<endl;
+		cout<< "ERROR: On line "<< yylineno <<" Repeat entry in symbol table \""<<symname<<"\""<<endl;
 		return false;
 	}
 	string scoped_name = fullscope + " " + symname;
@@ -165,6 +165,29 @@ void print_symtab( ostream& symbolTable /* =  *fp */ ){
 			symbolTable << " " << i->second->getType() <<endl;
 	}
 	symbolTable <<"----DONE----"<<endl;
+}
+
+Type *get_exprtype(Type* t1, Type* t2){
+	if( t1 != NULL && t2 != NULL ){
+		if( t1->typeClass == DEFINED_TYPE && t2->typeClass == DEFINED_TYPE ){
+			DefinedType* t1_def = static_cast<DefinedType*>(t1);
+			DefinedType* t2_def = static_cast<DefinedType*>(t2);
+			
+			if( t1_def->basename == "float" &&  t2_def->basename == "float" )	return t1;
+			if( t1_def->basename == "int" &&  t2_def->basename == "float" )	return t2;
+			if( t1_def->basename == "float" &&  t2_def->basename == "int" )	return t1;
+			if( t1_def->basename == "int" &&  t2_def->basename == "int" )	return t1;
+			if( t1_def->basename == "string" &&  t2_def->basename == "string" )	return t1;
+			if( t1_def->basename == "byte" &&  t2_def->basename == "byte" )	return t1;
+			
+			cout<<"ERROR: line "<< yylineno << " expression with incompatible types" << endl;
+			return NULL;	//string + others or byte + others
+		}
+		else
+			return t2; //not def type return whatever 2nd expr
+	}
+	
+	return NULL;
 }
 
 string prep_str(string inp_str){

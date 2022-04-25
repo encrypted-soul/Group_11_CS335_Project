@@ -11,7 +11,7 @@ func main() {
 
 	var a int;
 	const a int;	//working for now
-	var global int;
+	var defer int;
 	//a = 5;
 	foo();
 	if(a<6){

@@ -2,23 +2,24 @@ package main;
 import "fmt";
 func main() {
 
-    var i int = 1;
-    for ;i <= 3; {
-        fmt.Println(i);
-        i = i + 1;
+    if (7%2 == 0){
+        fmt.Println("7 is even\n");
+    }else {
+      fmt.Println("7 is odd\n");
     };
 
-    var j int;
-
-    for j = 7; j <= 9; j++ {
-        fmt.Println(j);
+    if (8%4 == 0) {
+       fmt.Println("8 is divisible by 4\n");
+    } ;
+   var a int  = 7+8;
+   fmt.Println(a,"\n");
+   var num int = 45;
+    if (num < 0) {
+        fmt.Println(num, " is negative\n");
+    } else if (num < 10) {
+        fmt.Println(num, " has 1 digit\n");
+    } else {
+        fmt.Println(num, " has multiple digits\n");
     };
 
-    var n int;
-    for n = 0; n <= 5; n++ {
-        if (n%2 == 0) {
-            continue;
-        };
-        fmt.Println(n);
-    };
 }

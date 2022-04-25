@@ -10,5 +10,5 @@ func main() {
             twoD = twoD +  i + k;
         };
     };
-    print("2d: ", twoD,"\n");
+    fmt.Println("2d: ", twoD,"\n");
 }
