@@ -22,10 +22,15 @@ make clean
 ```
 
 # Members
+In alphabetical order
 ```
 Abhay Mishra
 Ashok Kumar Saini
-Ashutosh
+Ashutosh Shukla
 Gagan Aryan
 ```
+### References -
+* [AMIGO](https://github.com/HexFlow/amigo)
+* [rohitgpt178/go-compiler](https://github.com/rohitgpt178/CS335_Compiler)
+
 
