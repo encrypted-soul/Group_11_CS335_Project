@@ -5,15 +5,27 @@ Source Language - Golang
 Implementation Language - C++
 Target Language - MIPS
 
-## Milestone 2 - Lexical Analysis
+## Usage
 
 1. Building
 Makefile is provided. Simply run `make` in top level directory.
 Use `make clean` as needed.
 
-2. Running test cases
+2. Running Test cases
+In root directory
 ```
-cd test
-./run_test.sh lex
+make clean
+make
+make T=4 -f test.make # for running test no 4, see test.make for details
+make clean -f test.make
+make clean
 ```
-This would generate the outputs in `lex/output` directory.
+
+# Members
+```
+Abhay Mishra
+Ashok Kumar Saini
+Ashutosh
+Gagan Aryan
+```
+
